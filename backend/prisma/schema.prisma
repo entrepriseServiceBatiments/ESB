@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")  // Replace with your actual database URL
+}
+
+model Client {
+  idClient    Int       @id @default(autoincrement())
+  userName    String
+  creditCard  Int?
+  address     String
+  cin         Int
+  phoneNum    Int
+  email       String    @unique
+  password    String
+  picture     String?
+  Orders      Order[]   @relation("ClientOrders")
+  Favorites   Favorite[]
+  Messages    Message[]
+}
+
+model Order {
+  idorders   Int           @id @default(autoincrement())
+  startDate  String?
+  endDate    String?
+  clientId   Int
+  Client     Client        @relation("ClientOrders", fields: [clientId], references: [idClient])
+  Workers    Worker[]      @relation("OrderWorkers")
+  Products   Product[]     @relation("OrderProducts")
+}
+
+model Product {
+  idproducts   Int       @id @default(autoincrement())
+  name         String
+  category     String
+  description  String
+  price        Int
+  picture      String
+  rating       Int
+  stock        Int
+  numOfRatings Int
+  ordersId     Int?      // Nullable by default
+  Order        Order?    @relation("OrderProducts", fields: [ordersId], references: [idorders])
+  Favorites    Favorite[]
+}
+
+model Favorite {
+  clientId    Int
+  productsId  Int
+  Client      Client    @relation(fields: [clientId], references: [idClient])
+  Product     Product   @relation(fields: [productsId], references: [idproducts])
+
+  @@id([clientId, productsId])
+}
+
+model Worker {
+  idworker     Int       @id @default(autoincrement())
+  cin          Int
+  creditCard   Int?
+  userName     String
+  phoneNumber  Int
+  email        String?   @unique
+  password     String?
+  rentedProd   String?
+  picture      String?
+  resume       String?
+  rating       Int?
+  jobTitle     String?
+  hourlyRate   Float?
+  available    Boolean?
+  address      String?
+  ordersId     Int?
+  latitude     Decimal?
+  longitude    Decimal?
+  status       Boolean?
+  comments     String?
+  Order        Order?    @relation("OrderWorkers", fields: [ordersId], references: [idorders])
+  Messages     Message[]
+
+  @@index([ordersId], name: "idx_ordersId") // Optional: Index for faster lookups
+}
+
+model Message {
+  clientId    Int
+  workerId    Int
+  content     String?
+
+  Client      Client    @relation(fields: [clientId], references: [idClient])
+  Worker      Worker    @relation(fields: [workerId], references: [idworker])
+
+  @@id([clientId, workerId])
+}
