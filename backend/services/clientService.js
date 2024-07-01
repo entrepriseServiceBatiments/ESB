@@ -29,7 +29,9 @@ const getClientById = async (clientId) => {
 module.exports = {
   getClients,
   createClient,
+
   updateClient,
   getClientById,
+
   getClientByEmail
 };

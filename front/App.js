@@ -1,12 +1,4 @@
 
-// import { StatusBar } from 'expo-status-bar';
-// import { StyleSheet, Text, View,Button } from 'react-native';
-// export default function App() {
-  //   return (
-    //     <>
-    
-    //     <Profile/>
-    //     </>
     
  import Profile from './profile/profile';
 import React from 'react';
@@ -20,17 +12,28 @@ import AccountType from './app/AccountType';
 import HomeScreen from './screens/HomeScreen'
 const Stack = createStackNavigator();
 
+
+
+
+
 const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator >
-        {/* <Stack.Screen name="Login" component={LoginForm} />
+
+        {<Stack.Screen name="Login" component={LoginForm} />
+
+        <Stack.Screen name="Login" component={LoginForm} />
+
         <Stack.Screen name="Signup" component={SignupForm} />
         <Stack.Screen name="SignupPassword" component={SignupPassword} />
         <Stack.Screen name="SignupDetails" component={SignupDetails} />
         <Stack.Screen name="AccountType" component={AccountType} />
-        <Stack.Screen name="HomePage" component={HomeScreen} /> */}
+
+        <Stack.Screen name="HomePage" component={HomeScreen} />}
          <Stack.Screen name =  "profile" component = {Profile}/>
+
+        <Stack.Screen name="HomePage" component={HomeScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>
