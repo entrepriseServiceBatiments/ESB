@@ -6,7 +6,9 @@ const getClients = async () => {
     include: { Orders: true, Favorites: true, Messages: true },
   });
 };
-
+const getClientByEmail = async (email) => {
+  return await prisma.client.findUnique({ where: { email } });
+};
 const createClient = async (data) => {
   return await prisma.client.create({ data });
 };
@@ -15,4 +17,5 @@ const createClient = async (data) => {
 module.exports = {
   getClients,
   createClient,
+  getClientByEmail
 };
