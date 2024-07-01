@@ -3,7 +3,13 @@ const router = express.Router();
 const clientController = require('../controllers/clientController');
 
 router.get('/clients', clientController.getClients);
+router.get('/clients/:clientId',clientController.getoneClients);
 router.post('/clients', clientController.createClient);
+router.put('/clients/:clientId', clientController.updateClient); 
 
-// Export the router to be used in index.js
+
+
+
+
 module.exports = router;
+
