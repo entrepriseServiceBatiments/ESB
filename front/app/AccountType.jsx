@@ -8,7 +8,7 @@ const AccountType = ({ route ,navigation}) => {
   const AccountSelection = async (type) => {
     if (type === 'Personal') {
       try {
-        const response = await axios.post('http://192.168.1.16:3000/clients', {
+        const response = await axios.post('http://192.168.11.237:3000/clients', {
           userName: username,
           address: address,
           cin: parseInt(cin),
@@ -17,7 +17,7 @@ const AccountType = ({ route ,navigation}) => {
           password: password,
         });
         console.log('Response:', response.data);
-        navigation.navigate('HomePage')
+        navigation.navigate('SignupPicture')
       } catch (error) {
         if (error.response) {
           console.error('Error response:', error.response.data);
