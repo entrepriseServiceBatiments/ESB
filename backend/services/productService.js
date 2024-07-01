@@ -29,7 +29,15 @@ const createProduct = async (data) => {
       throw new Error(`Failed to create product: ${error.message}`);
     }
 }
+const getProductsByCateg = async (category) => {
+  return await prisma.product.findMany({
+    where: {
+      category: category,
+    },
+  });
+};
 module.exports = {
   getProducts,
+  getProductsByCateg,
   createProduct,
 };

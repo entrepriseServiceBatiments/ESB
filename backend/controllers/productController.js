@@ -28,8 +28,21 @@ const createProduct = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+  const getProductsByCateg = async (req, res) => {
+    try {
+      const category = req.params.category;
+      const products = await productService.getProductsByCateg(category);
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
 
+
+
+  
 module.exports = {
   getProducts,
   createProduct,
+  getProductsByCateg
 };
