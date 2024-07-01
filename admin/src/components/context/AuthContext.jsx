@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
 
   const loginAction = async (data) => {
     try {
-      const response = await axios.post("http://localhost:3000/login", data);
+      const response = await axios.post("http://localhost:3000/admin/login");
 
       if (response.status === 200) {
         toast.success(response.data.message);
