@@ -7,31 +7,27 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(
-    JSON.parse(localStorage.getItem("admin")) || {}
+    JSON.parse(localStorage.getItem("admin")) || null
   );
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
 
   const navigate = useNavigate();
 
   const loginAction = async (data) => {
     try {
-      const response = await axios.post("http://localhost:3000/admin/login");
+      const response = await axios.post(
+        "http://localhost:3000/admin/login",
+        data
+      );
 
       if (response.status === 200) {
-        toast.success(response.data.message);
+        toast.success("Login successful");
 
-        if (response.data.admin) {
-          setAdmin(response.data.admin);
-          console.log("====================================");
-          console.log(response.data.admin, "admin");
-          console.log("====================================");
-          localStorage.setItem("admin", JSON.stringify(response.data.admin));
-          setToken(response.data.token);
-          localStorage.setItem("token", response.data.token);
-          navigate("/");
-        } else {
-          toast.error("Login failed!");
-        }
+        setAdmin(response.data.admin);
+        localStorage.setItem("admin", JSON.stringify(response.data.admin));
+        setToken(response.data.token);
+        localStorage.setItem("token", response.data.token);
+        navigate("/");
       }
     } catch (err) {
       console.error(err);
@@ -40,8 +36,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logOut = () => {
-    setAdmin({});
-    setToken("");
+    setAdmin(null);
+    setToken(null);
     localStorage.removeItem("token");
     localStorage.removeItem("admin");
     toast.success("Logged out successfully");
@@ -55,6 +51,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
