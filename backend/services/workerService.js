@@ -6,7 +6,9 @@ const getWorkers = async () => {
     include: { Order: true, Messages: true },
   });
 };
-
+const getWorkerByEmail = async (email) => {
+  return await prisma.worker.findUnique({ where: { email } });
+};
 const createWorker = async (data) => {
   return await prisma.worker.create({ data });
 };
@@ -14,4 +16,5 @@ const createWorker = async (data) => {
 module.exports = {
   getWorkers,
   createWorker,
+  getWorkerByEmail
 };
