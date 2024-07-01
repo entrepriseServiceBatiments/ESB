@@ -1,3 +1,6 @@
+
+    
+ import Profile from './profile/profile';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,16 +12,29 @@ import AccountType from './app/AccountType';
 import HomeScreen from './screens/HomeScreen'
 const Stack = createStackNavigator();
 
+
+
+
+
 const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator >
+
+        {<Stack.Screen name="Login" component={LoginForm} />
+
         <Stack.Screen name="Login" component={LoginForm} />
+
         <Stack.Screen name="Signup" component={SignupForm} />
         <Stack.Screen name="SignupPassword" component={SignupPassword} />
         <Stack.Screen name="SignupDetails" component={SignupDetails} />
         <Stack.Screen name="AccountType" component={AccountType} />
+
+        <Stack.Screen name="HomePage" component={HomeScreen} />}
+         <Stack.Screen name =  "profile" component = {Profile}/>
+
         <Stack.Screen name="HomePage" component={HomeScreen} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
