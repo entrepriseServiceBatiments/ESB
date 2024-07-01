@@ -22,10 +22,13 @@ export const AuthProvider = ({ children }) => {
 
         if (response.data.admin) {
           setAdmin(response.data.admin);
+          console.log("====================================");
+          console.log(response.data.admin, "admin");
+          console.log("====================================");
           localStorage.setItem("admin", JSON.stringify(response.data.admin));
-          setToken(response.data.tokenadmin);
+          setToken(response.data.token);
           localStorage.setItem("token", response.data.token);
-          navigate("/admin");
+          navigate("/");
         } else {
           toast.error("Login failed!");
         }

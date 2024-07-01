@@ -60,6 +60,6 @@ const deleteProductById = async (req, res) => {
 module.exports = {
   getProducts,
   getProductById,
-  deleteProductById,
   createProduct,
+  deleteProductById,
 };

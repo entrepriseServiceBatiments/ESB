@@ -65,7 +65,12 @@ function App() {
               path="/add"
               element={<AddProduct refresh={refresh} setRefresh={setRefresh} />}
             />
-            <Route path="/products/:id" element={<ProductDetails />} />
+            <Route
+              path="/products/:id"
+              element={
+                <ProductDetails refresh={refresh} setRefresh={setRefresh} />
+              }
+            />
           </Routes>
         </AuthProvider>
       </Router>

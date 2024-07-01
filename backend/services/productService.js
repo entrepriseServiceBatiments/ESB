@@ -7,6 +7,18 @@ const getProducts = async () => {
   });
 };
 
+const getProductById = async (id) => {
+  try {
+    const product = await prisma.product.findUnique({
+      where: { idproducts: parseInt(id) },
+    });
+    return product;
+  } catch (error) {
+    console.error(`Failed to get product with ID ${id}:`, error);
+    throw new Error(`Failed to get product with ID ${id}: ${error.message}`);
+  }
+};
+
 const createProduct = async (data) => {
   try {
     const newProduct = await prisma.product.create({
@@ -28,19 +40,6 @@ const createProduct = async (data) => {
     throw new Error(`Failed to create product: ${error.message}`);
   }
 };
-
-const getProductById = async (id) => {
-  try {
-    const product = await prisma.product.findUnique({
-      where: { idproducts: parseInt(id) },
-    });
-    return product;
-  } catch (error) {
-    console.error(`Failed to get product with ID ${id}:`, error);
-    throw new Error(`Failed to get product with ID ${id}: ${error.message}`);
-  }
-};
-
 const deleteProductById = async (id) => {
   try {
     await prisma.product.delete({

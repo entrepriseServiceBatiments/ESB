@@ -4,6 +4,7 @@ import "./Products.css";
 import { useNavigate } from "react-router-dom";
 const Products = ({ products }) => {
   const navigate = useNavigate();
+  console.log(products);
   return (
     <div className="products-container">
       <h1>Products</h1>
@@ -16,7 +17,7 @@ const Products = ({ products }) => {
             image={item.picture}
             price={item.price}
             category={item.category}
-            onClick={() => navigate(`/products/${item.id}`)}
+            click={() => navigate(`/products/${item.idproducts}`)}
           />
         ))}
       </div>

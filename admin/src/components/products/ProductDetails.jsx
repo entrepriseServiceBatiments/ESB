@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ProductDetails.css";
 
-const ProductDetails = () => {
+const ProductDetails = ({ refresh, setRefresh }) => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const navigate = useNavigate();
@@ -24,6 +24,8 @@ const ProductDetails = () => {
       .delete(`http://localhost:3000/products/${id}`)
       .then(() => {
         navigate("/products");
+        setRefresh(!refresh);
+        alert("Product deleted successfully");
       })
       .catch((err) => {
         console.error("Failed to delete product:", err);
