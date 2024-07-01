@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const SubscribeForm = () => {
+const Subscribe = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const navigation = useNavigation();
@@ -68,4 +68,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SubscribeForm;
+export default Subscribe;
