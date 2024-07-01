@@ -7,6 +7,7 @@ import SignupPassword from './app/SignupPassword';
 import SignupDetails from './app/SignupDetails';
 import AccountType from './app/AccountType';
 import HomeScreen from './screens/HomeScreen'
+import SignupPicture from './app/SignupPicture'
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
         <Stack.Screen name="SignupDetails" component={SignupDetails} />
         <Stack.Screen name="AccountType" component={AccountType} />
         <Stack.Screen name="HomePage" component={HomeScreen} />
+        <Stack.Screen name="SignupPicture" component={SignupPicture}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
