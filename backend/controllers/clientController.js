@@ -1,4 +1,5 @@
-const clientService = require("../services/clientService");
+const clientService = require('../services/clientService');
+const bcrypt = require('bcryptjs');
 
 const getClients = async (req, res) => {
   try {
@@ -10,17 +11,20 @@ const getClients = async (req, res) => {
 };
 
 const createClient = async (req, res) => {
+  const {
+    userName,
+    creditCard,
+    address,
+    cin,
+    phoneNum,
+    email,
+    password,
+    picture,
+  } = req.body;
+
   try {
-    const {
-      userName,
-      creditCard,
-      address,
-      cin,
-      phoneNum,
-      email,
-      password,
-      picture,
-    } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10); 
+
     const client = await clientService.createClient({
       userName,
       creditCard,
@@ -28,16 +32,16 @@ const createClient = async (req, res) => {
       cin,
       phoneNum,
       email,
-      password,
+      password: hashedPassword, 
       picture,
     });
+
     res.json(client);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Export the functions to be used in routes
 module.exports = {
   getClients,
   createClient,
