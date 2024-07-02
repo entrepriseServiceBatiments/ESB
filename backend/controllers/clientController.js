@@ -26,6 +26,7 @@ const createClient = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10); 
 
     const client = await clientService.createClient({
+
       userName,
       creditCard,
       address,
@@ -56,10 +57,12 @@ const updateClient = async (req, res) => {
 
   try {
     const { clientId } = req.params;
+
     const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
 
-    const client = await clientService.updateClient(clientId, {
-      userName,
+    const client = await clientService.updateClient(clientId ,{
+    const :{
+     userName,
       creditCard,
       address,
       cin,
@@ -67,13 +70,15 @@ const updateClient = async (req, res) => {
       email,
       password: hashedPassword,
       picture,
-    });
+    }  = req.body
+  })
 
-    res.json(client);
-  } catch (error) {
+  res.json(client)
+  }
+   catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}
 
 const getoneClients = async (req, res) => {
   try {
