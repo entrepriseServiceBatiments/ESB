@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,25 +7,22 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
-} from 'react-native';
-// import Navbar from './Navbar:';
-import { useNavigation } from '@react-navigation/native';
-
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const categories = [
-  'Plumbing',
-  'Electricity',
-  'Housekeeping',
-  'Windows and blinds',
-  'Air conditioning',
-  'DIY and assembly',
-  'Washing machine',
-  'Painting',
-  'Gardening',
+  "Plumbing",
+  "Electricity",
+  "Housekeeping",
+  "Windows and blinds",
+  "Air conditioning",
+  "DIY and assembly",
+  "Washing machine",
+  "Painting",
+  "Gardening",
 ];
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const navigation = useNavigation();
 
@@ -33,12 +30,11 @@ const Home = () => {
     try {
       console.log(`Fetching products for category: ${category}`);
       const response = await fetch(
-        `http://localhost:3000/products/${category}`
+        `http://192.168.11.224:3000/products/${category}`
       );
-      console.log('ressss', response);
       const data = await response.json();
-      console.log('Fetched products:', data);
-      setProducts(data);
+      console.log("Fetched products:", data);
+      navigation.navigate("ProductScreen", { category, products: data });
       setSelectedCategory(category);
     } catch (error) {
       console.error(error);
@@ -47,7 +43,6 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
-      {/* <Navbar /> */}
       <ScrollView>
         <ScrollView
           horizontal
@@ -68,7 +63,7 @@ const Home = () => {
         <View style={styles.promoContainer}>
           <Image
             source={{
-              uri: 'https://st.depositphotos.com/62628780/59500/i/450/depositphotos_595006128-stock-photo-passing-safety-inspections-every-single.jpg',
+              uri: "https://st.depositphotos.com/62628780/59500/i/450/depositphotos_595006128-stock-photo-passing-safety-inspections-every-single.jpg",
             }}
             style={styles.promoImage}
           />
@@ -87,7 +82,7 @@ const Home = () => {
             </Text>
             <TouchableOpacity
               style={styles.promoButton}
-              onPress={() => navigation.navigate('Subscribe')}
+              onPress={() => navigation.navigate("Subscribe")}
             >
               <Text style={styles.promoButtonText}>Je souscris un contrat</Text>
             </TouchableOpacity>
@@ -107,30 +102,13 @@ const Home = () => {
           </Text>
           <TouchableOpacity
             style={styles.noticeButton}
-            onPress={() => navigation.navigate('Subscribe')}
+            onPress={() => navigation.navigate("Subscribe")}
           >
             <Text style={styles.noticeButtonText}>
               Souscrire l’option “Gaz Vert+”
             </Text>
           </TouchableOpacity>
         </View>
-
-        {selectedCategory && (
-          <View style={styles.productsContainer}>
-            <Text style={styles.categoryTitle}>{selectedCategory}</Text>
-            <FlatList
-              data={products}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View style={styles.productBox}>
-                  <Text style={styles.productName}>{item.name}</Text>
-                  <Text>{item.description}</Text>
-                  <Text>Price: ${item.price}</Text>
-                </View>
-              )}
-            />
-          </View>
-        )}
 
         <View style={styles.servicesContainer}>
           <Text style={styles.servicesHeader}>
@@ -139,7 +117,7 @@ const Home = () => {
           </Text>
           <View style={styles.serviceItem}>
             <Image
-              source={require('../assets/icons/position.png')}
+              source={require("../assets/icons/position.png")}
               style={styles.serviceIcon}
             />
             <Text style={styles.serviceTitle}>Nos agences de proximité</Text>
@@ -150,7 +128,7 @@ const Home = () => {
           </View>
           <View style={styles.serviceItem}>
             <Image
-              source={require('../assets/icons/miner.png')}
+              source={require("../assets/icons/miner.png")}
               style={styles.serviceIcon}
             />
             <Text style={styles.serviceTitle}>
@@ -163,7 +141,7 @@ const Home = () => {
           </View>
           <View style={styles.serviceItem}>
             <Image
-              source={require('../assets/icons/team.png')}
+              source={require("../assets/icons/team.png")}
               style={styles.serviceIcon}
             />
             <Text style={styles.serviceTitle}>
@@ -176,7 +154,7 @@ const Home = () => {
           </View>
           <View style={styles.serviceItem}>
             <Image
-              source={require('../assets/icons/guarantee.png')}
+              source={require("../assets/icons/guarantee.png")}
               style={styles.serviceIcon}
             />
             <Text style={styles.serviceTitle}>
@@ -196,29 +174,29 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   scrollView: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
   box: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     padding: 20,
     marginHorizontal: 10,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   boxText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   promoContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     borderRadius: 10,
     marginBottom: 20,
     marginHorizontal: 10,
@@ -231,89 +209,70 @@ const styles = StyleSheet.create({
   },
   promoTextContainer: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   promoTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   promoDescription: {
     fontSize: 14,
-    color: '#555',
+    color: "#555",
     marginBottom: 10,
   },
   promoButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: "#007BFF",
     padding: 10,
     borderRadius: 5,
   },
   promoButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: "#fff",
+    fontWeight: "bold",
+    textAlign: "center",
   },
   noticeContainer: {
     padding: 20,
-    backgroundColor: '#e0f7fa',
+    backgroundColor: "#e0f7fa",
     borderRadius: 10,
     marginBottom: 20,
     marginHorizontal: 10,
   },
   noticeTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   noticeDescription: {
     fontSize: 14,
-    color: '#555',
+    color: "#555",
     marginBottom: 10,
   },
   noticeButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: "#007BFF",
     padding: 10,
     borderRadius: 5,
   },
   noticeButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  productsContainer: {
-    flex: 1,
-    padding: 20,
-  },
-  categoryTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  productBox: {
-    padding: 15,
-    backgroundColor: '#e0e0e0',
-    marginBottom: 10,
-    borderRadius: 10,
-  },
-  productName: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
+    textAlign: "center",
   },
   servicesContainer: {
     padding: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     borderRadius: 10,
     marginBottom: 20,
     marginHorizontal: 10,
   },
   servicesHeader: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   serviceItem: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   serviceIcon: {
@@ -323,13 +282,13 @@ const styles = StyleSheet.create({
   },
   serviceTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
   serviceDescription: {
     fontSize: 14,
-    color: '#555',
-    textAlign: 'center',
+    color: "#555",
+    textAlign: "center",
     paddingHorizontal: 20,
   },
 });

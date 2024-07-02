@@ -8,30 +8,29 @@ const getProducts = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 const getProductById = async (req, res) => {
   try {
     const product = await productService.getProductById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-  };
-  const getProductsByCateg = async (req, res) => {
-    try {
-      const category = req.params.category;
-      const products = await productService.getProductsByCateg(category);
-      res.json(products);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
-
-
-
     res.json(product);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+const getProductsByCateg = async (req, res) => {
+  try {
+    const category = req.params.category;
+    const products = await productService.getProductsByCateg(category);
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const createProduct = async (req, res) => {
   try {
     const {
@@ -61,6 +60,7 @@ const createProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 const deleteProductById = async (req, res) => {
   try {
     const result = await productService.deleteProductById(req.params.id);
@@ -70,12 +70,10 @@ const deleteProductById = async (req, res) => {
   }
 };
 
-  
 module.exports = {
   getProducts,
   getProductById,
-  createProduct,
-
   getProductsByCateg,
+  createProduct,
   deleteProductById,
 };
