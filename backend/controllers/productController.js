@@ -14,6 +14,19 @@ const getProductById = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
+  };
+  const getProductsByCateg = async (req, res) => {
+    try {
+      const category = req.params.category;
+      const products = await productService.getProductsByCateg(category);
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+
+
     res.json(product);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -57,9 +70,12 @@ const deleteProductById = async (req, res) => {
   }
 };
 
+  
 module.exports = {
   getProducts,
   getProductById,
   createProduct,
+
+  getProductsByCateg,
   deleteProductById,
 };

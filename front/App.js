@@ -1,3 +1,8 @@
+import LandingPage from './LandingPages/LandingPage';
+import Home from './Nav/Home';
+import Subscribe from './Nav/Subscribe';
+import Navbar from './Nav/Navbar';
+
 import Profile from "./profile/profile";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
@@ -14,6 +19,21 @@ const Stack = createStackNavigator();
 
 const App = () => {
   return (
+        <NavigationContainer>
+      
+        <Stack.Navigator initialRouteName="Landing">
+          <Stack.Screen
+            name="Landing"
+            component={LandingPage}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Subscribe" component={Subscribe} />
+        </Stack.Navigator>
+    </NavigationContainer>
+      
+    
+
  <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Login" component={LoginForm} />
@@ -27,6 +47,7 @@ const App = () => {
         <Stack.Screen name="profile" component={Profile} />
       </Stack.Navigator>
     </NavigationContainer>
+
   );
 };
 

@@ -40,6 +40,14 @@ const createProduct = async (req, res) => {
       });
       pictureUrl = result.secure_url;
     }
+}
+const getProductsByCateg = async (category) => {
+  return await prisma.product.findMany({
+    where: {
+      category: category,
+    },
+  });
+};
 
     const newProduct = await productService.createProduct({
       name,
@@ -72,6 +80,7 @@ const deleteProductById = async (id) => {
 
 module.exports = {
   getProducts,
+  getProductsByCateg,
   createProduct,
   getProductById,
   deleteProductById,
