@@ -1,6 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
+const { cloudinary } = require("../cloudinaryConfig");
 const getProducts = async () => {
   return await prisma.product.findMany({
     include: { Order: true, Favorites: true },
@@ -19,25 +19,43 @@ const getProductById = async (id) => {
   }
 };
 
-const createProduct = async (data) => {
+const createProduct = async (req, res) => {
   try {
-    const newProduct = await prisma.product.create({
-      data: {
-        name: data.name,
-        category: data.category,
-        description: data.description,
-        price: data.price,
-        picture: data.picture,
-        rating: data.rating,
-        stock: data.stock,
-        numOfRatings: data.numOfRatings,
-        orderId: data.orderId,
-      },
+    const {
+      name,
+      category,
+      description,
+      price,
+      rating,
+      stock,
+      numOfRatings,
+      orderId,
+    } = req.body;
+
+    // Upload the picture to Cloudinary
+    let pictureUrl = "";
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "products",
+      });
+      pictureUrl = result.secure_url;
+    }
+
+    const newProduct = await productService.createProduct({
+      name,
+      category,
+      description,
+      price,
+      picture: pictureUrl,
+      rating,
+      stock,
+      numOfRatings,
+      orderId,
     });
-    return newProduct;
+
+    res.status(201).json(newProduct);
   } catch (error) {
-    console.error("Failed to create product:", error);
-    throw new Error(`Failed to create product: ${error.message}`);
+    res.status(500).json({ error: error.message });
   }
 };
 const deleteProductById = async (id) => {
