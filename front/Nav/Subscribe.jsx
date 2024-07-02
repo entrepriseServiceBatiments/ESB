@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const Subscribe = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+
   const navigation = useNavigation();
 
   const subScription = () => {
@@ -28,6 +37,12 @@ const Subscribe = () => {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="address"
+        value={address}
+        onChangeText={setAddress}
       />
       <TouchableOpacity style={styles.button} onPress={subScription}>
         <Text style={styles.buttonText}>Submit</Text>

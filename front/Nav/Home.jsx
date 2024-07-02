@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,9 @@ import {
   FlatList,
   Image,
 } from 'react-native';
-import Navbar from './Navbar';
+// import Navbar from './Navbar:';
 import { useNavigation } from '@react-navigation/native';
+
 
 const categories = [
   'Plumbing',
@@ -30,8 +31,13 @@ const Home = () => {
 
   const fetchProductsByCategory = async (category) => {
     try {
-      const response = await fetch(`http://10.0.2.2:3000/products/${category}`);
+      console.log(`Fetching products for category: ${category}`);
+      const response = await fetch(
+        `http://localhost:3000/products/${category}`
+      );
+      console.log('ressss', response);
       const data = await response.json();
+      console.log('Fetched products:', data);
       setProducts(data);
       setSelectedCategory(category);
     } catch (error) {
@@ -41,7 +47,7 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
-      <Navbar />
+      {/* <Navbar /> */}
       <ScrollView>
         <ScrollView
           horizontal
@@ -81,7 +87,7 @@ const Home = () => {
             </Text>
             <TouchableOpacity
               style={styles.promoButton}
-              onPress={() => navigation.navigate('SubscribeForm')}
+              onPress={() => navigation.navigate('Subscribe')}
             >
               <Text style={styles.promoButtonText}>Je souscris un contrat</Text>
             </TouchableOpacity>
@@ -101,7 +107,7 @@ const Home = () => {
           </Text>
           <TouchableOpacity
             style={styles.noticeButton}
-            onPress={() => navigation.navigate('SubscribeForm')}
+            onPress={() => navigation.navigate('Subscribe')}
           >
             <Text style={styles.noticeButtonText}>
               Souscrire l’option “Gaz Vert+”
@@ -125,6 +131,63 @@ const Home = () => {
             />
           </View>
         )}
+
+        <View style={styles.servicesContainer}>
+          <Text style={styles.servicesHeader}>
+            Un service de proximité et de qualité pour vous accompagner en toute
+            sécurité
+          </Text>
+          <View style={styles.serviceItem}>
+            <Image
+              source={require('../assets/icons/position.png')}
+              style={styles.serviceIcon}
+            />
+            <Text style={styles.serviceTitle}>Nos agences de proximité</Text>
+            <Text style={styles.serviceDescription}>
+              Entretien, dépannage, installation et remplacement de vos
+              équipements par nos équipes locales
+            </Text>
+          </View>
+          <View style={styles.serviceItem}>
+            <Image
+              source={require('../assets/icons/miner.png')}
+              style={styles.serviceIcon}
+            />
+            <Text style={styles.serviceTitle}>
+              Une expertise de près de 50 ans
+            </Text>
+            <Text style={styles.serviceDescription}>
+              Des agences certifiées RGE avec un réseau de technico-commerciaux
+              et techniciens régulièrement formés
+            </Text>
+          </View>
+          <View style={styles.serviceItem}>
+            <Image
+              source={require('../assets/icons/team.png')}
+              style={styles.serviceIcon}
+            />
+            <Text style={styles.serviceTitle}>
+              Des partenariats aves des grandes marques
+            </Text>
+            <Text style={styles.serviceDescription}>
+              Large choix d’équipements de chauffage, climatisation et
+              production d’eau chaude de grandes marques
+            </Text>
+          </View>
+          <View style={styles.serviceItem}>
+            <Image
+              source={require('../assets/icons/guarantee.png')}
+              style={styles.serviceIcon}
+            />
+            <Text style={styles.serviceTitle}>
+              Confiance et sécurité au cœur de nos priorités
+            </Text>
+            <Text style={styles.serviceDescription}>
+              Nous veillons à la sécurité et à la satisfaction de nos clients au
+              travers de nos actions et nos interventions !
+            </Text>
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -236,18 +299,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  additionalFeaturesContainer: {
+  servicesContainer: {
     padding: 20,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#f9f9f9',
     borderRadius: 10,
     marginBottom: 20,
     marginHorizontal: 10,
   },
-  additionalFeatureTitle: {
+  servicesHeader: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
     textAlign: 'center',
+  },
+  serviceItem: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  serviceIcon: {
+    width: 50,
+    height: 50,
+    marginBottom: 10,
+  },
+  serviceTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  serviceDescription: {
+    fontSize: 14,
+    color: '#555',
+    textAlign: 'center',
+    paddingHorizontal: 20,
   },
 });
 

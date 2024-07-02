@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Button, Image } from 'react-native';
 const LandingPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to RentAll Products</Text>
+      <Text style={styles.title}>Welcome to A&BC Products</Text>
       <Text style={styles.subtitle}>Rent all the building products you need</Text>
       <Image source={{ uri: 'https://unbounce.com/photos/best-mobile-landing-page-examples-blog-header.jpg' }} style={styles.image} />
       <Button title="Get Started" onPress={() => navigation.navigate('Home')} />
