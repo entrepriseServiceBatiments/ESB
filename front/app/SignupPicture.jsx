@@ -1,39 +1,46 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
-import cloudinary from 'cloudinary-react';
 
 const SignupPicture = ({ route, navigation }) => {
-  const { email, password, username, address, phoneNumber, cin } = route.params;
   const [profilePicture, setProfilePicture] = useState(null);
 
-  const selectImage = () => {
-    launchImageLibrary({ mediaType: 'photo' }, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        setProfilePicture(response.assets[0]);
-      }
+  const selectImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to make this work!');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
     });
+
+    if (!result.canceled) {
+      setProfilePicture(result);
+    }
   };
 
   const uploadImageToCloudinary = async () => {
     const data = new FormData();
     data.append('file', {
       uri: profilePicture.uri,
-      type: profilePicture.type,
-      name: profilePicture.fileName,
+      type: 'image/jpeg',
+      name: 'profile-pic.jpg',
     });
-    data.append('upload_preset', 'finalProject'); 
+    data.append('upload_preset', 'finalProject');
+
     try {
       const res = await fetch('https://api.cloudinary.com/v1_1/dqsmyqnfl/image/upload', {
         method: 'POST',
         body: data,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
       const response = await res.json();
       return response.secure_url;
@@ -51,14 +58,9 @@ const SignupPicture = ({ route, navigation }) => {
         imageUrl = await uploadImageToCloudinary();
       }
 
+      const cin = route.params.cin; // assuming you pass the cin parameter from the previous screen
       const response = await axios.put(`http://192.168.1.16:3000/clients/${cin}`, {
-        userName: username,
-        address: address,
-        cin: parseInt(cin),
-        phoneNum: parseInt(phoneNumber),
-        email: email,
-        password: password,
-        profilePicture: imageUrl,
+        picture: imageUrl,
       });
 
       console.log('Response:', response.data);
