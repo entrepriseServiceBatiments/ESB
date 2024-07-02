@@ -12,9 +12,13 @@ const getWorkerByEmail = async (email) => {
 const createWorker = async (data) => {
   return await prisma.worker.create({ data });
 };
+const getWorkersByJobTitle = async(jobTitle)=>{
+  return await prisma.worker.findMany({where:{jobTitle}})
+}
 
 module.exports = {
   getWorkers,
   createWorker,
-  getWorkerByEmail
+  getWorkerByEmail,
+  getWorkersByJobTitle
 };

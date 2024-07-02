@@ -8,7 +8,6 @@ const orderRoutes = require('./routes/orderRoutes');
 const app = express();
 app.use(express.json());
 app.use(cors());
-require("dotenv").config();
 
 
 const authAdminRoutes = require("./routes/authAdminRoutes");

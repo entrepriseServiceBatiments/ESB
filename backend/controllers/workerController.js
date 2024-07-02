@@ -58,8 +58,17 @@ const createWorker = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const getWorkersByJobTitle = async (req, res) => {
+  try {
+    const workers = await workerService.getWorkersByJobTitle(req.params.jobTitle);
+    res.json(workers);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 module.exports = {
   getWorkers,
   createWorker,
+  getWorkersByJobTitle
 };
