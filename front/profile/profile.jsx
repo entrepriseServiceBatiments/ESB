@@ -1,29 +1,47 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Image, StyleSheet, Button, TouchableOpacity, Alert } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import jwtDecode from 'jwt-decode';
 
 const ProfileEditScreen = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [userName, setUserName] = useState('hmed');
+  const [userName, setUserName] = useState('');
   const [creditCard, setCreditCard] = useState('');
   const [address, setAddress] = useState('');
   const [cin, setCin] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
   const [email, setEmail] = useState('');
-  const [Password, setPassword] = useState('');
+  const [password, setPassword] = useState('');
   const [picture, setPicture] = useState('');
+ const [clientId,setClientId]=useState('')
 
-  useEffect(()=>{
+  const retrieveData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (token !== null) {
+        const decodedToken = jwtDecode(token);
+        setUserName(decodedToken.userName);
+        setCreditCard(decodedToken.creditCard);
+        setAddress(decodedToken.address);
+        setCin(decodedToken.cin);
+        setPhoneNum(decodedToken.phoneNum);
+        setEmail(decodedToken.email);
+        setPicture(decodedToken.picture);
+        setClientId(decodedToken.idClient)
+      }
+    } catch (error) {
+      console.error('Error retrieving data:', error);
+    }
+  };
 
-  })
-  
+  useEffect(() => {
+    retrieveData();
+  }, []);
 
   const handleSave = async () => {
-  
-
     try {
-     
       const updatedProfile = {
         userName,
         creditCard,
@@ -31,24 +49,22 @@ const ProfileEditScreen = () => {
         cin,
         phoneNum,
         email,
-        Password   
+        password,
+        picture,
       };
+       
+      const updateResponse = await axios.put(`http://192.168.1.27:8081/clients/${clientId}`, updatedProfile);
 
-    //   const updateResponse = await axios.put(`http://192.168.1.27:8081/clients/`, updatedProfile);
-
-    //   if (updateResponse.data.success) {
-    //     setIsEditing(false);
-    //     Alert.alert('Success', 'Profile updated successfully!');
-    //   } else if (updateResponse.data.error === 'incorrect_password') {
-    //     Alert.alert('Error', 'Current password is incorrect');
-    //   } else {
-    //     Alert.alert('Error', 'Failed to update profile');
-    //   }
-    }
-     catch (error) {
+      if (updateResponse.data) {
+        setIsEditing(false);
+        Alert.alert('Success', 'Profile updated successfully!');
+      } 
+      
+    } catch (error) {
       console.error('Error:', error);
       Alert.alert('Error', 'An error occurred');
     }
+   
   };
 
   const confirmSave = () => {
@@ -147,12 +163,11 @@ const ProfileEditScreen = () => {
         <>
           <TextInput
             style={styles.input}
-            value={Password}
+            value={password}
             onChangeText={setPassword}
-            placeholder=" Password"
+            placeholder="Password"
             secureTextEntry
           />
-        
         </>
       ) : null}
       {isEditing ? (
@@ -228,5 +243,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
-export default ProfileEditScreen
+export default ProfileEditScreen;

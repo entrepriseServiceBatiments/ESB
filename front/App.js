@@ -8,12 +8,13 @@ import SignupPassword from "./app/SignupPassword";
 import SignupDetails from "./app/SignupDetails";
 import AccountType from "./app/AccountType";
 import HomeScreen from "./screens/HomeScreen";
+
 import SignupPicture from "./app/SignupPicture";
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer>
+ <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Login" component={LoginForm} />
 
@@ -21,11 +22,9 @@ const App = () => {
         <Stack.Screen name="SignupPassword" component={SignupPassword} />
         <Stack.Screen name="SignupDetails" component={SignupDetails} />
         <Stack.Screen name="AccountType" component={AccountType} />
-
+  <Stack.Screen name="SignupPicture" component={SignupPicture} />
         <Stack.Screen name="HomePage" component={HomeScreen} />
         <Stack.Screen name="profile" component={Profile} />
-
-        <Stack.Screen name="SignupPicture" component={SignupPicture} />
       </Stack.Navigator>
     </NavigationContainer>
   );
