@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")  // Replace with your actual database URL
 }
 
+model Admin {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
+}
+
 model Client {
   idClient    Int       @id @default(autoincrement())
   userName    String
