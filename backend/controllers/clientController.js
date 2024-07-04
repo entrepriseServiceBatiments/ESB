@@ -27,13 +27,11 @@ const createClient = async (req, res) => {
 
     const client = await clientService.createClient({
       userName,
-      creditCard,
       address,
       cin,
       phoneNum,
       email,
       password: hashedPassword,
-      picture,
     });
 
     res.json(client);
