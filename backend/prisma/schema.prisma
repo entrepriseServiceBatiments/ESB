@@ -89,13 +89,24 @@ model Worker {
   @@index([ordersId], name: "idx_ordersId") // Optional: Index for faster lookups
 }
 
+
+
 model Message {
-  clientId    Int
-  workerId    Int
-  content     String?
+  id              Int            @id @default(autoincrement())
+  senderId        Int
+  recipientId     Int
+  content         String
+  conversationId  Int
 
-  Client      Client    @relation(fields: [clientId], references: [idClient])
-  Worker      Worker    @relation(fields: [workerId], references: [idworker])
+  Sender          Client?        @relation(fields: [senderId], references: [idClient])
+  Recipient       Worker?        @relation(fields: [recipientId], references: [idworker])
+  Conversation    Conversation   @relation(fields: [conversationId], references: [id])
 
-  @@id([clientId, workerId])
+  @@index([conversationId], name: "idx_conversationId")
+}
+
+model Conversation {
+  id         Int       @id @default(autoincrement())
+  title      String?
+  Messages   Message[]
 }

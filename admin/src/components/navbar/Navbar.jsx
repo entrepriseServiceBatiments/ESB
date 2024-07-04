@@ -63,7 +63,7 @@ const Navbar = () => {
                     <i class="fa-regular fa-user"></i>
                     <span>Verification</span>
                   </li>
-                  <li>
+                  <li onClick={() => navigate("/allOrders")}>
                     <i className="fas fa-shopping-bag"></i>
                     <span>Orders</span>
                   </li>
