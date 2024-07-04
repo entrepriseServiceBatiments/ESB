@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginForm = ({ navigation }) => {
@@ -8,7 +8,7 @@ const LoginForm = ({ navigation }) => {
 
   const Login = async () => {
     try {
-      const response = await fetch('http://192.168.1.16:3000/login', {
+      const response = await fetch('http://192.168.11.146:3000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -19,7 +19,9 @@ const LoginForm = ({ navigation }) => {
       const data = await response.json();
       if (response.ok) {
         await AsyncStorage.setItem('token', data.token);
-        navigation.navigate('HomePage');
+        await AsyncStorage.setItem('user',JSON.stringify(data.user))
+        console.log(data.token);
+        navigation.navigate('Profile');
       } else {
         Alert.alert('Login Failed', data.message);
       }
@@ -39,6 +41,7 @@ const LoginForm = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <ScrollView>
       <Image style={styles.image} source={require('../assets/logo.png')} />
       <Text style={styles.title}>Log in to your account</Text>
       <Text style={styles.p}>Enter your username and password</Text>
@@ -80,6 +83,7 @@ const LoginForm = ({ navigation }) => {
       <TouchableOpacity style={styles.googleButton} onPress={gotoSignup}>
         <Text style={styles.googleButtonText}>Signup</Text>
       </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 };

@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")  // Replace with your actual database URL
+  url      = env("DATABASE_URL")  
 }
 
 model Admin {
@@ -18,8 +18,8 @@ model Client {
   userName    String
   creditCard  Int?
   address     String
-  cin         Int
-  phoneNum    Int
+  cin         Int       @unique
+  phoneNum    Int       @unique
   email       String    @unique
   password    String
   picture     String?
@@ -67,7 +67,7 @@ model Worker {
   cin          Int
   creditCard   Int?
   userName     String
-  phoneNumber  Int
+  phoneNum     Int
   email        String?   @unique
   password     String?
   rentedProd   String?

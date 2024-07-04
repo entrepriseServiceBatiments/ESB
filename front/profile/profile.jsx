@@ -1,102 +1,63 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, Button, TouchableOpacity, Alert } from 'react-native';
-import ImagePicker from 'react-native-image-picker';
-import axios from 'axios';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import jwtDecode from 'jwt-decode';
+import { FontAwesome } from '@expo/vector-icons';
 
-const ProfileEditScreen = () => {
-  const [isEditing, setIsEditing] = useState(false);
+const Profile = ({ navigation }) => {
   const [userName, setUserName] = useState('');
   const [creditCard, setCreditCard] = useState('');
   const [address, setAddress] = useState('');
   const [cin, setCin] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [picture, setPicture] = useState('');
- const [clientId,setClientId]=useState('')
+ const [email,setEmail]=useState("")
+  useEffect(() => {
+    retrieveData();
+  }, []);
 
   const retrieveData = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
+      let user = await  AsyncStorage.getItem('user')
+      user=JSON.parse(user)
       if (token !== null) {
-        const decodedToken = jwtDecode(token);
-        setUserName(decodedToken.userName);
-        setCreditCard(decodedToken.creditCard);
-        setAddress(decodedToken.address);
-        setCin(decodedToken.cin);
-        setPhoneNum(decodedToken.phoneNum);
-        setEmail(decodedToken.email);
-        setPicture(decodedToken.picture);
-        setClientId(decodedToken.idClient)
+       
+        setUserName(user.userName);
+        setCreditCard(user.creditCard);
+        setAddress(user.address);
+        setCin(user.cin);
+        setPhoneNum(user.phoneNum);
+        setPicture(user.picture);
+        setEmail(user.email)
       }
     } catch (error) {
       console.error('Error retrieving data:', error);
     }
   };
-
-  useEffect(() => {
-    retrieveData();
-  }, []);
-
-  const handleSave = async () => {
-    try {
-      const updatedProfile = {
-        userName,
-        creditCard,
-        address,
-        cin,
-        phoneNum,
-        email,
-        password,
-        picture,
-      };
-       
-      const updateResponse = await axios.put(`http://192.168.1.27:8081/clients/${clientId}`, updatedProfile);
-
-      if (updateResponse.data) {
-        setIsEditing(false);
-        Alert.alert('Success', 'Profile updated successfully!');
-      } 
-      
-    } catch (error) {
-      console.error('Error:', error);
-      Alert.alert('Error', 'An error occurred');
-    }
-   
-  };
-
-  const confirmSave = () => {
+  const handleLogout = () => {
     Alert.alert(
-      'Confirm Save',
-      'Are you sure you want to save the changes?',
+      'Logout',
+      'Are you sure you want to logout?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Save', onPress: handleSave },
-      ]
+        { text: 'Logout', onPress: ()=>AsyncStorage.clear() },
+      ],
+      { cancelable: false }
     );
   };
-
-  const handleImagePick = () => {
-    const options = {
-      noData: true,
-    };
-
-    ImagePicker.showImagePicker(options, response => {
-      if (response.uri) {
-        setPicture(response.uri);
-      }
-    });
+  const handleAddPicture = () => {
+    // Implement logic to add picture
+    Alert.alert('Add Picture', 'Implement logic to add a profile picture.');
   };
 
-  const getCreditCardDisplay = (creditCard) => {
-    return creditCard ? `**** **** **** ${creditCard.slice(-4)}` : '';
+  const handleAddCreditCard = () => {
+    // Implement logic to add credit card
+    Alert.alert('Add Credit Card', 'Implement logic to add a credit card.');
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={handleImagePick}>
+      <TouchableOpacity style={styles.profileImageContainer} onPress={handleAddPicture}>
         {picture ? (
           <Image style={styles.profileImage} source={{ uri: picture }} />
         ) : (
@@ -106,87 +67,31 @@ const ProfileEditScreen = () => {
         )}
       </TouchableOpacity>
 
-      {isEditing ? (
-        <TextInput
-          style={styles.input}
-          value={userName}
-          onChangeText={setUserName}
-          placeholder="User Name"
-        />
-      ) : (
-        <Text style={styles.name}>{userName}</Text>
-      )}
-      {isEditing ? (
-        <TextInput
-          style={styles.input}
-          value={creditCard}
-          onChangeText={setCreditCard}
-          placeholder="Credit Card"
-          keyboardType="numeric"
-          maxLength={16}
-        />
-      ) : (
-        <Text style={styles.name}>{getCreditCardDisplay(creditCard)}</Text>
-      )}
-      {isEditing ? (
-        <TextInput
-          style={styles.input}
-          value={address}
-          onChangeText={setAddress}
-          placeholder="Address"
-        />
-      ) : (
-        <Text style={styles.name}>{address}</Text>
-      )}
-      {isEditing ? (
-        <TextInput
-          style={styles.input}
-          value={cin}
-          onChangeText={setCin}
-          placeholder="CIN"
-          keyboardType="numeric"
-        />
-      ) : (
-        <Text style={styles.name}>{cin}</Text>
-      )}
-      {isEditing ? (
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          placeholder="Email"
-        />
-      ) : (
-        <Text style={styles.email}>{email}</Text>
-      )}
-      {isEditing ? (
-        <>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Password"
-            secureTextEntry
-          />
-        </>
-      ) : null}
-      {isEditing ? (
-        <TextInput
-          style={styles.input}
-          value={phoneNum}
-          onChangeText={setPhoneNum}
-          placeholder="Phone Number"
-          keyboardType="numeric"
-        />
-      ) : (
-        <Text style={styles.number}>{phoneNum}</Text>
-      )}
+      <View style={styles.userInfoContainer}>
+        <Text style={styles.label}>User Name:</Text>
+        <Text style={styles.value}>{userName}</Text>
 
-      {isEditing ? (
-        <Button title="Save" onPress={confirmSave} />
-      ) : (
-        <Button title="Edit Profile" onPress={() => setIsEditing(true)} />
-      )}
+        <Text style={styles.label}>Email:</Text>
+        <Text style={styles.value}>{email}</Text>
+
+        <Text style={styles.label}>Address:</Text>
+        <Text style={styles.value}>{address}</Text>
+
+        <Text style={styles.label}>Phone Number:</Text>
+        <Text style={styles.value}>{phoneNum}</Text>
+        <Text style={styles.label}>CIN:</Text>
+        <Text style={styles.value}>{cin}</Text>
+        {creditCard ? (
+          <Text style={styles.creditCard}>{`**** **** **** ${creditCard.slice(-4)}`}</Text>
+        ) : (
+          <TouchableOpacity onPress={handleAddCreditCard}>
+            <Text style={styles.addCreditCard}>Add Credit Card</Text>
+          </TouchableOpacity>
+        )}
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+          <FontAwesome name="sign-out" size={24} color="#dc3545" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -194,15 +99,18 @@ const ProfileEditScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f8f8f8',
+    padding: 20,
+  },
+  profileImageContainer: {
+    marginTop: 20,
+    marginBottom: 20,
   },
   profileImage: {
     width: 150,
     height: 150,
     borderRadius: 75,
-    marginBottom: 20,
   },
   profileImagePlaceholder: {
     width: 150,
@@ -211,36 +119,33 @@ const styles = StyleSheet.create({
     backgroundColor: '#ddd',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
   },
-  name: {
-    fontSize: 24,
+  userInfoContainer: {
+    width: '100%',
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 3,
+  },
+  label: {
+    fontSize: 16,
     fontWeight: 'bold',
+    marginTop: 10,
+  },
+  value: {
+    fontSize: 16,
     marginBottom: 10,
   },
-  email: {
+  creditCard: {
     fontSize: 16,
     color: 'gray',
-    marginBottom: 20,
-    textAlign: 'center',
-    paddingHorizontal: 20,
+    marginTop: 10,
   },
-  number: {
+  addCreditCard: {
     fontSize: 16,
-    color: 'gray',
-    marginBottom: 20,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    width: '80%',
+    color: 'tomato',
+    marginTop: 10,
   },
 });
 
-export default ProfileEditScreen;
+export default Profile;

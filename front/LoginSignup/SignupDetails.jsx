@@ -12,11 +12,21 @@ const SignupDetails = ({ route, navigation }) => {
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
 
+  const validateDetails = () => {
+    if (username.trim() === '') return 'Please enter a username.';
+    if (address.trim() === '') return 'Please enter an address.';
+    if (phoneNumber.trim() === '') return 'Please enter a phone number.';
+    if (cin.trim() === '') return 'Please enter a CIN.';
+    if (!/^\d{8}$/.test(phoneNumber)) return 'Phone number must be 8 digits.';
+    if (!/^\d{8}$/.test(cin)) return 'CIN must be 8 digits.';
+    return '';
+  };
+
   const Next = () => {
-    
-    if (username.trim() === '' || address.trim() === '' || phoneNumber.trim() === '' || cin.trim() === '') {
+    const errorMessage = validateDetails();
+    if (errorMessage) {
       setModalTitle('Error');
-      setModalMessage('Please fill in all details.');
+      setModalMessage(errorMessage);
       setErrorModalVisible(true);
       return;
     }
@@ -30,7 +40,7 @@ const SignupDetails = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Your details</Text>
-      <Text style={styles.label}>Username</Text>
+      <Text style={styles.label}>Username*</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your username"
@@ -38,14 +48,14 @@ const SignupDetails = ({ route, navigation }) => {
         onChangeText={setUsername}
         autoCapitalize="none"
       />
-      <Text style={styles.label}>Address</Text>
+      <Text style={styles.label}>Address*</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your address"
         value={address}
         onChangeText={setAddress}
       />
-      <Text style={styles.label}>Phone Number</Text>
+      <Text style={styles.label}>Phone Number*</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your phone number"
@@ -53,12 +63,13 @@ const SignupDetails = ({ route, navigation }) => {
         onChangeText={setPhoneNumber}
         keyboardType="phone-pad"
       />
-      <Text style={styles.label}>CIN</Text>
+      <Text style={styles.label}>CIN*</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your CIN"
         value={cin}
         onChangeText={setCin}
+        keyboardType="number-pad"
       />
       <TouchableOpacity style={styles.button} onPress={Next}>
         <Text style={styles.buttonText}>Next</Text>
