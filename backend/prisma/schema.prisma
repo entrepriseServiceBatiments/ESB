@@ -16,7 +16,7 @@ model Admin {
 model Client {
   idClient    Int       @id @default(autoincrement())
   userName    String
-  creditCard  Int?
+  creditCard  String?
   address     String
   cin         Int       @unique
   phoneNum    Int       @unique
@@ -65,7 +65,7 @@ model Favorite {
 model Worker {
   idworker     Int       @id @default(autoincrement())
   cin          Int
-  creditCard   Int?
+  creditCard   String?
   userName     String
   phoneNum     Int
   email        String?   @unique

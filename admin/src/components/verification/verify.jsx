@@ -1,86 +1,74 @@
-import React, { useState, useEffect } from "react";
+
+
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./WorkersTable.css";
+import './WorkersTable.css'
 
-const WorkersTable = () => {
+const WorkerTable = () => {
   const [workers, setWorkers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [refresh, setRefresh] = useState(false);
-
+const [refresh, setRefresh] = useState(false);
   useEffect(() => {
-    const fetchWorkers = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/workers");
-        setWorkers(response.data);
-        setLoading(false);
-        setRefresh(!refresh);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
     fetchWorkers();
   }, [refresh]);
 
-  const toggleStatus = async (workerId, currentStatus) => {
+  const fetchWorkers = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/workers");
+      setWorkers(response.data);
+      setRefresh(!refresh)
+    } catch (error) {
+      console.error("Error fetching workers:", error);
+    }
+  };
+
+  const toggleStatus = async (id, currentStatus) => {
     try {
       const response = await axios.put(
-        `http://localhost:3000/workers/${workerId}`,
+        `http://localhost:3000/workers/status/${id}`,
         {
           status: !currentStatus,
         }
       );
-
-      console.log(response.data);
+      setWorkers((prevWorkers) =>
+        prevWorkers.map((worker) =>
+          worker.idworker === id
+            ? { ...worker, status: response.data.status }
+            : worker
+        )
+      );
     } catch (error) {
-      console.error("Error toggling status:", error);
+      console.error("Error updating worker status:", error);
     }
   };
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
-
   return (
-    <div className="workers-container">
-      <h2 className="table-title">Workers List</h2>
-      <table className="workers-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>User Name</th>
-            <th>Job Title</th>
-            <th>Status</th>
-            <th>Action</th>
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {workers.map((worker) => (
+          <tr key={worker.idworker}>
+            <td>{worker.userName}</td>
+            <td>{worker.email}</td>
+            <td>{worker.status ? "Active" : "Inactive"}</td>
+            <td>
+              <button
+                onClick={() => toggleStatus(worker.idworker, worker.status)}
+              >
+                verify
+              </button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {workers.map((worker) => (
-            <tr key={worker.idworker}>
-              <td>{worker.idworker}</td>
-              <td>{worker.userName}</td>
-              <td>{worker.jobTitle}</td>
-              <td>{worker.status ? "verified" : "Inactive"}</td>
-              <td>
-                <button
-                  className="status-btn"
-                  onClick={() => toggleStatus(worker.idworker, worker.status)}
-                >
-                  {worker.status ? "Inactive" : "verified"}
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
   );
 };
 
-export default WorkersTable;
+export default WorkerTable;

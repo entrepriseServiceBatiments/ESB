@@ -16,18 +16,22 @@ const AccountType = ({ route, navigation }) => {
 
   const automaticLogin = async () => {
     try {
-      const response = await axios.post('http://192.168.1.16:3000/login', {
-        email,
-        password
+      const response = await fetch('http://192.168.11.12:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (response.status === 200) {
-        const { token } = response.data;
-        await AsyncStorage.setItem('token', token);
-        console.log(token);
-        navigation.navigate('Home');
+      const data = await response.json();
+      if (response.ok) {
+        await AsyncStorage.setItem('token', data.token);
+        await AsyncStorage.setItem('user',JSON.stringify(data.user))
+        console.log(data.token);
+        navigation.navigate('Profile');
       } else {
-        Alert.alert('Login Failed', response.data.message);
+        Alert.alert('Login Failed', data.message);
       }
     } catch (error) {
       console.error('Error logging in:', error);
@@ -39,8 +43,10 @@ const AccountType = ({ route, navigation }) => {
     try {
       const url =
         type === "Personal"
+
           ? "http://192.168.104.3:3000/clients/add"
           : "http://192.168.104.3:3000/workers/add";
+
       const payload = {
         userName: username,
         address: address,
@@ -54,7 +60,8 @@ const AccountType = ({ route, navigation }) => {
 
       if (response.status === 200) {
         console.log("Response:", response.data);
-        await automaticLogin();  
+         automaticLogin();  
+     
       } else {
         throw new Error('Failed to sign up');
       }
