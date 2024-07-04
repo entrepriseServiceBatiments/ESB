@@ -8,7 +8,7 @@ const LoginForm = ({ navigation }) => {
 
   const Login = async () => {
     try {
-      const response = await fetch('http://192.168.11.146:3000/login', {
+      const response = await fetch('http://192.168.11.12:3000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
