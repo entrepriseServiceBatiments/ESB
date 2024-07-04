@@ -7,7 +7,7 @@ import CartScreen from "./Cart";
 import ProfileScreen from "./Profile";
 import Profile from "../profile/profile";
 import NotificationsScreen from "./Notifications";
-import LoginStack from "../Nav/LoginScreen"; // Ensure the path is correct
+import LoginStack from "../Nav/LoginScreen"; 
 
 const Tab = createBottomTabNavigator();
 

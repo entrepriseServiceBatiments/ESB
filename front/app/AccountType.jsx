@@ -16,7 +16,7 @@ const AccountType = ({ route, navigation }) => {
     if (type === "Personal") {
       try {
         const response = await axios.post(
-          "http://192.168.11.224:3000/clients",
+          "http://192.168.104.13:3000/clients",
           {
             userName: username,
             address: address,
