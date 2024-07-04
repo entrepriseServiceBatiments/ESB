@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import jwtDecode from "jwt-decode";
 
 const Cart = () => {
   const [orders, setOrders] = useState([]);
@@ -10,29 +9,29 @@ const Cart = () => {
   const [error, setError] = useState(null);
   const [clientId, setClientId] = useState(null);
 
-  // const retrieveData = async () => {
-  //   try {
-  //     const token = await AsyncStorage.getItem("token");
-  //     if (token !== null) {
-  //       const decodedToken = jwtDecode(token);
-  //       setClientId(decodedToken.idClient);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error retrieving data:", error);
-  //   }
-  // };
+  const retrieveData = async () => {
+    try {
+      let user = await AsyncStorage.getItem("user");
+      if (user) {
+        user = JSON.parse(user);
+        setClientId(user.idClient);
+      }
+    } catch (error) {
+      console.error("Error retrieving data:", error);
+    }
+  };
 
-  // useEffect(() => {
-  //   retrieveData();
-  // }, []);
+  useEffect(() => {
+    retrieveData();
+  }, []);
 
   useEffect(() => {
     const fetchOrders = async () => {
-      // if (!clientId) return;
+      if (!clientId) return;
 
       try {
         const response = await axios.get(
-          `http://192.168.104.3:3000/client/${1}`
+          `http://192.168.104.3:3000/client/${clientId}`
         );
         setOrders(response.data[0]?.Products || []);
         setLoading(false);
@@ -43,7 +42,7 @@ const Cart = () => {
     };
 
     fetchOrders();
-  }, [1]);
+  }, [clientId]);
 
   if (loading) {
     return (

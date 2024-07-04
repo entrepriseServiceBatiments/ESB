@@ -17,6 +17,7 @@ import AddProduct from "./components/adding/AddProduct.jsx";
 import Navbar from "./components/navbar/Navbar.jsx";
 import ProductDetails from "./components/products/ProductDetails.jsx";
 import AllOrders from "./components/orders/AllOrders.jsx";
+import Verify from "./components/verification/verify.jsx";
 function App() {
   const [data, setData] = useState([]);
   const [workers, setWorkers] = useState([]);
@@ -98,6 +99,7 @@ const AuthContent = ({ data, workers, clients, refresh, setRefresh }) => {
           path="/products/:id"
           element={<ProductDetails refresh={refresh} setRefresh={setRefresh} />}
         />
+        <Route path="/verify" element={<Verify />} />
       </Routes>
     </>
   );

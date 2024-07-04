@@ -1,4 +1,4 @@
-const workerService = require('../services/workerService');
+const workerService = require("../services/workerService");
 
 const getWorkers = async (req, res) => {
   try {
@@ -58,8 +58,66 @@ const createWorker = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const updateWorker = async (req, res) => {
+  const {
+    cin,
+    creditCard,
+    userName,
+    phoneNumber,
+    email,
+    password,
+    rentedProd,
+    picture,
+    resume,
+    rating,
+    jobTitle,
+    hourlyRate,
+    available,
+    address,
+    ordersId,
+    latitude,
+    longitude,
+    status,
+    comments,
+  } = req.body;
+  try {
+    const { workerId } = req.params;
+    const hashedPassword = password
+      ? await bcrypt.hash(password, 10)
+      : undefined;
+    const updateData = {
+      cin,
+      creditCard,
+      userName,
+      phoneNumber,
+      email,
+      password,
+      rentedProd,
+      picture,
+      resume,
+      rating,
+      jobTitle,
+      hourlyRate,
+      available,
+      address,
+      ordersId,
+      latitude,
+      longitude,
+      status,
+      comments,
+    };
+    if (hashedPassword) {
+      updateData.password = hashedPassword;
+    }
+    const Worker = await workerService.updateworker(workerId, updateData);
 
+    res.json(Worker);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 module.exports = {
   getWorkers,
   createWorker,
+  updateWorker,
 };

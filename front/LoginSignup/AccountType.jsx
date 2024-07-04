@@ -39,8 +39,8 @@ const AccountType = ({ route, navigation }) => {
     try {
       const url =
         type === "Personal"
-          ? "http://192.168.11.146:3000/clients/add"
-          : "http://192.168.11.146:3000/workers/add";
+          ? "http://192.168.104.3:3000/clients/add"
+          : "http://192.168.104.3:3000/workers/add";
       const payload = {
         userName: username,
         address: address,

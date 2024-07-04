@@ -51,7 +51,7 @@ async function main() {
         cin: faker.number.int({ min: 100000, max: 999999 }),
         creditCard: faker.number.int({ min: 10000000, max: 99999999 }),
         userName: faker.internet.userName(),
-        phoneNumber: parseInt(
+        phoneNum: parseInt(
           faker.phone.number("########").replace(/\D/g, "")
         ),
         email: faker.internet.email(),

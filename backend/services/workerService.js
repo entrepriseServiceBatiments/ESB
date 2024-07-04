@@ -12,9 +12,15 @@ const getWorkerByEmail = async (email) => {
 const createWorker = async (data) => {
   return await prisma.worker.create({ data });
 };
-
+const updateworker = async (workerId, data) => {
+  return await prisma.worker.update({
+    where: { idworker: Number(workerId) },
+    data,
+  });
+};
 module.exports = {
   getWorkers,
   createWorker,
-  getWorkerByEmail
+  getWorkerByEmail,
+  updateworker,
 };

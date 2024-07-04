@@ -7,21 +7,20 @@ import FavoritesScreen from "./Favorites";
 import CartScreen from "./Cart";
 import Profile from "../profile/profile";
 import NotificationsScreen from "./Notifications";
-import LoginStack from "../Nav/LoginScreen"; 
+import LoginStack from "./LoginStack";
 import Shop from "./Shop";
 
 const Tab = createBottomTabNavigator();
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [initialScreen, setInitialScreen] = useState("Login"); // Default to "Login"
+  const [initialScreen, setInitialScreen] = useState("Login");
 
   useEffect(() => {
     const checkToken = async () => {
-      const token = await AsyncStorage.getItem('token');
+      const token = await AsyncStorage.getItem("token");
       setIsLoggedIn(token !== null);
 
-      // Set initial screen to "Profile" if logged in
       if (token !== null) {
         setInitialScreen("Profile");
       } else {
@@ -57,7 +56,7 @@ const Navbar = () => {
             case "Login":
               iconName = focused ? "log-in" : "log-in-outline";
               break;
-              case "Shop":
+            case "Shop":
               iconName = focused ? "pricetag" : "pricetag-outline";
               break;
             default:
@@ -78,10 +77,9 @@ const Navbar = () => {
       )}
       <Tab.Screen name="Favorites" component={FavoritesScreen} />
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Shop" component ={Shop}/>
+      <Tab.Screen name="Shop" component={Shop} />
       <Tab.Screen name="Cart" component={CartScreen} />
-      
-     </Tab.Navigator>
+    </Tab.Navigator>
   );
 };
 
