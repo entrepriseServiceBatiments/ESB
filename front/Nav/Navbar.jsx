@@ -1,19 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import HomeScreen from "./HomeScreen.jsx";
 import FavoritesScreen from "./Favorites";
 import CartScreen from "./Cart";
-import ProfileScreen from "./Profile";
 import Profile from "../profile/profile";
-import NotificationsScreen from "./Notifications";
-import LoginStack from "../Nav/LoginScreen"; // Ensure the path is correct
+import LoginStack from "../Nav/LoginStack"; // Ensure the path is correct
+import Shop from "./Shop";
 
 const Tab = createBottomTabNavigator();
 
 const Navbar = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [initialScreen, setInitialScreen] = useState("Login"); // Default to "Login"
+
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setIsLoggedIn(token !== null);
+
+      // Set initial screen to "Profile" if logged in
+      if (token !== null) {
+        setInitialScreen("Profile");
+      } else {
+        setInitialScreen("Login");
+      }
+    };
+
+    const interval = setInterval(checkToken, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Tab.Navigator
+      initialRouteName={initialScreen}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
@@ -34,6 +56,9 @@ const Navbar = () => {
             case "Login":
               iconName = focused ? "log-in" : "log-in-outline";
               break;
+              case "Shop":
+              iconName = focused ? "pricetag" : "pricetag-outline";
+              break;
             default:
               iconName = "help-circle";
               break;
@@ -45,12 +70,17 @@ const Navbar = () => {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
+      {isLoggedIn ? (
+        <Tab.Screen name="Profile" component={Profile} />
+      ) : (
+        <Tab.Screen name="Login" component={LoginStack} />
+      )}
       <Tab.Screen name="Favorites" component={FavoritesScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Shop" component ={Shop}/>
       <Tab.Screen name="Cart" component={CartScreen} />
-      <Tab.Screen name="Profile" component={Profile} />
-      <Tab.Screen name="Login" component={LoginStack} />
-    </Tab.Navigator>
+      
+     </Tab.Navigator>
   );
 };
 

@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-const Profile = () => (
+const Shop = () => (
   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>Profile</Text>
+    <Text>Shop</Text>
   </View>
 );
 
-export default Profile;
+export default Shop;

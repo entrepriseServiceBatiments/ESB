@@ -6,8 +6,8 @@ const Stack = createStackNavigator();
 
 function LoginStack() {
   return (
-    <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen name="Home" component={Home} />
+    <Stack.Navigator initialRouteName="HomeScreen">
+      <Stack.Screen name="HomeScreen" component={Home} />
       <Stack.Screen name="ProductScreen" component={ProductScreen} />
     </Stack.Navigator>
   );

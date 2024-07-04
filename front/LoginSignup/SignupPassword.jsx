@@ -10,6 +10,26 @@ const SignupPassword = ({ route, navigation }) => {
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
 
+  const validatePassword = (password) => {
+    const minLength = password.length >= 8;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+
+    if (!minLength) {
+      return 'Password must be at least 8 characters long.';
+    }
+
+    if (!hasUppercase) {
+      return 'Password must contain at least one uppercase letter.';
+    }
+
+    if (!hasLowercase) {
+      return 'Password must contain at least one lowercase letter.';
+    }
+
+    return '';
+  };
+
   const Next = () => {
     if (password.trim() === '' || confirmPassword.trim() === '') {
       setModalTitle('Error');
@@ -17,7 +37,15 @@ const SignupPassword = ({ route, navigation }) => {
       setErrorModalVisible(true);
       return;
     }
-    
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setModalTitle('Error');
+      setModalMessage(passwordError);
+      setErrorModalVisible(true);
+      return;
+    }
+
     if (password === confirmPassword) {
       // Passwords match, navigate to the next screen
       navigation.navigate('SignupDetails', { email, password });
@@ -37,7 +65,7 @@ const SignupPassword = ({ route, navigation }) => {
     <View style={styles.container}>
       <Image style={styles.image} source={require('../assets/logo.png')} />
       <Text style={styles.title}>Set Your Password</Text>
-      <Text style={styles.label}>Password</Text>
+      <Text style={styles.label}>Password*</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your password"
@@ -45,8 +73,9 @@ const SignupPassword = ({ route, navigation }) => {
         onChangeText={setPassword}
         secureTextEntry
         autoCapitalize="none"
+        accessibilityLabel="Password Input"
       />
-      <Text style={styles.label}>Confirm Password</Text>
+      <Text style={styles.label}>Confirm Password*</Text>
       <TextInput
         style={styles.input}
         placeholder="Confirm your password"
@@ -54,8 +83,9 @@ const SignupPassword = ({ route, navigation }) => {
         onChangeText={setConfirmPassword}
         secureTextEntry
         autoCapitalize="none"
+        accessibilityLabel="Confirm Password Input"
       />
-      <TouchableOpacity style={styles.button} onPress={Next}>
+      <TouchableOpacity style={styles.button} onPress={Next} accessibilityRole="button">
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
 
