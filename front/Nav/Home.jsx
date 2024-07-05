@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React ,{useEffect,useState} from 'react';
 import {
   View,
   Text,
@@ -7,108 +7,103 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import PromoCard from '../promos/PromoCard';
+import SearchBar from '../homePage/SearchBar';
+
 
 const categories = [
-  "Plumbing",
-  "Electricity",
-  "Housekeeping",
-  "Windows and blinds",
-  "Air conditioning",
-  "DIY and assembly",
-  "Washing machine",
-  "Painting",
-  "Gardening",
+  { name: 'Plumbing', jobTitle: 'Plumber' },
+  { name: 'Electricity', jobTitle: 'Electrician' },
+  { name: 'Housekeeping', jobTitle: 'Housekeeper' },
+  { name: 'Masonry', jobTitle: 'Mason' },
+  { name: 'Air conditioning', jobTitle: 'HVAC Technician' },
+  { name: 'DIY and assembly', jobTitle: 'Handyman' },
+  { name: 'Washing machine', jobTitle: 'Appliance Repair Technician' },
+  { name: 'Painting', jobTitle: 'Painter' },
+  { name: 'Gardening', jobTitle: 'Gardener' },
+];
+
+const promoData = [
+  {
+    id: '1',
+    title: 'installation climatiseur',
+    location: ' Grand Tunis',
+    price: '70',
+    oldPrice: '90',
+    image:
+      'https://st.depositphotos.com/62628780/59500/i/450/depositphotos_595006128-stock-photo-passing-safety-inspections-every-single.jpg',
+  },
+  {
+    id: '2',
+    title: 'Etancheite avec le systeme horizon chimi',
+    location: "Gouvernorat de l'Ariana, Ariana",
+    price: '30',
+    oldPrice: '35',
+    image:
+      'https://ijenintechstorage.blob.core.windows.net/testv2/Promo-UserId-6dddac3d-1461-4eb9-5649-08dc32914590--144559fa-ee24-4dcf-98c4-5e2f78208914',
+  },
+  {
+    id: '3',
+    title: 'Entretien général',
+    location: 'Gouvernorat de Bizerte, ',
+    price: '50',
+    oldPrice: '65',
+    image:
+      'https://ijenintechstorage.blob.core.windows.net/testv2/Promo-UserId-6dddac3d-1461-4eb9-5649-08dc32914590--144559fa-ee24-4dcf-98c4-5e2f78208914',
+  },
 ];
 
 const Home = () => {
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const navigation = useNavigation();
-
-  const fetchProductsByCategory = async (category) => {
-    try {
-      console.log(`Fetching products for category: ${category}`);
-      const response = await fetch(
-        `http://192.168.11.224:3000/products/${category}`
-      );
-      const data = await response.json();
-      console.log("Fetched products:", data);
-      navigation.navigate("ProductScreen", { category, products: data });
-      setSelectedCategory(category);
-    } catch (error) {
-      console.error(error);
-    }
+  const [categoriess, setCategories] = useState(categories);
+  const handleCategoryPress = (category, jobTitle) => {
+    navigation.navigate('CategoryDetails', { category, jobTitle });
   };
 
+  const handlePromoPress = (item) => {
+    navigation.navigate('Promos', { item , allPromos:promoData});
+  };
+  const handleSearch = (query) => {
+    console.log('Search query:', query);
+    const filteredCategories = categories.filter((category) =>
+      category.name.toLowerCase().includes(query.toLowerCase())
+    );
+    setCategories(filteredCategories);
+  }
   return (
     <View style={styles.container}>
       <ScrollView>
+        <SearchBar onSearch={handleSearch}/>
         <ScrollView
           horizontal
           contentContainerStyle={styles.scrollView}
           showsHorizontalScrollIndicator={false}
         >
-          {categories.map((category, index) => (
+          {categories.map((item, index) => (
             <TouchableOpacity
               key={index}
               style={styles.box}
-              onPress={() => fetchProductsByCategory(category)}
+              onPress={() => handleCategoryPress(item.name, item.jobTitle)}
             >
-              <Text style={styles.boxText}>{category}</Text>
+              <Text style={styles.boxText}>{item.name}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
-        <View style={styles.promoContainer}>
-          <Image
-            source={{
-              uri: "https://st.depositphotos.com/62628780/59500/i/450/depositphotos_595006128-stock-photo-passing-safety-inspections-every-single.jpg",
-            }}
-            style={styles.promoImage}
-          />
-          <View style={styles.promoTextContainer}>
-            <Text style={styles.promoTitle}>
-              -25% sur la première année de votre contrat Sécurité avec le code
-              JUIN2024
-            </Text>
-            <Text style={styles.promoDescription}>
-              Profitez d’une remise immédiate de 25% sur la souscription de
-              votre contrat d’une chaudière gaz ou pompe à chaleur air/eau ou
-              d’un climatiseur réversible, Formule Sécurité, avec ou sans option
-              Service illigo (non disponible pour le climatiseur réversible).
-              Offre réservée aux nouveaux clients ENGIE Home Services et valable
-              uniquement sur la première année de contrat.
-            </Text>
-            <TouchableOpacity
-              style={styles.promoButton}
-              onPress={() => navigation.navigate("Subscribe")}
-            >
-              <Text style={styles.promoButtonText}>Je souscris un contrat</Text>
+        <FlatList
+          data={promoData}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handlePromoPress(item)}>
+              <PromoCard item={item} />
             </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.noticeContainer}>
-          <Text style={styles.noticeTitle}>
-            Jusqu’au 30 juin 2024 pour souscrire 1 an d’option “Gaz Vert+”
-            offert
-          </Text>
-          <Text style={styles.noticeDescription}>
-            Vous avez validé un devis d’installation de chaudière gaz à Très
-            Haute Performance Énergétique entre le 1er avril et le 31 mai ? Vous
-            avez encore jusqu’au 30 juin 2024 pour bénéficier de 1 an offert
-            d’option “Gaz Vert+ 100%” d’ENGIE.
-          </Text>
-          <TouchableOpacity
-            style={styles.noticeButton}
-            onPress={() => navigation.navigate("Subscribe")}
-          >
-            <Text style={styles.noticeButtonText}>
-              Souscrire l’option “Gaz Vert+”
-            </Text>
-          </TouchableOpacity>
-        </View>
+          )}
+          keyExtractor={(item) => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.promoList}
+        />
 
         <View style={styles.servicesContainer}>
           <Text style={styles.servicesHeader}>
@@ -117,7 +112,7 @@ const Home = () => {
           </Text>
           <View style={styles.serviceItem}>
             <Image
-              source={require("../assets/icons/position.png")}
+              source={require('../assets/icons/position.png')}
               style={styles.serviceIcon}
             />
             <Text style={styles.serviceTitle}>Nos agences de proximité</Text>
@@ -128,7 +123,7 @@ const Home = () => {
           </View>
           <View style={styles.serviceItem}>
             <Image
-              source={require("../assets/icons/miner.png")}
+              source={require('../assets/icons/miner.png')}
               style={styles.serviceIcon}
             />
             <Text style={styles.serviceTitle}>
@@ -141,7 +136,7 @@ const Home = () => {
           </View>
           <View style={styles.serviceItem}>
             <Image
-              source={require("../assets/icons/team.png")}
+              source={require('../assets/icons/team.png')}
               style={styles.serviceIcon}
             />
             <Text style={styles.serviceTitle}>
@@ -154,7 +149,7 @@ const Home = () => {
           </View>
           <View style={styles.serviceItem}>
             <Image
-              source={require("../assets/icons/guarantee.png")}
+              source={require('../assets/icons/guarantee.png')}
               style={styles.serviceIcon}
             />
             <Text style={styles.serviceTitle}>
@@ -174,105 +169,44 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   scrollView: {
-    alignItems: "center",
+    alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
   box: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: '#f0f0f0',
     padding: 20,
     marginHorizontal: 10,
     borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   boxText: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
-  promoContainer: {
-    flexDirection: "row",
-    padding: 20,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-    marginBottom: 20,
-    marginHorizontal: 10,
-  },
-  promoImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 10,
-    marginRight: 20,
-  },
-  promoTextContainer: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  promoTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  promoDescription: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 10,
-  },
-  promoButton: {
-    backgroundColor: "#007BFF",
-    padding: 10,
-    borderRadius: 5,
-  },
-  promoButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  noticeContainer: {
-    padding: 20,
-    backgroundColor: "#e0f7fa",
-    borderRadius: 10,
-    marginBottom: 20,
-    marginHorizontal: 10,
-  },
-  noticeTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  noticeDescription: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 10,
-  },
-  noticeButton: {
-    backgroundColor: "#007BFF",
-    padding: 10,
-    borderRadius: 5,
-  },
-  noticeButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    textAlign: "center",
+  promoList: {
+    paddingHorizontal: 10,
+    paddingVertical: 20,
   },
   servicesContainer: {
     padding: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: '#f9f9f9',
     borderRadius: 10,
     marginBottom: 20,
     marginHorizontal: 10,
   },
   servicesHeader: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 20,
-    textAlign: "center",
+    textAlign: 'center',
   },
   serviceItem: {
-    alignItems: "center",
+    alignItems: 'center',
     marginBottom: 20,
   },
   serviceIcon: {
@@ -282,13 +216,13 @@ const styles = StyleSheet.create({
   },
   serviceTitle: {
     fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   serviceDescription: {
     fontSize: 14,
-    color: "#555",
-    textAlign: "center",
+    color: '#555',
+    textAlign: 'center',
     paddingHorizontal: 20,
   },
 });
