@@ -5,21 +5,30 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import HomeScreen from "./HomeScreen.jsx";
 import FavoritesScreen from "./Favorites";
 import CartScreen from "./Cart";
+
+import Profile from "../profile/profile.jsx";
+import LoginStack from "../LoginSignup/LoginStack.jsx"; 
+
 import Profile from "../profile/profile";
 import NotificationsScreen from "./Notifications";
-import LoginStack from "./LoginStack";
+
 import Shop from "./Shop";
 
 const Tab = createBottomTabNavigator();
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [initialScreen, setInitialScreen] = useState("Login");
+
+  const [initialScreen, setInitialScreen] = useState("Login"); 
+
+
+
 
   useEffect(() => {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem("token");
       setIsLoggedIn(token !== null);
+
 
       if (token !== null) {
         setInitialScreen("Profile");

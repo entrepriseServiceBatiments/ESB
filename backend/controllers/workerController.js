@@ -1,6 +1,10 @@
+
+const bcrypt=require('bcryptjs')
+
 const workerService = require("../services/workerService");
 const prisma = require("../prisma");
 const { sendStatusChangeEmail } = require("../services/emailService");
+
 const getWorkers = async (req, res) => {
   try {
     const workers = await workerService.getWorkers();
@@ -33,13 +37,16 @@ const createWorker = async (req, res) => {
       status,
       comments,
     } = req.body;
+
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
+
     const worker = await workerService.createWorker({
       cin,
       creditCard,
       userName,
       phoneNum,
       email,
-      password,
+      password:hashedPassword,
       rentedProd,
       picture,
       resume,

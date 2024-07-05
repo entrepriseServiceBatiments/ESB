@@ -90,11 +90,32 @@ const getoneClients = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const updatePassword = async (req, res) => {
+  const { clientId } = req.params;
+  const { currentPassword, newPassword } = req.body;
 
+  try {
+    const client = await clientService.getClientById(clientId);
+    if (!client) {
+      return res.status(404).json({ error: 'Client not found' });
+    }
+
+    const passwordMatch = await bcrypt.compare(currentPassword, client.password);
+    if (!passwordMatch) {
+      return res.status(400).json({ error: 'Current password is incorrect' });
+    }
+
+    await clientService.updatePassword(clientId, newPassword);
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 module.exports = {
   getClients,
   createClient,
   updateClient,
   getoneClients,
+  updatePassword,
 };
 
