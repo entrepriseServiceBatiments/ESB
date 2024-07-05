@@ -28,12 +28,11 @@ const productCategories = [
 ];
 
 async function main() {
-
   for (let i = 0; i < 100; i++) {
     await prisma.client.create({
       data: {
         userName: faker.internet.userName(),
-        creditCard: faker.number.int({ min: 10000000, max: 99999999 }),
+        creditCard: faker.finance.creditCardNumber(),
         address: faker.location.streetAddress(),
         cin: faker.number.int({ min: 100000, max: 999999 }),
         phoneNum: parseInt(faker.phone.number("########").replace(/\D/g, "")),
@@ -44,16 +43,13 @@ async function main() {
     });
   }
 
-
   for (let i = 0; i < 100; i++) {
     await prisma.worker.create({
       data: {
         cin: faker.number.int({ min: 100000, max: 999999 }),
-        creditCard: faker.number.int({ min: 10000000, max: 99999999 }),
+        creditCard: faker.finance.creditCardNumber(),
         userName: faker.internet.userName(),
-        phoneNum: parseInt(
-          faker.phone.number("########").replace(/\D/g, "")
-        ),
+        phoneNum: parseInt(faker.phone.number("########").replace(/\D/g, "")),
         email: faker.internet.email(),
         password: faker.internet.password(),
         rentedProd: faker.random.words(),
@@ -73,7 +69,6 @@ async function main() {
       },
     });
   }
-
 
   for (let i = 0; i < 100; i++) {
     await prisma.product.create({
