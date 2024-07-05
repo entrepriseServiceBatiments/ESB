@@ -97,6 +97,8 @@ model Worker {
   @@index([ordersId], name: "idx_ordersId") // Optional: Index for faster lookups
 }
 
+
+
 model Message {
   clientId    Int
   workerId    Int

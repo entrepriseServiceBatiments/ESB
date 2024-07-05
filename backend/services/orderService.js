@@ -8,7 +8,6 @@ const createOrder = async (data) => {
         startDate: data.startDate,
         endDate: data.endDate,
         clientId: data.clientId,
-        // You can add other fields as needed
       },
     });
     return newOrder;
@@ -24,9 +23,9 @@ const getOrdersByClientId = async (clientId) => {
         clientId: clientId,
       },
       include: {
-        Client: true, // Include Client details if needed
-        Workers: true, // Include Workers associated with the order
-        Products: true, // Include Products associated with the order
+        Client: true,
+        Workers: true,
+        Products: true,
       },
     });
     return orders;
@@ -35,7 +34,23 @@ const getOrdersByClientId = async (clientId) => {
   }
 };
 
+const getAllOrders = async () => {
+  try {
+    const orders = await prisma.order.findMany({
+      include: {
+        Client: true,
+        Workers: true,
+        Products: true,
+      },
+    });
+    return orders;
+  } catch (error) {
+    throw new Error(`Failed to fetch all orders: ${error.message}`);
+  }
+};
+
 module.exports = {
   createOrder,
   getOrdersByClientId,
+  getAllOrders,
 };
