@@ -82,10 +82,14 @@ const deleteProductById = async (id) => {
   }
 };
 
+
+
+
 module.exports = {
   getProducts,
   getProductById,
   getProductsByCateg,
   createProduct,
   deleteProductById,
+
 };
