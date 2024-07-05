@@ -4,8 +4,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome } from '@expo/vector-icons';
 import CreditCardModal from './CreditCardModal';
 import EditProfileModal from './EditProfileModal';
+import ProfilePictureModal from './ProfilePicture';
 
-const Profile = () => {
+const Profile = ({ navigation }) => {
   const [userName, setUserName] = useState('');
   const [creditCard, setCreditCard] = useState('');
   const [address, setAddress] = useState('');
@@ -15,12 +16,14 @@ const Profile = () => {
   const [email, setEmail] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [editProfileModalVisible, setEditProfileModalVisible] = useState(false);
+  const [profilePictureModalVisible, setProfilePictureModalVisible] = useState(false);
   const [creditCardNumber, setCreditCardNumber] = useState('');
   const [expirationMonth, setExpirationMonth] = useState('');
   const [expirationYear, setExpirationYear] = useState('');
   const [cvv, setCvv] = useState('');
   const [clientId, setClientId] = useState('');
 
+  console.log(picture);
   useEffect(() => {
     retrieveData();
   }, []);
@@ -31,7 +34,7 @@ const Profile = () => {
       let user = await AsyncStorage.getItem('user');
       user = JSON.parse(user);
       if (user !== null) {
-        const CreditCard = JSON.parse(user.creditCard);
+        const creditCard = JSON.parse(user.creditCard);
         setUserName(user.userName);
         setAddress(user.address);
         setCin(user.cin);
@@ -39,16 +42,16 @@ const Profile = () => {
         setPicture(user.picture);
         setEmail(user.email);
         setClientId(user.idClient);
-        setCreditCardNumber(CreditCard.creditCardNumber);
-        setCvv(CreditCard.cvv);
-        setExpirationMonth(CreditCard.expirationMonth);
-        setExpirationYear(CreditCard.expirationYear);
+        setCreditCardNumber(creditCard.creditCardNumber);
+        setCvv(creditCard.cvv);
+        setExpirationMonth(creditCard.expirationMonth);
+        setExpirationYear(creditCard.expirationYear);
+        console.log(user);
       }
     } catch (error) {
       console.error('Error retrieving data:', error);
     }
   };
-
   const Logout = () => {
     Alert.alert(
       'Logout',
@@ -62,7 +65,7 @@ const Profile = () => {
   };
 
   const AddPicture = () => {
-    navgation.navigate('ProfilePicture')
+    setProfilePictureModalVisible(true);
   };
 
   const AddCreditCard = () => {
@@ -74,9 +77,10 @@ const Profile = () => {
   };
 
   const handleUpdate = (updatedUserInfo) => {
-    setUserName(updatedUserInfo.userName);
-    setAddress(updatedUserInfo.address);
-    setEmail(updatedUserInfo.email);
+    if (updatedUserInfo.picture) setPicture(updatedUserInfo.picture);
+    if (updatedUserInfo.userName) setUserName(updatedUserInfo.userName);
+    if (updatedUserInfo.address) setAddress(updatedUserInfo.address);
+    if (updatedUserInfo.email) setEmail(updatedUserInfo.email);
   };
 
   return (
@@ -143,6 +147,13 @@ const Profile = () => {
         modalVisible={editProfileModalVisible}
         setModalVisible={setEditProfileModalVisible}
         userInfo={{ userName, email, address, clientId }}
+        onUpdate={handleUpdate}
+      />
+
+      <ProfilePictureModal
+        modalVisible={profilePictureModalVisible}
+        setModalVisible={setProfilePictureModalVisible}
+        clientId={clientId}
         onUpdate={handleUpdate}
       />
     </View>
@@ -213,7 +224,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 5,
     marginBottom: 10,
-    marginLeft:220
+    marginLeft: 220,
   },
   buttonText: {
     fontSize: 16,
