@@ -9,12 +9,14 @@ const Stack = createStackNavigator();
 
 function LoginStack() {
   return (
+
     <Stack.Navigator initialRouteName="Login">
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="CategoryDetails" component={CategoryDetails} />
       <Stack.Screen name="WorkerDetails" component={WorkerDetails} />
       <Stack.Screen name="Promos" component={Promos} />
       <Stack.Screen name="Subscribe" component={Subscribe} />
+
     </Stack.Navigator>
   );
 }

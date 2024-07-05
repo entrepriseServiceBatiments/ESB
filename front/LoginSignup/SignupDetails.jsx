@@ -1,26 +1,49 @@
-import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-native';
-import ErrorModal from './ErrorModal'; 
+import React, { useState } from "react";
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+} from "react-native";
+import ErrorModal from "./ErrorModal";
 
 const SignupDetails = ({ route, navigation }) => {
   const { email, password } = route.params;
-  const [username, setUsername] = useState('');
-  const [address, setAddress] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [cin, setCin] = useState('');
+  const [username, setUsername] = useState("");
+  const [address, setAddress] = useState("");
+  const [phoneNum, setPhoneNumber] = useState("");
+  const [cin, setCin] = useState("");
   const [errorModalVisible, setErrorModalVisible] = useState(false);
-  const [modalTitle, setModalTitle] = useState('');
-  const [modalMessage, setModalMessage] = useState('');
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+
+  const validateDetails = () => {
+    if (username.trim() === "") return "Please enter a username.";
+    if (address.trim() === "") return "Please enter an address.";
+    if (phoneNum.trim() === "") return "Please enter a phone number.";
+    if (cin.trim() === "") return "Please enter a CIN.";
+    if (!/^\d{8}$/.test(phoneNum)) return "Phone number must be 8 digits.";
+    if (!/^\d{8}$/.test(cin)) return "CIN must be 8 digits.";
+    return "";
+  };
 
   const Next = () => {
-    
-    if (username.trim() === '' || address.trim() === '' || phoneNumber.trim() === '' || cin.trim() === '') {
-      setModalTitle('Error');
-      setModalMessage('Please fill in all details.');
+    const errorMessage = validateDetails();
+    if (errorMessage) {
+      setModalTitle("Error");
+      setModalMessage(errorMessage);
       setErrorModalVisible(true);
       return;
     }
-    navigation.navigate('AccountType', { email, password, username, address, phoneNumber, cin });
+    navigation.navigate("AccountType", {
+      email,
+      password,
+      username,
+      address,
+      phoneNum,
+      cin,
+    });
   };
 
   const closeModal = () => {
@@ -30,7 +53,7 @@ const SignupDetails = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Your details</Text>
-      <Text style={styles.label}>Username</Text>
+      <Text style={styles.label}>Username*</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your username"
@@ -38,27 +61,28 @@ const SignupDetails = ({ route, navigation }) => {
         onChangeText={setUsername}
         autoCapitalize="none"
       />
-      <Text style={styles.label}>Address</Text>
+      <Text style={styles.label}>Address*</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your address"
         value={address}
         onChangeText={setAddress}
       />
-      <Text style={styles.label}>Phone Number</Text>
+      <Text style={styles.label}>Phone Number*</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your phone number"
-        value={phoneNumber}
+        value={phoneNum}
         onChangeText={setPhoneNumber}
         keyboardType="phone-pad"
       />
-      <Text style={styles.label}>CIN</Text>
+      <Text style={styles.label}>CIN*</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your CIN"
         value={cin}
         onChangeText={setCin}
+        keyboardType="number-pad"
       />
       <TouchableOpacity style={styles.button} onPress={Next}>
         <Text style={styles.buttonText}>Next</Text>
@@ -77,38 +101,38 @@ const SignupDetails = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: 16,
-    backgroundColor: "#e6ede6"
+    backgroundColor: "#e6ede6",
   },
   label: {
     fontSize: 16,
     marginBottom: 8,
-    color: "#042630"
+    color: "#042630",
   },
   input: {
     height: 50,
-    borderColor: '#042630',
+    borderColor: "#042630",
     borderWidth: 1,
     marginBottom: 16,
     paddingHorizontal: 8,
-    backgroundColor: "#d0d6d6"
+    backgroundColor: "#d0d6d6",
   },
   title: {
     textAlign: "center",
     fontSize: 22,
     marginBottom: 8,
-    color:'#042630'
+    color: "#042630",
   },
   button: {
-    backgroundColor: '#042630',
+    backgroundColor: "#042630",
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 4,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
   },
 });

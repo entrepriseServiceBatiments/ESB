@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Text, Image } from 'react-native';
-import ErrorModal from './ErrorModal'; // Adjust the path as per your file structure
+import ErrorModal from './ErrorModal'; 
 
 const SignupForm = ({ navigation, ErrorModalVisible, toggleErrorModal }) => {
   const [email, setEmail] = useState('');
@@ -8,10 +8,21 @@ const SignupForm = ({ navigation, ErrorModalVisible, toggleErrorModal }) => {
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const Next = () => {
     if (email.trim() === '') {
-     setModalTitle('Error');
-      setModalMessage('Please Enter Email.');
+      setModalTitle('Error');
+      setModalMessage('Please enter an email.');
+      setErrorModalVisible(true);
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setModalTitle('Error');
+      setModalMessage('Please enter a valid email address.');
       setErrorModalVisible(true);
       return;
     }
@@ -20,10 +31,11 @@ const SignupForm = ({ navigation, ErrorModalVisible, toggleErrorModal }) => {
 
   const GoogleLogin = () => {
     console.log('Continue with Google');
+    // Handle Google login logic here
   };
 
   const goToLogin = () => {
-    navigation.navigate('Login');
+    navigation.navigate('LoginForm');
   };
 
   const closeModal = () => {
@@ -35,7 +47,7 @@ const SignupForm = ({ navigation, ErrorModalVisible, toggleErrorModal }) => {
       <Image style={styles.image} source={require('../assets/logo.png')} />
       <Text style={styles.title}>Create an account</Text>
       <Text style={styles.p}>Enter your email to sign up for this app</Text>
-      <Text style={styles.label}>Email</Text>
+      <Text style={styles.label}>Email*</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your email"
@@ -43,8 +55,9 @@ const SignupForm = ({ navigation, ErrorModalVisible, toggleErrorModal }) => {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        accessibilityLabel="Email Input"
       />
-      <TouchableOpacity style={styles.button} onPress={Next}>
+      <TouchableOpacity style={styles.button} onPress={Next} accessibilityRole="button">
         <Text style={styles.buttonText}>Signup with email</Text>
       </TouchableOpacity>
       <View style={styles.separatorContainer}>
@@ -52,7 +65,7 @@ const SignupForm = ({ navigation, ErrorModalVisible, toggleErrorModal }) => {
         <Text style={styles.separatorText}>or continue with</Text>
         <View style={styles.separator} />
       </View>
-      <TouchableOpacity style={styles.googleButton} onPress={GoogleLogin}>
+      <TouchableOpacity style={styles.googleButton} onPress={GoogleLogin} accessibilityRole="button">
         <Image style={styles.googleIcon} source={require('../assets/google-icon.png')} />
         <Text style={styles.googleButtonText}>Google</Text>
       </TouchableOpacity>
@@ -61,12 +74,10 @@ const SignupForm = ({ navigation, ErrorModalVisible, toggleErrorModal }) => {
         <Text style={styles.separatorText}>Already have an account?</Text>
         <View style={styles.separator} />
       </View>
-      <TouchableOpacity style={styles.googleButton} onPress={goToLogin}>
+      <TouchableOpacity style={styles.googleButton} onPress={goToLogin} accessibilityRole="button">
         <Text style={styles.googleButtonText}>Login</Text>
       </TouchableOpacity>
 
-      
-      
       <ErrorModal
         visible={errorModalVisible}
         onClose={closeModal}
@@ -88,7 +99,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
     color: "#042630"
-  }, 
+  },
   image: {
     width: 300,
     height: 200,
