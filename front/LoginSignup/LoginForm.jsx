@@ -18,8 +18,10 @@ const LoginForm = ({ navigation }) => {
 
   const Login = async () => {
     try {
-      const response = await fetch("http://192.168.104.3:3000/login", {
-        method: "POST",
+
+      const response = await fetch('http://192.168.11.49:3000/login', {
+        method: 'POST',
+
         headers: {
           "Content-Type": "application/json",
         },
@@ -28,10 +30,12 @@ const LoginForm = ({ navigation }) => {
 
       const data = await response.json();
       if (response.ok) {
-        await AsyncStorage.setItem("token", data.token);
-        await AsyncStorage.setItem("user", JSON.stringify(data.user));
-        console.log(data.token);
-        navigation.navigate("Profile");
+
+        await AsyncStorage.setItem('token', data.token);
+        await AsyncStorage.setItem('user',JSON.stringify(data.user))
+        console.log(data);
+        navigation.navigate('Profile');
+
       } else {
         Alert.alert("Login Failed", data.message);
       }
