@@ -18,9 +18,13 @@ const updateworker = async (workerId, data) => {
     data,
   });
 };
+const getWorkersByJobTitle = async(jobTitle)=>{
+  return await prisma.worker.findMany({where:{jobTitle}})
+}
 module.exports = {
   getWorkers,
   createWorker,
   getWorkerByEmail,
   updateworker,
+  getWorkersByJobTitle
 };
