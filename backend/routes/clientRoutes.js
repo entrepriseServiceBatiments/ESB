@@ -9,6 +9,7 @@ router.get('/clients', clientController.getClients);
 
 router.get('/clients/:clientId',clientController.getoneClients);
 router.put('/clients/:clientId', clientController.updateClient); 
+router.put('/clients/updatePassword/:clientId', clientController.updatePassword); // New route for updating password
 
 
 

@@ -1,41 +1,51 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const createOrder = async (data) => {
-  try {
-    const newOrder = await prisma.order.create({
-      data: {
-        startDate: data.startDate,
-        endDate: data.endDate,
-        clientId: data.clientId,
-        // You can add other fields as needed
+const createOrder = async (clientId, products, startDate, endDate) => {
+  const order = await prisma.order.create({
+    data: {
+      clientId,
+      startDate,
+      endDate,
+      Products: {
+        create: products.map((product) => ({
+          productId: product.idproducts,
+        })),
       },
-    });
-    return newOrder;
-  } catch (error) {
-    throw new Error(`Failed to create order: ${error.message}`);
-  }
+    },
+    include: {
+      Products: true,
+    },
+  });
+
+  return order;
 };
 
-const getOrdersByClientId = async (clientId) => {
-  try {
-    const orders = await prisma.order.findMany({
-      where: {
-        clientId: clientId,
-      },
-      include: {
-        Client: true, // Include Client details if needed
-        Workers: true, // Include Workers associated with the order
-        Products: true, // Include Products associated with the order
-      },
-    });
-    return orders;
-  } catch (error) {
-    throw new Error(`Failed to fetch orders: ${error.message}`);
-  }
+const getClientOrders = async (clientId) => {
+  const orders = await prisma.order.findMany({
+    where: {
+      clientId: parseInt(clientId),
+    },
+    include: {
+      Products: true,
+    },
+  });
+
+  return orders;
+};
+
+const getAllOrders = async () => {
+  const orders = await prisma.order.findMany({
+    include: {
+      Products: true,
+    },
+  });
+
+  return orders;
 };
 
 module.exports = {
   createOrder,
-  getOrdersByClientId,
+  getClientOrders,
+  getAllOrders,
 };

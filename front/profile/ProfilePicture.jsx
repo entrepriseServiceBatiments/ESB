@@ -10,7 +10,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 
-const SignupPicture = ({ route, navigation }) => {
+const ProfilePicture = ({ route, navigation }) => {
   const [profilePicture, setProfilePicture] = useState(null);
 
   const selectImage = async () => {
@@ -70,7 +70,7 @@ const SignupPicture = ({ route, navigation }) => {
 
       const cin = route.params.cin; // assuming you pass the cin parameter from the previous screen
       const response = await axios.put(
-        `http://192.168.1.16:3000/clients/${cin}`,
+        `http://192.168.104.15:3000/clients/${cin}`,
         {
           picture: imageUrl,
         }
@@ -98,12 +98,7 @@ const SignupPicture = ({ route, navigation }) => {
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Home")}
-        >
-          <Text style={styles.buttonText}>Skip</Text>
-        </TouchableOpacity>
+       
       </View>
     </View>
   );
@@ -154,4 +149,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignupPicture;
+export default ProfilePicture;
