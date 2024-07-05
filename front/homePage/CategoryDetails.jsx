@@ -18,7 +18,7 @@ const CategoryDetails = ({ route, navigation }) => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/products/${category}`
+          `http://192.168.104.15:3000/products/${category}`
         );
         const data = await response.json();
         setProducts(data);
