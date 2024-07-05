@@ -8,7 +8,6 @@ import CartScreen from "./Cart";
 import Profile from "../profile/profile";
 import LoginStack from "../Nav/LoginStack"; // Ensure the path is correct
 import Shop from "./Shop";
-
 const Tab = createBottomTabNavigator();
 
 const Navbar = () => {
@@ -79,6 +78,7 @@ const Navbar = () => {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Shop" component ={Shop}/>
       <Tab.Screen name="Cart" component={CartScreen} />
+     
       
      </Tab.Navigator>
   );
