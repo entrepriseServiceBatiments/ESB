@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")  // Replace with your actual database URL
+  url      = env("DATABASE_URL")
 }
 
 model Admin {
@@ -16,10 +16,10 @@ model Admin {
 model Client {
   idClient    Int       @id @default(autoincrement())
   userName    String
-  creditCard  Int?
+  creditCard  String?
   address     String
-  cin         Int
-  phoneNum    Int
+  cin         Int       @unique
+  phoneNum    Int       @unique
   email       String    @unique
   password    String
   picture     String?
@@ -35,7 +35,7 @@ model Order {
   clientId   Int
   Client     Client        @relation("ClientOrders", fields: [clientId], references: [idClient])
   Workers    Worker[]      @relation("OrderWorkers")
-  Products   Product[]     @relation("OrderProducts")
+  Products   OrderProduct[]   // Update relation field
 }
 
 model Product {
@@ -48,9 +48,17 @@ model Product {
   rating       Int
   stock        Int
   numOfRatings Int
-  ordersId     Int?      // Nullable by default
-  Order        Order?    @relation("OrderProducts", fields: [ordersId], references: [idorders])
+  Orders       OrderProduct[]   // Update relation field
   Favorites    Favorite[]
+}
+
+model OrderProduct {
+  orderId   Int
+  productId Int
+  Order     Order    @relation(fields: [orderId], references: [idorders])
+  Product   Product  @relation(fields: [productId], references: [idproducts])
+
+  @@id([orderId, productId])
 }
 
 model Favorite {
@@ -65,9 +73,9 @@ model Favorite {
 model Worker {
   idworker     Int       @id @default(autoincrement())
   cin          Int
-  creditCard   Int?
+  creditCard   String?
   userName     String
-  phoneNumber  Int
+  phoneNum     Int
   email        String?   @unique
   password     String?
   rentedProd   String?

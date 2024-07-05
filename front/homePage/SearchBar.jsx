@@ -11,12 +11,12 @@ const SearchBar = ({ onSearch }) => {
     const phrases = ['5000 prestataires', '150 services'];
     let index = 0;
 
-    const intervalId = setInterval(() => {
+    const interval = setInterval(() => {
       index = (index + 1) % phrases.length;
       setPlaceHolder(`Trouver plus de ${phrases[index]}`);
-    }, 3000);
+    }, 2000);
 
-    return () => clearInterval(intervalId);
+    return () => clearInterval(interval);
   }, []);
 
   const searchii = () => {

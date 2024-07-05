@@ -17,7 +17,9 @@ const CategoryDetails = ({ route, navigation }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/products/${category}`);
+        const response = await fetch(
+          `http://localhost:3000/products/${category}`
+        );
         const data = await response.json();
         setProducts(data);
       } catch (error) {
@@ -27,7 +29,9 @@ const CategoryDetails = ({ route, navigation }) => {
 
     const fetchWorkers = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/workers/${jobTitle}`);
+        const response = await fetch(
+          `http://localhost:3000/workers/${jobTitle}`
+        );
         const data = await response.json();
         setWorkers(data);
       } catch (error) {
@@ -39,14 +43,37 @@ const CategoryDetails = ({ route, navigation }) => {
     fetchWorkers();
   }, [category, jobTitle]);
 
+  
+  const toggleFavorite = (item) => {
+    setFavorites((prevFavorites) => {
+      if (prevFavorites.includes(item.id)) {
+        return prevFavorites.filter(favId => favId !== item.id);
+      } else {
+        return [...prevFavorites, item.id];
+      }
+    });
+  };
+
+
+
+
+
   const renderProductItem = ({ item }) => (
     <View style={styles.card}>
+      <View style={styles.favoriteIconContainer}>
+        <Image
+          source={require('../assets/icons/favorite.png')}
+          style={styles.favoriteIcon}
+        />
+      </View>
       <Image source={{ uri: item.image }} style={styles.image} />
       <View style={styles.cardContent}>
         <Text style={styles.title}>{item.name}</Text>
         <Text style={styles.description}>{item.description}</Text>
         {item.price ? (
-          <Text style={styles.price}>À PARTIR DE : {item.price.toFixed(2)} € TTC/JOUR</Text>
+          <Text style={styles.price}>
+            À PARTIR DE : {item.price.toFixed(2)} € TTC/JOUR
+          </Text>
         ) : (
           <Text style={styles.price}>Price not available</Text>
         )}
@@ -67,10 +94,14 @@ const CategoryDetails = ({ route, navigation }) => {
         <View style={styles.workerInfo}>
           <Text style={styles.workerName}>{item.name}</Text>
           <Text style={styles.workerVerified}>Identité Vérifiée</Text>
-          <Text style={styles.workerRating}>{item.rating ? `${item.rating} ★` : 'No rating available'}</Text>
+          <Text style={styles.workerRating}>
+            {item.rating ? `${item.rating} ★` : 'No rating available'}
+          </Text>
         </View>
         <View style={styles.workerDistance}>
-          <Text style={styles.distanceText}>{item.distance ? `${item.distance} KM` : 'Distance not available'}</Text>
+          <Text style={styles.distanceText}>
+            {item.distance ? `${item.distance} KM` : 'Distance not available'}
+          </Text>
         </View>
       </View>
       <View style={styles.workerContent}>
@@ -79,16 +110,26 @@ const CategoryDetails = ({ route, navigation }) => {
     </TouchableOpacity>
   );
 
-  const keyExtractor = (item) => item.id ? item.id.toString() : item.name;
+  const keyExtractor = (item) => (item.id ? item.id.toString() : item.name);
 
   return (
     <View style={styles.container}>
       <View style={styles.navbar}>
-        <TouchableOpacity style={styles.navItem} onPress={() => setTab('products')}>
-          <Text style={tab === 'products' ? styles.activeTab : styles.tab}>Products</Text>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => setTab('products')}
+        >
+          <Text style={tab === 'products' ? styles.activeTab : styles.tab}>
+            Products
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => setTab('services')}>
-          <Text style={tab === 'services' ? styles.activeTab : styles.tab}>Services</Text>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => setTab('services')}
+        >
+          <Text style={tab === 'services' ? styles.activeTab : styles.tab}>
+            Services
+          </Text>
         </TouchableOpacity>
       </View>
       <FlatList
@@ -145,6 +186,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 4,
     elevation: 2,
+  },
+  favoriteIconContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+  },
+  favoriteIcon: {
+    width: 24,
+    height: 24,
   },
   image: {
     width: '100%',
