@@ -1,5 +1,5 @@
 const workerService = require('../services/workerService');
-
+const bcrypt=require('bcryptjs')
 const getWorkers = async (req, res) => {
   try {
     const workers = await workerService.getWorkers();
@@ -15,7 +15,7 @@ const createWorker = async (req, res) => {
       cin,
       creditCard,
       userName,
-      phoneNumber,
+      phoneNum,
       email,
       password,
       rentedProd,
@@ -32,13 +32,16 @@ const createWorker = async (req, res) => {
       status,
       comments,
     } = req.body;
+
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
+
     const worker = await workerService.createWorker({
       cin,
       creditCard,
       userName,
-      phoneNumber,
+      phoneNum,
       email,
-      password,
+      password:hashedPassword,
       rentedProd,
       picture,
       resume,

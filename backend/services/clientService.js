@@ -1,4 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcryptjs");
+
 const prisma = new PrismaClient();
 
 const getClients = async () => {
@@ -27,11 +29,18 @@ const getClientById = async (clientId) => {
     where: { idClient: Number(clientId) },
   });
 };
-
+const updatePassword = async (clientId, newPassword) => {
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  return await prisma.client.update({
+    where: { idClient: Number(clientId) },
+    data: { password: hashedPassword },
+  });
+};
 module.exports = {
   getClients,
   createClient,
   updateClient,
   getClientById,
   getClientByEmail,
+  updatePassword,
 };
