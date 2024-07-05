@@ -4,7 +4,7 @@ const { cloudinary } = require("../cloudinaryConfig");
 
 const getProducts = async () => {
   return await prisma.product.findMany({
-    include: { Order: true, Favorites: true },
+    // include: { Order: true, Favorites: true },
   });
 };
 
