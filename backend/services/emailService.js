@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 const sendStatusChangeEmail = async (workerEmail, status) => {
   const mailOptions = {
     from: "salahadem817@gmail.com",
-    to: "adem.hameed.123@gmail.com",
+    to: workerEmail,
     subject: "Status Change Notification",
     text: `Hello,\n\nYour status has been updated to: ${
       status ? "Active" : "Inactive"

@@ -70,7 +70,7 @@ const SignupPicture = ({ route, navigation }) => {
 
       const cin = route.params.cin; // assuming you pass the cin parameter from the previous screen
       const response = await axios.put(
-        `http://192.168.1.16:3000/clients/${cin}`,
+        `http://192.168.104.15:3000/clients/${cin}`,
         {
           picture: imageUrl,
         }

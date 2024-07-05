@@ -1,6 +1,6 @@
 const workerService = require("../services/workerService");
 const prisma = require("../prisma");
-const {sendStatusChangeEmail} = require("../services/emailService");
+const { sendStatusChangeEmail } = require("../services/emailService");
 const getWorkers = async (req, res) => {
   try {
     const workers = await workerService.getWorkers();
@@ -16,7 +16,7 @@ const createWorker = async (req, res) => {
       cin,
       creditCard,
       userName,
-      phoneNumber,
+      phoneNum,
       email,
       password,
       rentedProd,
@@ -37,7 +37,7 @@ const createWorker = async (req, res) => {
       cin,
       creditCard,
       userName,
-      phoneNumber,
+      phoneNum,
       email,
       password,
       rentedProd,
@@ -64,7 +64,7 @@ const updateWorker = async (req, res) => {
     cin,
     creditCard,
     userName,
-    phoneNumber,
+    phoneNum,
     email,
     password,
     rentedProd,
@@ -90,7 +90,7 @@ const updateWorker = async (req, res) => {
       cin,
       creditCard,
       userName,
-      phoneNumber,
+      phoneNum,
       email,
       password,
       rentedProd,
@@ -128,6 +128,7 @@ const updateWorkerStatus = async (req, res) => {
     });
     await sendStatusChangeEmail(worker.email, status);
     res.json(worker);
+    console.log(worker.email);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Failed to update worker status" });
