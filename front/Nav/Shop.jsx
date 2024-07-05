@@ -39,7 +39,7 @@ const Shop = () => {
 
   const fetchProducts = async (category) => {
     try {
-      const response = await fetch(`http://192.168.104.10:8081/products/${category}`);
+      const response = await fetch(`http://192.168.104.10:3000/products/${category}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -58,7 +58,7 @@ const Shop = () => {
   
   const fetchWorkers = async (jobTitle) => {
     try {
-      const response = await fetch(`http://192.168.104.10:8081/workers/${jobTitle}`);
+      const response = await fetch(`http://192.168.104.10:3000/workers/${jobTitle}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
