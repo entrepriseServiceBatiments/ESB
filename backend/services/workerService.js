@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const getWorkers = async () => {
@@ -18,13 +18,13 @@ const updateworker = async (workerId, data) => {
     data,
   });
 };
-const getWorkersByJobTitle = async(jobTitle)=>{
-  return await prisma.worker.findMany({where:{jobTitle}})
-}
+const getWorkersByJobTitle = async (jobTitle) => {
+  return await prisma.worker.findMany({ where: { jobTitle } });
+};
 module.exports = {
   getWorkers,
   createWorker,
   getWorkerByEmail,
   updateworker,
-  getWorkersByJobTitle
+  getWorkersByJobTitle,
 };

@@ -4,15 +4,15 @@ const { faker } = require("@faker-js/faker");
 const prisma = new PrismaClient();
 
 const workerCategories = [
-  "Plumbing",
-  "Electricity",
-  "Housekeeping",
-  "Windows and blinds",
-  "Air conditioning",
-  "DIY and assembly",
-  "Washing machine",
-  "Painting",
-  "Gardening",
+  "Plumber",
+  "Electrician",
+  "Housekeeper",
+  "Mason",
+  "HVAC Technician",
+  "Handyman",
+  "Appliance Repair Technician",
+  "Painter",
+  "Gardener",
 ];
 
 const productCategories = [
