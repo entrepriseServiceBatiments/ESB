@@ -8,17 +8,24 @@ import {
   Image,
 } from "react-native";
 
+import Calendar from './Calendar';
+
 const CategoryDetails = ({ route, navigation }) => {
   const { category, jobTitle } = route.params;
   const [tab, setTab] = useState("products");
   const [products, setProducts] = useState([]);
   const [workers, setWorkers] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
           `http://192.168.104.9:3000/products/${category}`
+
         );
         const data = await response.json();
         setProducts(data);
@@ -30,7 +37,9 @@ const CategoryDetails = ({ route, navigation }) => {
     const fetchWorkers = async () => {
       try {
         const response = await fetch(
+
           `http://192.168.104.9:3000/workers/${jobTitle}`
+
         );
         const data = await response.json();
         setWorkers(data);
@@ -53,14 +62,63 @@ const CategoryDetails = ({ route, navigation }) => {
     });
   };
 
+
+  const handleReserverPress = (product) => {
+    setSelectedProduct(product);
+  };
+
+  const handleStartDateChange = (selectedDate) => {
+    setStartDate(selectedDate || startDate);
+  };
+
+  const handleEndDateChange = (selectedDate) => {
+    setEndDate(selectedDate || endDate);
+  };
+
+  const handleCalendarClose = () => {
+    setSelectedProduct(null);
+  };
+
+  const handleFavoritePress = async (productId) => {
+    const clientId = 1;
+    try {
+      const response = await fetch('http://192.168.104.9:3000/wishlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ clientId, productsId: productId }),
+      });
+
+      const responseText = await response.text();
+
+      try {
+        const data = JSON.parse(responseText);
+
+        if (response.ok) {
+          setFavorites((prevFavorites) => [...prevFavorites, productId]);
+        } else {
+          console.error('Error adding to wishlist:', data.error);
+        }
+      } catch (jsonError) {
+        console.error('Invalid JSON response:', responseText);
+      }
+    } catch (error) {
+      console.error('Error adding to wishlist:', error);
+    }
+  };
+
   const renderProductItem = ({ item }) => (
     <View style={styles.card}>
-      <View style={styles.favoriteIconContainer}>
+      <TouchableOpacity
+        style={styles.favoriteIconContainer}
+        onPress={() => handleFavoritePress(item.id)}
+      >
         <Image
           source={require("../assets/icons/favorite.png")}
           style={styles.favoriteIcon}
         />
-      </View>
+      </TouchableOpacity>
       <Image source={{ uri: item.image }} style={styles.image} />
       <View style={styles.cardContent}>
         <Text style={styles.title}>{item.name}</Text>
@@ -72,7 +130,7 @@ const CategoryDetails = ({ route, navigation }) => {
         ) : (
           <Text style={styles.price}>Price not available</Text>
         )}
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => handleReserverPress(item)}>
           <Text style={styles.buttonText}>Réserver</Text>
         </TouchableOpacity>
       </View>
@@ -128,13 +186,28 @@ const CategoryDetails = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <FlatList
+ HEAD
         key={tab} 
         data={tab === "products" ? products : workers}
         keyExtractor={keyExtractor}
         renderItem={tab === "products" ? renderProductItem : renderWorkerItem}
         numColumns={tab === "products" ? 2 : 1}
         columnWrapperStyle={tab === "products" && styles.row}
+        key={tab}
+        data={tab === 'products' ? products : workers}
+        keyExtractor={keyExtractor}
+        renderItem={tab === 'products' ? renderProductItem : renderWorkerItem}
+        numColumns={tab === 'products' ? 2 : 1}
+        columnWrapperStyle={tab === 'products' ? styles.columnWrapper : null}
         contentContainerStyle={styles.listContent}
+      />
+      <Calendar
+        visible={selectedProduct !== null}
+        startDate={startDate}
+        endDate={endDate}
+        onStartDateChange={handleStartDateChange}
+        onEndDateChange={handleEndDateChange}
+        onClose={handleCalendarClose}
       />
     </View>
   );
@@ -143,6 +216,7 @@ const CategoryDetails = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+ 
     backgroundColor: "#fff",
   },
   navbar: {
@@ -150,9 +224,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     padding: 10,
     backgroundColor: "#f0f0f0",
+    backgroundColor: '#f8f8f8',
+  },
+  navbar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#fff',
+    paddingVertical: 10,
+    elevation: 2,
   },
   navItem: {
-    padding: 10,
+    flex: 1,
+    alignItems: 'center',
   },
   tab: {
     fontSize: 16,
@@ -163,9 +246,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#000",
+    color: '#666',
+  },
+  activeTab: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: 'bold',
   },
   listContent: {
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingBottom: 20,
   },
   row: {
     flex: 1,
@@ -187,19 +277,32 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     zIndex: 1,
+  columnWrapper: {
+    justifyContent: 'space-between',
+  },
+  card: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    margin: 10,
+    padding: 10,
+    elevation: 3,
+  },
+  favoriteIconContainer: {
+    alignItems: 'flex-end',
   },
   favoriteIcon: {
     width: 24,
     height: 24,
+    tintColor: '#ff0000',
   },
   image: {
     width: "100%",
     height: 150,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    borderRadius: 8,
   },
   cardContent: {
-    padding: 10,
+    marginTop: 10,
   },
   title: {
     fontSize: 16,
@@ -217,24 +320,44 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 10,
     backgroundColor: "#ff0000",
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  description: {
+    fontSize: 14,
+    color: '#666',
+    marginVertical: 5,
+  },
+  price: {
+    fontSize: 16,
+    color: '#000',
+    marginVertical: 5,
+  },
+  button: {
+    marginTop: 10,
+    backgroundColor: '#007BFF',
     paddingVertical: 10,
     borderRadius: 4,
+    alignItems: 'center',
   },
   buttonText: {
     color: "#fff",
     textAlign: "center",
     fontWeight: "bold",
+    color: '#fff',
+    fontWeight: 'bold',
   },
   workerCard: {
     backgroundColor: "#fff",
     borderRadius: 8,
-    marginVertical: 10,
+    margin: 10,
     padding: 10,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 4,
     elevation: 2,
+    elevation: 3,
   },
   workerHeader: {
     flexDirection: "row",
@@ -244,10 +367,10 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
+    marginRight: 10,
   },
   workerInfo: {
     flex: 1,
-    marginLeft: 10,
   },
   workerName: {
     fontSize: 16,
@@ -260,6 +383,12 @@ const styles = StyleSheet.create({
   workerRating: {
     fontSize: 14,
     color: "#FFA500",
+    fontSize: 14,
+    color: '#4CAF50',
+  },
+  workerRating: {
+    fontSize: 14,
+    color: '#FFD700',
   },
   workerDistance: {
     alignItems: "flex-end",
@@ -267,6 +396,8 @@ const styles = StyleSheet.create({
   distanceText: {
     fontSize: 12,
     color: "#555",
+    fontSize: 14,
+    color: '#666',
   },
   workerContent: {
     marginTop: 10,
@@ -275,6 +406,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
   },
-});
+},})
+
 
 export default CategoryDetails;

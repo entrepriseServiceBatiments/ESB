@@ -107,62 +107,7 @@ const Home = () => {
           contentContainerStyle={styles.promoList}
         />
 
-        <ScrollView
-          horizontal
-          contentContainerStyle={styles.servicesContainer}
-          showsHorizontalScrollIndicator={false}
-        >
-          <View style={styles.serviceItem}>
-            <Image
-              source={require('../assets/icons/position.png')}
-              style={styles.serviceIcon}
-            />
-            <Text style={styles.serviceTitle}>Nos agences de proximité</Text>
-            <Text style={styles.serviceDescription}>
-              Entretien, dépannage, installation et remplacement de vos
-              équipements par nos équipes locales
-            </Text>
-          </View>
-          <View style={styles.serviceItem}>
-            <Image
-              source={require('../assets/icons/miner.png')}
-              style={styles.serviceIcon}
-            />
-            <Text style={styles.serviceTitle}>
-              Une expertise de près de 50 ans
-            </Text>
-            <Text style={styles.serviceDescription}>
-              Des agences certifiées RGE avec un réseau de technico-commerciaux
-              et techniciens régulièrement formés
-            </Text>
-          </View>
-          <View style={styles.serviceItem}>
-            <Image
-              source={require('../assets/icons/team.png')}
-              style={styles.serviceIcon}
-            />
-            <Text style={styles.serviceTitle}>
-              Des partenariats aves des grandes marques
-            </Text>
-            <Text style={styles.serviceDescription}>
-              Large choix d’équipements de chauffage, climatisation et
-              production d’eau chaude de grandes marques
-            </Text>
-          </View>
-          <View style={styles.serviceItem}>
-            <Image
-              source={require('../assets/icons/guarantee.png')}
-              style={styles.serviceIcon}
-            />
-            <Text style={styles.serviceTitle}>
-              Confiance et sécurité au cœur de nos priorités
-            </Text>
-            <Text style={styles.serviceDescription}>
-              Nous veillons à la sécurité et à la satisfaction de nos clients au
-              travers de nos actions et nos interventions !
-            </Text>
-          </View>
-        </ScrollView>
+ 
       </ScrollView>
     </View>
   );
