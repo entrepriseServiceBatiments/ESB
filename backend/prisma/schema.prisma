@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
- 
+
 }
 
 model Admin {
@@ -26,17 +26,20 @@ model Client {
   picture     String?
   Orders      Order[]   @relation("ClientOrders")
   Favorites   Favorite[]
-  Messages    Message[]
+    Messages    Message[] @relation("ClientMessages")
 }
 
 model Order {
   idorders   Int           @id @default(autoincrement())
   startDate  String?
   endDate    String?
+  status     String        @default("pending")  
   clientId   Int
   Client     Client        @relation("ClientOrders", fields: [clientId], references: [idClient])
   Workers    Worker[]      @relation("OrderWorkers")
+
   Products   OrderProduct[]   // Update relation field
+
 }
 
 model Product {
@@ -50,18 +53,14 @@ model Product {
   stock        Int
   numOfRatings Int
   Orders       OrderProduct[]   // Update relation field
+
  
+
+
   Favorites    Favorite[]
 }
 
-model OrderProduct {
-  orderId   Int
-  productId Int
-  Order     Order    @relation(fields: [orderId], references: [idorders])
-  Product   Product  @relation(fields: [productId], references: [idproducts])
 
-  @@id([orderId, productId])
-}
 
 
 
@@ -96,18 +95,25 @@ model Worker {
   status       Boolean?
   comments     String?
   Order        Order?    @relation("OrderWorkers", fields: [ordersId], references: [idorders])
-  Messages     Message[]
-
+  Messages     Message[] @relation("WorkerMessages")
   @@index([ordersId], name: "idx_ordersId") // Optional: Index for faster lookups
 }
 
 model Message {
-  clientId    Int
-  workerId    Int
-  content     String?
+  id              Int            @id @default(autoincrement())
+  content         String
+  clientId        Int?
+  workerId        Int?
+  conversationId  Int
 
-  Client      Client    @relation(fields: [clientId], references: [idClient])
-  Worker      Worker    @relation(fields: [workerId], references: [idworker])
+  Client          Client?        @relation("ClientMessages", fields: [clientId], references: [idClient])
+  Worker          Worker?        @relation("WorkerMessages", fields: [workerId], references: [idworker])
+  Conversation    Conversation   @relation(fields: [conversationId], references: [id])
 
-  @@id([clientId, workerId])
+  @@index([conversationId], name: "idx_conversationId")
+}
+model Conversation {
+  id         Int       @id @default(autoincrement())
+  title      String?
+  Messages   Message[]
 }

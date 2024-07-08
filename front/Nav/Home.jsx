@@ -1,4 +1,4 @@
-import React ,{useEffect,useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,6 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import PromoCard from '../promos/PromoCard';
 import SearchBar from '../homePage/SearchBar';
-
 
 const categories = [
   { name: 'Plumbing', jobTitle: 'Plumber' },
@@ -58,24 +57,27 @@ const promoData = [
 const Home = () => {
   const navigation = useNavigation();
   const [categoriess, setCategories] = useState(categories);
+
   const handleCategoryPress = (category, jobTitle) => {
     navigation.navigate('CategoryDetails', { category, jobTitle });
   };
 
   const handlePromoPress = (item) => {
-    navigation.navigate('Promos', { item , allPromos:promoData});
+    navigation.navigate('Promos', { item, allPromos: promoData });
   };
+
   const handleSearch = (query) => {
     console.log('Search query:', query);
     const filteredCategories = categories.filter((category) =>
       category.name.toLowerCase().includes(query.toLowerCase())
     );
     setCategories(filteredCategories);
-  }
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView>
-        <SearchBar onSearch={handleSearch}/>
+        <SearchBar onSearch={handleSearch} />
         <ScrollView
           horizontal
           contentContainerStyle={styles.scrollView}
@@ -105,62 +107,7 @@ const Home = () => {
           contentContainerStyle={styles.promoList}
         />
 
-        <View style={styles.servicesContainer}>
-          <Text style={styles.servicesHeader}>
-            Un service de proximité et de qualité pour vous accompagner en toute
-            sécurité
-          </Text>
-          <View style={styles.serviceItem}>
-            <Image
-              source={require('../assets/icons/position.png')}
-              style={styles.serviceIcon}
-            />
-            <Text style={styles.serviceTitle}>Nos agences de proximité</Text>
-            <Text style={styles.serviceDescription}>
-              Entretien, dépannage, installation et remplacement de vos
-              équipements par nos équipes locales
-            </Text>
-          </View>
-          <View style={styles.serviceItem}>
-            <Image
-              source={require('../assets/icons/miner.png')}
-              style={styles.serviceIcon}
-            />
-            <Text style={styles.serviceTitle}>
-              Une expertise de près de 50 ans
-            </Text>
-            <Text style={styles.serviceDescription}>
-              Des agences certifiées RGE avec un réseau de technico-commerciaux
-              et techniciens régulièrement formés
-            </Text>
-          </View>
-          <View style={styles.serviceItem}>
-            <Image
-              source={require('../assets/icons/team.png')}
-              style={styles.serviceIcon}
-            />
-            <Text style={styles.serviceTitle}>
-              Des partenariats aves des grandes marques
-            </Text>
-            <Text style={styles.serviceDescription}>
-              Large choix d’équipements de chauffage, climatisation et
-              production d’eau chaude de grandes marques
-            </Text>
-          </View>
-          <View style={styles.serviceItem}>
-            <Image
-              source={require('../assets/icons/guarantee.png')}
-              style={styles.serviceIcon}
-            />
-            <Text style={styles.serviceTitle}>
-              Confiance et sécurité au cœur de nos priorités
-            </Text>
-            <Text style={styles.serviceDescription}>
-              Nous veillons à la sécurité et à la satisfaction de nos clients au
-              travers de nos actions et nos interventions !
-            </Text>
-          </View>
-        </View>
+ 
       </ScrollView>
     </View>
   );
@@ -193,11 +140,8 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   servicesContainer: {
-    padding: 20,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    marginBottom: 20,
-    marginHorizontal: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 20,
   },
   servicesHeader: {
     fontSize: 18,
@@ -207,7 +151,7 @@ const styles = StyleSheet.create({
   },
   serviceItem: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginHorizontal: 10,
   },
   serviceIcon: {
     width: 50,

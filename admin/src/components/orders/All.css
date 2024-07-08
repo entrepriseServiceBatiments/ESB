@@ -1,23 +1,25 @@
 /* AllOrders.css */
-.orders-container .orders-container {
+.orders-container {
   padding: 20px;
+  margin-left: 0px;
+  margin-right: 0px;
 }
 
-.decline-button {
+.orders-container .decline-button {
   background-color: rgb(0, 0, 0);
 }
 
-.accept-button {
+.orders-container .accept-button {
   background-color: rgb(0, 0, 0);
   margin-bottom: 10px;
 }
 
-.orders-container .orders-table {
+.orders-container .orders-container .orders-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.orders-container .orders-table th,
+.orders-container .orders-container .orders-table th,
 .orders-table td {
   border: 1px solid #ddd;
   padding: 8px;
@@ -28,7 +30,7 @@
   text-align: left;
 } */
 
-.orders-container .orders-table tr:nth-child(even) {
+.orders-container .orders-container .orders-table tr:nth-child(even) {
   background-color: #f9f9f9;
 }
 
@@ -48,6 +50,6 @@
   opacity: 0.5;
 } */
 
-.orders-container .orders-table button:hover:not(:disabled) {
+.orders-container .orders-container .orders-table button:hover:not(:disabled) {
   background-color: #000000;
 }
