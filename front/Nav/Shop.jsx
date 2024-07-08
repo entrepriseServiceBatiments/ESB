@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, FlatList, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const categories = [
   { name: 'Plumbing', jobTitle: 'Plumber' },
@@ -15,11 +17,13 @@ const categories = [
 
 const Shop = () => {
   const [selectedCard, setSelectedCard] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [workers, setWorkers] = useState([]);
+  const [data, setData] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [favorites, setFavorites] = useState([]);
+  const [clientId, setClientId] = useState('');
 
   useEffect(() => {
-    
+    retrieveData();
     if (selectedCard === 'Products') {
       fetchProducts();
     } else if (selectedCard === 'Services') {
@@ -27,57 +31,129 @@ const Shop = () => {
     }
   }, [selectedCard]);
 
+  const retrieveData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      let user = await AsyncStorage.getItem('user');
+      user = JSON.parse(user);
+      if (user !== null) {
+        setClientId(user.idClient);
+        console.log(user);
+      }
+    } catch (error) {
+      console.error('Error retrieving data:', error);
+    }
+  };
+
   const handleCardPress = (card) => {
     setSelectedCard(card);
   };
 
-  const handleCategoryPress = (category, jobTitle) => {
-    setSelectedCard(null); 
-    fetchProducts(category);
-    fetchWorkers(jobTitle);
+  const handleCategoryPress = (category) => {
+    setSelectedCategory(category);
+    if (selectedCard === 'Products') {
+      fetchProducts(category);
+    } else if (selectedCard === 'Services') {
+      fetchServices(category);
+    }
   };
 
   const fetchProducts = async (category) => {
     try {
-      const response = await fetch(`http://192.168.104.10:3000/products/${category}`);
+      const response = await fetch(`http://192.168.104.11:3000/products/${category}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const data = await response.json();
-        setProducts(data);
+        setData(data);
       } else {
         throw new Error('Oops! Unexpected response from server');
       }
     } catch (error) {
       console.error('Fetch Error:', error.message);
-      setProducts([]);
+      setData([]);
     }
   };
-  
-  const fetchWorkers = async (jobTitle) => {
+
+  const fetchServices = async (category) => {
+    const jobTitle = categories.find(cat => cat.name === category)?.jobTitle;
+    if (!jobTitle) return;
+
     try {
-      const response = await fetch(`http://192.168.104.10:3000/workers/${jobTitle}`);
+      const response = await fetch(`http://192.168.104.11:3000/workers/${jobTitle}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const data = await response.json();
-        setWorkers(data);
+        setData(data);
       } else {
         throw new Error('Oops! Unexpected response from server');
       }
     } catch (error) {
       console.error('Fetch Error:', error.message);
-      setWorkers([]);
+      setData([]);
     }
+  };
+
+  const toggleFavorite = async (itemId) => {
+
+      if (favorites.includes(itemId)) {
+       
+        setFavorites(favorites.filter(id => id !== itemId));
+        try {
+          const response = await fetch('http://192.168.104.11:3000/wishlist', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ clientId, itemId }),
+          });
+    
+          if (response.ok) {
+            setFavorites((prevFavorites) => prevFavorites.filter(item => item.id !== productId))}
+            else {
+              const data = await response.json();
+              throw new Error(data.error);
+            }
+          } catch (error) {
+            console.error('Error removing item from wishlist:', error);}
+      } else {
+        setFavorites([...favorites, itemId]);
+        try {
+          const response = await fetch('http://192.168.104.11:3000/wishlist', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ clientId,itemId}),
+          });
+    
+          const responseText = await response.text();
+    
+          try {
+            const data = JSON.parse(responseText);
+    
+            if (response.ok) {
+              setFavorites((prevFavorites) => [...prevFavorites, productId]);
+            } else {
+              console.error('Error adding to wishlist:', data.error);
+            }
+          } catch (jsonError) {
+            console.error('Invalid JSON response:', responseText);
+          }
+        } catch (error) {
+          console.error('Error adding to wishlist:', error);
+        }
+      }
   };
 
   const renderProductItem = ({ item }) => (
     <View style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.image} />
+      <Image source={{ uri: item.picture }} style={styles.image} />
       <View style={styles.cardContent}>
         <Text style={styles.title}>{item.name}</Text>
         <Text style={styles.description}>{item.description}</Text>
@@ -91,16 +167,48 @@ const Shop = () => {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Réserver</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
+          <Icon
+            name={favorites.includes(item.id) ? 'heart' : 'heart-outline'}
+            size={30}
+            color={favorites.includes(item.id) ? 'red' : 'black'}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  const renderWorkerItem = ({ item }) => (
+    <View style={styles.card}>
+      <Image source={{ uri: item.picture }} style={styles.image} />
+      <View style={styles.cardContent}>
+        <Text style={styles.title}>{item.userName}</Text>
+        <Text style={styles.description}>{item.resume}</Text>
+        <Text style={styles.details}>Phone: {item.phoneNum}</Text>
+        <Text style={styles.details}>Email: {item.email}</Text>
+        <Text style={styles.details}>Rating: {item.rating}</Text>
+        <Text style={styles.details}>Job Title: {item.jobTitle}</Text>
+        <Text style={styles.details}>Address: {item.address}</Text>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Réserver</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
+          <Icon
+            name={favorites.includes(item.id) ? 'heart' : 'heart-outline'}
+            size={30}
+            color={favorites.includes(item.id) ? 'red' : 'black'}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      {!selectedCard && (
+      {!selectedCard && !selectedCategory && (
         <>
-          <TouchableOpacity 
-            style={styles.card} 
+          <TouchableOpacity
+            style={styles.card}
             onPress={() => handleCardPress('Products')}
           >
             <ImageBackground source={{ uri: 'https://shorturl.at/ZwQVz' }} style={styles.imageBackground}>
@@ -109,8 +217,8 @@ const Shop = () => {
               </View>
             </ImageBackground>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.card} 
+          <TouchableOpacity
+            style={styles.card}
             onPress={() => handleCardPress('Services')}
           >
             <ImageBackground source={{ uri: 'https://shorturl.at/4ZLN5' }} style={styles.imageBackground}>
@@ -121,7 +229,7 @@ const Shop = () => {
           </TouchableOpacity>
         </>
       )}
-      {selectedCard && (
+      {selectedCard && !selectedCategory && (
         <View style={styles.categoriesContainer}>
           <FlatList
             data={categories}
@@ -129,7 +237,7 @@ const Shop = () => {
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.categoryContainer}
-                onPress={() => handleCategoryPress(item.name, item.jobTitle)}
+                onPress={() => handleCategoryPress(item.name)}
               >
                 <Text style={styles.categoryText}>{item.name}</Text>
               </TouchableOpacity>
@@ -140,27 +248,18 @@ const Shop = () => {
           </TouchableOpacity>
         </View>
       )}
-      {products.length > 0 && (
+      {selectedCategory && (
         <View style={styles.listContainer}>
-          <Text style={styles.listTitle}>Products</Text>
+          <TouchableOpacity style={styles.backButton} onPress={() => setSelectedCategory(null)}>
+            <Text style={styles.backButtonText}>Back to Categories</Text>
+          </TouchableOpacity>
+          <Text style={styles.listTitle}>
+            {selectedCard === 'Products' ? `Products in ${selectedCategory}` : `Workers in ${selectedCategory}`}
+          </Text>
           <FlatList
-            data={products}
-            keyExtractor={(item) => item.id}
-            renderItem={renderProductItem}
-          />
-        </View>
-      )}
-      {workers.length > 0 && (
-        <View style={styles.listContainer}>
-          <Text style={styles.listTitle}>Workers</Text>
-          <FlatList
-            data={workers}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.itemContainer}>
-                <Text style={styles.itemText}>{item.name}</Text>
-              </View>
-            )}
+            data={data}
+            keyExtractor={(item) => item.id ? item.id.toString() : String(Math.random())} // Ensure unique key for each item
+            renderItem={selectedCard === 'Products' ? renderProductItem : renderWorkerItem}
           />
         </View>
       )}
@@ -185,14 +284,14 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
     width: '100%',
-    flex: 1, 
+    flex: 1,
     overflow: 'hidden',
   },
   imageBackground: {
     flex: 1,
     width: '100%',
     height: '100%',
-    justifyContent: 'flex-start', 
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   titleContainer: {
@@ -254,33 +353,40 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 5,
-    width: '100%',
   },
   itemText: {
     fontSize: 16,
   },
   cardContent: {
     padding: 10,
-    width: '100%',
+    alignItems: 'center',
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 5,
   },
   description: {
-    fontSize: 16,
-    marginTop: 5,
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  details: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 5,
   },
   price: {
-    fontSize: 14,
-    color: '#888',
-    marginTop: 5,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#000',
   },
   button: {
     backgroundColor: '#2196F3',
     padding: 10,
-    borderRadius: 8,
-    marginTop: 10,
+    borderRadius: 10,
     alignItems: 'center',
   },
   buttonText: {

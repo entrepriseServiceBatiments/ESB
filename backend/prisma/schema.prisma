@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  url      = env("DATABASE_URL")
+ 
 }
 
 model Admin {
@@ -37,7 +37,6 @@ model Order {
   Client     Client        @relation("ClientOrders", fields: [clientId], references: [idClient])
   Workers    Worker[]      @relation("OrderWorkers")
   Products   OrderProduct[]   // Update relation field
-  Products   OrderProduct[]   // Update relation field
 }
 
 model Product {
@@ -51,7 +50,7 @@ model Product {
   stock        Int
   numOfRatings Int
   Orders       OrderProduct[]   // Update relation field
-  Orders       OrderProduct[]   // Update relation field
+ 
   Favorites    Favorite[]
 }
 
@@ -64,14 +63,7 @@ model OrderProduct {
   @@id([orderId, productId])
 }
 
-model OrderProduct {
-  orderId   Int
-  productId Int
-  Order     Order    @relation(fields: [orderId], references: [idorders])
-  Product   Product  @relation(fields: [productId], references: [idproducts])
 
-  @@id([orderId, productId])
-}
 
 model Favorite {
   clientId    Int
