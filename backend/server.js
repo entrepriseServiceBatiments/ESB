@@ -28,17 +28,7 @@ app.use(orderRoutes);
 app.use(authAdminRoutes);
 app.use(chatRoutes);
 
-// app.get("/protected", authenticateToken, (req, res) => {
-//   res.json({ message: "This is a protected route" });
-// });
 
-// io.on("connect", (socket) => {
-//   console.log(`User connected: ${socket.id}`);
-
-//   socket.on("disconnect", () => {
-//     console.log(`User disconnected: ${socket.id}`);
-//   });
-// });
 io.on("connect", (socket) => {
   console.log(socket.id);
   socket.on("joinconvo", async ({ clientId, workerId }) => {
