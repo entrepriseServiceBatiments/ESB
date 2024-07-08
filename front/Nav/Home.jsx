@@ -6,13 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
-  Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import PromoCard from '../promos/PromoCard';
 import SearchBar from '../homePage/SearchBar';
+import AnnouncementCard from '../homePage/Announcement';
 
-const categories = [
+const categoryData = [
   { name: 'Plumbing', jobTitle: 'Plumber' },
   { name: 'Electricity', jobTitle: 'Electrician' },
   { name: 'Housekeeping', jobTitle: 'Housekeeper' },
@@ -54,9 +54,22 @@ const promoData = [
   },
 ];
 
+const announcementData = [
+  {
+    id: '1',
+    imageUri: 'https://www.maghrebia.com.tn/images/images_article/134_max.jpg',
+    url: 'https://www.maghrebia.com.tn/site/fr/packs-assurance-habitation.134.html',
+  },
+  {
+    id: '2',
+    imageUri: 'https://mir-s3-cdn-cf.behance.net/projects/404/8f3d85180072561.Y3JvcCwxNDA5LDExMDIsMCww.jpg',
+    url: 'https://www.facebook.com/Brico.m.mhirsi',
+  },
+];
+
 const Home = () => {
   const navigation = useNavigation();
-  const [categoriess, setCategories] = useState(categories);
+  const [filteredCategories, setFilteredCategories] = useState(categoryData);
 
   const handleCategoryPress = (category, jobTitle) => {
     navigation.navigate('CategoryDetails', { category, jobTitle });
@@ -68,22 +81,27 @@ const Home = () => {
 
   const handleSearch = (query) => {
     console.log('Search query:', query);
-    const filteredCategories = categories.filter((category) =>
+    const filteredCategories = categoryData.filter((category) =>
       category.name.toLowerCase().includes(query.toLowerCase())
     );
-    setCategories(filteredCategories);
+    setFilteredCategories(filteredCategories);
+  };
+
+  const handleAnnouncementPress = (url) => {
+    window.open(url, '_blank');
   };
 
   return (
     <View style={styles.container}>
       <ScrollView>
         <SearchBar onSearch={handleSearch} />
+
         <ScrollView
           horizontal
           contentContainerStyle={styles.scrollView}
           showsHorizontalScrollIndicator={false}
         >
-          {categories.map((item, index) => (
+          {filteredCategories.map((item, index) => (
             <TouchableOpacity
               key={index}
               style={styles.box}
@@ -93,6 +111,25 @@ const Home = () => {
             </TouchableOpacity>
           ))}
         </ScrollView>
+
+        <View style={styles.announcementContainer}>
+          <Text style={styles.announcementHeader}>Announcements</Text>
+          <View style={styles.announcementBorder}>
+            <FlatList
+              data={announcementData}
+              renderItem={({ item }) => (
+                <AnnouncementCard
+                  imageUri={item.imageUri}
+                  onPress={() => handleAnnouncementPress(item.url)}
+                />
+              )}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.announcementList}
+            />
+          </View>
+        </View>
 
         <FlatList
           data={promoData}
@@ -106,8 +143,6 @@ const Home = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.promoList}
         />
-
- 
       </ScrollView>
     </View>
   );
@@ -168,6 +203,25 @@ const styles = StyleSheet.create({
     color: '#555',
     textAlign: 'center',
     paddingHorizontal: 20,
+  },
+  announcementContainer: {
+    marginVertical: 20,
+    paddingHorizontal: 10,
+  },
+  announcementHeader: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  announcementBorder: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  announcementList: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
 });
 

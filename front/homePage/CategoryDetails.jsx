@@ -8,6 +8,7 @@ import {
   Image,
 } from 'react-native';
 import Calendar from './Calendar';
+import ProductCard from './ProductCard';
 
 const CategoryDetails = ({ route, navigation }) => {
   const { category, jobTitle } = route.params;
@@ -23,7 +24,7 @@ const CategoryDetails = ({ route, navigation }) => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `http://192.168.103.2:3000/products/${category}`
+          `http://localhost:3000/products/${category}`
         );
         const data = await response.json();
         setProducts(data);
@@ -35,7 +36,7 @@ const CategoryDetails = ({ route, navigation }) => {
     const fetchWorkers = async () => {
       try {
         const response = await fetch(
-          `http:///192.168.103.2:3000/workers/${jobTitle}`
+          `http://localhost:3000/workers/${jobTitle}`
         );
         const data = await response.json();
         setWorkers(data);
@@ -67,7 +68,7 @@ const CategoryDetails = ({ route, navigation }) => {
   const handleFavoritePress = async (productId) => {
     const clientId = 1;
     try {
-      const response = await fetch('http:///192.168.103.2:3000/wishlist', {
+      const response = await fetch('http://localhost:3000/wishlist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,32 +95,11 @@ const CategoryDetails = ({ route, navigation }) => {
   };
 
   const renderProductItem = ({ item }) => (
-    <View style={styles.card}>
-      <TouchableOpacity
-        style={styles.favoriteIconContainer}
-        onPress={() => handleFavoritePress(item.id)}
-      >
-        <Image
-          source={require('../assets/icons/favorite.png')}
-          style={styles.favoriteIcon}
-        />
-      </TouchableOpacity>
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <View style={styles.cardContent}>
-        <Text style={styles.title}>{item.name}</Text>
-        <Text style={styles.description}>{item.description}</Text>
-        {item.price ? (
-          <Text style={styles.price}>
-            À PARTIR DE : {item.price.toFixed(2)} € TTC/JOUR
-          </Text>
-        ) : (
-          <Text style={styles.price}>Price not available</Text>
-        )}
-        <TouchableOpacity style={styles.button} onPress={() => handleReserverPress(item)}>
-          <Text style={styles.buttonText}>Réserver</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <ProductCard
+      item={item}
+      onReservePress={handleReserverPress}
+      onFavoritePress={handleFavoritePress}
+    />
   );
 
   const renderWorkerItem = ({ item }) => (

@@ -30,8 +30,8 @@ app.use(productRoutes);
 app.use(orderRoutes);
 app.use(authAdminRoutes);
 app.use(chatRoutes);
-
 app.use(wishlistRoutes);
+
 io.on("connect", (socket) => {
   console.log(socket.id);
   socket.on("joinconvo", async ({ clientId, workerId }) => {
