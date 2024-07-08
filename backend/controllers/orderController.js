@@ -1,5 +1,5 @@
 const orderService = require("../services/orderService");
-const prisma = require("../prisma");
+
 const createOrder = async (req, res) => {
   try {
     const { clientId, products, startDate, endDate } = req.body;
@@ -20,23 +20,13 @@ const getClientOrders = async (req, res) => {
   const clientId = parseInt(req.params.clientId, 10);
 
   try {
-    const clientOrders = await prisma.order.findMany({
-      where: { clientId },
-      include: {
-        Products: {
-          include: {
-            Product: true, 
-          },
-        },
-      },
-    });
-
+    const clientOrders = await orderService.getClientOrders(clientId);
     res.status(200).json(clientOrders);
   } catch (error) {
     console.error(error);
     res
       .status(500)
-      .json({ error: "An error occurred while retrieving orders" });
+      .json({ error: "An error occurred while retrieving client orders" });
   }
 };
 
@@ -50,8 +40,34 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+const acceptOrder = async (req, res) => {
+  const orderId = parseInt(req.params.orderId, 10);
+
+  try {
+    const order = await orderService.acceptOrder(orderId);
+    res.status(200).json(order);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to accept order" });
+  }
+};
+
+const declineOrder = async (req, res) => {
+  const orderId = parseInt(req.params.orderId, 10);
+
+  try {
+    const order = await orderService.declineOrder(orderId);
+    res.status(200).json(order);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to decline order" });
+  }
+};
+
 module.exports = {
   createOrder,
   getClientOrders,
   getAllOrders,
+  acceptOrder,
+  declineOrder,
 };

@@ -33,10 +33,11 @@ model Order {
   idorders   Int           @id @default(autoincrement())
   startDate  String?
   endDate    String?
+  status     String        @default("pending")  
   clientId   Int
   Client     Client        @relation("ClientOrders", fields: [clientId], references: [idClient])
   Workers    Worker[]      @relation("OrderWorkers")
-  Products   OrderProduct[]   // Update relation field
+  Products   OrderProduct[]  
 }
 
 model Product {
