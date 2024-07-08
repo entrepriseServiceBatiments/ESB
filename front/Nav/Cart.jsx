@@ -15,6 +15,7 @@ const Cart = () => {
       if (user) {
         user = JSON.parse(user);
         setClientId(user.idClient || user.idworker);
+        console.log(user);
       }
     } catch (error) {
       console.error("Error retrieving data:", error);
@@ -31,7 +32,7 @@ const Cart = () => {
 
       try {
         const response = await axios.get(
-          `http://192.168.104.15:3000/orders/client/${clientId}`
+          `http://192.168.104.9:3000/orders/client/${clientId}`
         );
         const products =
           response.data[0].Products
@@ -43,7 +44,7 @@ const Cart = () => {
           // ) || [];
         setOrders(products);
         setLoading(false);
-        console.log(response.data, "orders useEff");
+        console.log(products, "products useEff");
       } catch (err) {
         setError(err);
         setLoading(false);

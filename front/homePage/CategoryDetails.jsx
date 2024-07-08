@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
-} from 'react-native';
+} from "react-native";
 
 const CategoryDetails = ({ route, navigation }) => {
   const { category, jobTitle } = route.params;
-  const [tab, setTab] = useState('products');
+  const [tab, setTab] = useState("products");
   const [products, setProducts] = useState([]);
   const [workers, setWorkers] = useState([]);
 
@@ -18,7 +18,7 @@ const CategoryDetails = ({ route, navigation }) => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `http://192.168.104.15:3000/products/${category}`
+          `http://192.168.104.9:3000/products/${category}`
         );
         const data = await response.json();
         setProducts(data);
@@ -30,7 +30,7 @@ const CategoryDetails = ({ route, navigation }) => {
     const fetchWorkers = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/workers/${jobTitle}`
+          `http://192.168.104.9:3000/workers/${jobTitle}`
         );
         const data = await response.json();
         setWorkers(data);
@@ -43,26 +43,21 @@ const CategoryDetails = ({ route, navigation }) => {
     fetchWorkers();
   }, [category, jobTitle]);
 
-  
   const toggleFavorite = (item) => {
     setFavorites((prevFavorites) => {
       if (prevFavorites.includes(item.id)) {
-        return prevFavorites.filter(favId => favId !== item.id);
+        return prevFavorites.filter((favId) => favId !== item.id);
       } else {
         return [...prevFavorites, item.id];
       }
     });
   };
 
-
-
-
-
   const renderProductItem = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.favoriteIconContainer}>
         <Image
-          source={require('../assets/icons/favorite.png')}
+          source={require("../assets/icons/favorite.png")}
           style={styles.favoriteIcon}
         />
       </View>
@@ -87,7 +82,7 @@ const CategoryDetails = ({ route, navigation }) => {
   const renderWorkerItem = ({ item }) => (
     <TouchableOpacity
       style={styles.workerCard}
-      onPress={() => navigation.navigate('WorkerDetails', { worker: item })}
+      onPress={() => navigation.navigate("WorkerDetails", { worker: item })}
     >
       <View style={styles.workerHeader}>
         <Image source={{ uri: item.image }} style={styles.workerImage} />
@@ -95,12 +90,12 @@ const CategoryDetails = ({ route, navigation }) => {
           <Text style={styles.workerName}>{item.name}</Text>
           <Text style={styles.workerVerified}>Identité Vérifiée</Text>
           <Text style={styles.workerRating}>
-            {item.rating ? `${item.rating} ★` : 'No rating available'}
+            {item.rating ? `${item.rating} ★` : "No rating available"}
           </Text>
         </View>
         <View style={styles.workerDistance}>
           <Text style={styles.distanceText}>
-            {item.distance ? `${item.distance} KM` : 'Distance not available'}
+            {item.distance ? `${item.distance} KM` : "Distance not available"}
           </Text>
         </View>
       </View>
@@ -117,28 +112,28 @@ const CategoryDetails = ({ route, navigation }) => {
       <View style={styles.navbar}>
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() => setTab('products')}
+          onPress={() => setTab("products")}
         >
-          <Text style={tab === 'products' ? styles.activeTab : styles.tab}>
+          <Text style={tab === "products" ? styles.activeTab : styles.tab}>
             Products
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() => setTab('services')}
+          onPress={() => setTab("services")}
         >
-          <Text style={tab === 'services' ? styles.activeTab : styles.tab}>
+          <Text style={tab === "services" ? styles.activeTab : styles.tab}>
             Services
           </Text>
         </TouchableOpacity>
       </View>
       <FlatList
-        key={tab} // Unique key based on the current tab
-        data={tab === 'products' ? products : workers}
+        key={tab} 
+        data={tab === "products" ? products : workers}
         keyExtractor={keyExtractor}
-        renderItem={tab === 'products' ? renderProductItem : renderWorkerItem}
-        numColumns={tab === 'products' ? 2 : 1}
-        columnWrapperStyle={tab === 'products' && styles.row}
+        renderItem={tab === "products" ? renderProductItem : renderWorkerItem}
+        numColumns={tab === "products" ? 2 : 1}
+        columnWrapperStyle={tab === "products" && styles.row}
         contentContainerStyle={styles.listContent}
       />
     </View>
@@ -148,47 +143,47 @@ const CategoryDetails = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     padding: 10,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   navItem: {
     padding: 10,
   },
   tab: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#555',
+    fontWeight: "bold",
+    color: "#555",
   },
   activeTab: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
+    fontWeight: "bold",
+    color: "#000",
   },
   listContent: {
     padding: 10,
   },
   row: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   card: {
     flex: 1,
     margin: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 4,
     elevation: 2,
   },
   favoriteIconContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
     zIndex: 1,
@@ -198,7 +193,7 @@ const styles = StyleSheet.create({
     height: 24,
   },
   image: {
-    width: '100%',
+    width: "100%",
     height: 150,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
@@ -208,42 +203,42 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   description: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   price: {
     fontSize: 16,
-    color: '#000',
+    color: "#000",
     marginTop: 5,
   },
   button: {
     marginTop: 10,
-    backgroundColor: '#ff0000',
+    backgroundColor: "#ff0000",
     paddingVertical: 10,
     borderRadius: 4,
   },
   buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: 'bold',
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
   },
   workerCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     marginVertical: 10,
     padding: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 4,
     elevation: 2,
   },
   workerHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   workerImage: {
     width: 50,
@@ -256,29 +251,29 @@ const styles = StyleSheet.create({
   },
   workerName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   workerVerified: {
     fontSize: 12,
-    color: '#4CAF50',
+    color: "#4CAF50",
   },
   workerRating: {
     fontSize: 14,
-    color: '#FFA500',
+    color: "#FFA500",
   },
   workerDistance: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   distanceText: {
     fontSize: 12,
-    color: '#555',
+    color: "#555",
   },
   workerContent: {
     marginTop: 10,
   },
   workerDescription: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
 });
 
