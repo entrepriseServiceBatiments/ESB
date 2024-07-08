@@ -21,7 +21,7 @@ const ChangePasswordModal = ({ modalVisible, setModalVisible, email }) => {
       console.log(client);
       console.log(idClient);
       const response = await axios.put(
-        `http://192.168.104.2:3000/clients/updatePassword/${idClient}`,
+        `http://192.168.104.9:3000/clients/updatePassword/${idClient}`,
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
