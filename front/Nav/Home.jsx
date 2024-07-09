@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   announcementHeader: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#483D8B	',
     paddingHorizontal: 10,
     marginBottom: 10,
   },
