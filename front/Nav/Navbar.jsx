@@ -83,7 +83,9 @@ const Navbar = () => {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Shop" component={Shop} />
       <Tab.Screen name="Cart" component={CartScreen} />
-    </Tab.Navigator>
+     
+      
+     </Tab.Navigator>
   );
 };
 

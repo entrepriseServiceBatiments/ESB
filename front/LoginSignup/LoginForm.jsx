@@ -19,7 +19,10 @@ const LoginForm = ({ navigation }) => {
   const Login = async () => {
     try {
 
-      const response = await fetch("http://localhost:3000/login", {
+
+      const response = await fetch("http://192.168.104.11:3000/login", {
+
+
         method: "POST",
 
         headers: {
