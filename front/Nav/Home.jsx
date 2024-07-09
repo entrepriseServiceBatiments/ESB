@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import PromoCard from '../promos/PromoCard';
 import SearchBar from '../homePage/SearchBar';
 import AnnouncementCard from '../homePage/Announcement';
+import ServicesDemand from '../homePage/ServicesDemand';
 
 const categoryData = [
   { name: 'Plumbing', jobTitle: 'Plumber' },
@@ -53,6 +54,20 @@ const promoData = [
       'https://ijenintechstorage.blob.core.windows.net/testv2/Promo-UserId-6dddac3d-1461-4eb9-5649-08dc32914590--144559fa-ee24-4dcf-98c4-5e2f78208914',
   },
 ];
+const services = [
+  {
+    id: 1,
+    imageUri: 'https://example.com/service1.jpg',
+    title: 'Entretien climatisateur',
+    description: 'Par nos meilleurs',
+  },
+  {
+    id: 2,
+    imageUri: 'https://example.com/service2.jpg',
+    title: 'Réparation de plomberie',
+    description: 'Service rapide',
+  },
+];
 
 const announcementData = [
   {
@@ -62,7 +77,8 @@ const announcementData = [
   },
   {
     id: '2',
-    imageUri: 'https://mir-s3-cdn-cf.behance.net/projects/404/8f3d85180072561.Y3JvcCwxNDA5LDExMDIsMCww.jpg',
+    imageUri:
+      'https://mir-s3-cdn-cf.behance.net/projects/404/8f3d85180072561.Y3JvcCwxNDA5LDExMDIsMCww.jpg',
     url: 'https://www.facebook.com/Brico.m.mhirsi',
   },
 ];
@@ -71,15 +87,15 @@ const Home = () => {
   const navigation = useNavigation();
   const [filteredCategories, setFilteredCategories] = useState(categoryData);
 
-  const handleCategoryPress = (category, jobTitle) => {
+  const CategoryPress = (category, jobTitle) => {
     navigation.navigate('CategoryDetails', { category, jobTitle });
   };
 
-  const handlePromoPress = (item) => {
+  const PromoPress = (item) => {
     navigation.navigate('Promos', { item, allPromos: promoData });
   };
 
-  const handleSearch = (query) => {
+  const Search = (query) => {
     console.log('Search query:', query);
     const filteredCategories = categoryData.filter((category) =>
       category.name.toLowerCase().includes(query.toLowerCase())
@@ -87,14 +103,17 @@ const Home = () => {
     setFilteredCategories(filteredCategories);
   };
 
-  const handleAnnouncementPress = (url) => {
+  const AnnouncementPress = (url) => {
     window.open(url, '_blank');
+  };
+  const serviceVisit = (serviceId) => {
+    console.log('Service pressed:', serviceId);
   };
 
   return (
     <View style={styles.container}>
       <ScrollView>
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar onSearch={Search} />
 
         <ScrollView
           horizontal
@@ -105,7 +124,7 @@ const Home = () => {
             <TouchableOpacity
               key={index}
               style={styles.box}
-              onPress={() => handleCategoryPress(item.name, item.jobTitle)}
+              onPress={() => CategoryPress(item.name, item.jobTitle)}
             >
               <Text style={styles.boxText}>{item.name}</Text>
             </TouchableOpacity>
@@ -120,7 +139,7 @@ const Home = () => {
               renderItem={({ item }) => (
                 <AnnouncementCard
                   imageUri={item.imageUri}
-                  onPress={() => handleAnnouncementPress(item.url)}
+                  onPress={() => AnnouncementPress(item.url)}
                 />
               )}
               keyExtractor={(item) => item.id}
@@ -134,7 +153,7 @@ const Home = () => {
         <FlatList
           data={promoData}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handlePromoPress(item)}>
+            <TouchableOpacity onPress={() => PromoPress(item)}>
               <PromoCard item={item} />
             </TouchableOpacity>
           )}
@@ -143,6 +162,7 @@ const Home = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.promoList}
         />
+        <ServicesDemand services={services} onServicePress={serviceVisit} />
       </ScrollView>
     </View>
   );
@@ -151,78 +171,49 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f2f2f2',
   },
   scrollView: {
-    alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 10,
   },
   box: {
-    backgroundColor: '#f0f0f0',
-    padding: 20,
-    marginHorizontal: 10,
+    width: 120,
+    height: 50,
+    backgroundColor: '#fff',
     borderRadius: 10,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 5,
+    marginVertical: 10,
   },
   boxText: {
     fontSize: 16,
     fontWeight: 'bold',
   },
-  promoList: {
-    paddingHorizontal: 10,
-    paddingVertical: 20,
-  },
-  servicesContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 20,
-  },
-  servicesHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  serviceItem: {
-    alignItems: 'center',
-    marginHorizontal: 10,
-  },
-  serviceIcon: {
-    width: 50,
-    height: 50,
-    marginBottom: 10,
-  },
-  serviceTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  serviceDescription: {
-    fontSize: 14,
-    color: '#555',
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
   announcementContainer: {
-    marginVertical: 20,
-    paddingHorizontal: 10,
+    marginVertical: 10,
   },
   announcementHeader: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#fff',
+    paddingHorizontal: 10,
     marginBottom: 10,
   },
   announcementBorder: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 10,
-    paddingVertical: 10,
+    overflow: 'hidden',
+    marginHorizontal: 10,
   },
   announcementList: {
-    paddingHorizontal: 10,
     paddingVertical: 10,
+    paddingHorizontal: 5,
+  },
+  promoList: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
   },
 });
-
 export default Home;

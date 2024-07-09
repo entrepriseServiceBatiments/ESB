@@ -59,8 +59,8 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     marginTop: 10,
-    flex: 1, // Allow content to expand vertically
-    justifyContent: 'space-between', // Align content vertically
+    flex: 1, 
+    justifyContent: 'space-between', 
   },
   title: {
     fontSize: 18,
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     color: '#000',
-    marginBottom: 10, // Add margin to separate price from button
+    marginBottom: 10, 
   },
   button: {
     backgroundColor: '#007BFF',
