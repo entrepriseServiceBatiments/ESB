@@ -32,7 +32,7 @@ const CartScreen = ({ navigation }) => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`http://192.168.104.27:3000/orders/client/${clientId}`);
+      const response = await axios.get(`http://192.168.11.225:3000/orders/client/${clientId}`);
       setOrders(response.data);
       calculateTotalAmount(response.data);
     } catch (error) {

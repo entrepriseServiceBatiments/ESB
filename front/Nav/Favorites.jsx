@@ -16,7 +16,7 @@ const Favorites = ({ navigation }) => {
       const clientId = 1; 
       try {
         const response = await fetch(
-          `http://localhost:3000/wishlist/${clientId}`
+          `http://192.168.11.225:3000/wishlist/${clientId}`
         );
         const data = await response.json();
         setFavorites(data);

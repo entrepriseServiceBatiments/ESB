@@ -60,7 +60,7 @@ const Shop = () => {
 
   const fetchProducts = async (category) => {
     try {
-      const response = await fetch(`http://192.168.104.11:3000/products/${category}`);
+      const response = await fetch(`http://192.168.11.225:3000/products/${category}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -82,7 +82,7 @@ const Shop = () => {
     if (!jobTitle) return;
 
     try {
-      const response = await fetch(`http://192.168.104.11:3000/workers/${jobTitle}`);
+      const response = await fetch(`http://192.168.11.225:3000/workers/${jobTitle}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -105,7 +105,7 @@ const Shop = () => {
        
         setFavorites(favorites.filter(id => id !== itemId));
         try {
-          const response = await fetch('http://192.168.104.11:3000/wishlist', {
+          const response = await fetch('http://192.168.11.225:3000/wishlist', {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ const Shop = () => {
       } else {
         setFavorites([...favorites, itemId]);
         try {
-          const response = await fetch('http://192.168.104.11:3000/wishlist', {
+          const response = await fetch('http://192.168.11.225:3000/wishlist', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
