@@ -49,6 +49,7 @@ const AccountType = ({ route, navigation }) => {
       const url =
         type === "Personal"
 
+
           ? "http://192.168.104.11:3000/clients/add"
           : "http://192.168.104.11:3000/workers/add";
 
