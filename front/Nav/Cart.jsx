@@ -20,9 +20,37 @@ const CartScreen = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
+
+    const fetchOrders = async () => {
+      if (!clientId) return;
+
+      try {
+        const response = await axios.get(
+          `http://192.168.11.49:3000/orders/client/${clientId}`
+        );
+        const products =
+          response.data[0].Products
+          .flatMap((order) =>
+            order.Products.map((product) => ({
+              ...product,
+              quantity: 1,
+            }))
+          ) || [];
+        setOrders(products);
+        setLoading(false);
+        console.log(response.data, "orders useEff");
+      } catch (err) {
+        setError(err);
+        setLoading(false);
+      }
+    };
+
+ 
+
     if (clientId) {
       fetchOrders();
     }
+
   }, [clientId]);
 
   const retrieveClientId = async () => {

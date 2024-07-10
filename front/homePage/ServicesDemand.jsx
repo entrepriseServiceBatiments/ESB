@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#483D8B	',
+    color: '#042630	',
   },
   viewMore: {
     fontSize: 14,

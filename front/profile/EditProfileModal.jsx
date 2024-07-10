@@ -1,17 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Alert } from 'react-native';
-import axios from 'axios';
+import ChangePasswordModal from './ChangePasswordModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ChangePasswordModal from './ChangePasswordModal'; // Import ChangePasswordModal
+import axios from 'axios';
+import {jwtDecode} from 'jwt-decode'; 
 
 const EditProfileModal = ({ modalVisible, setModalVisible, userInfo, onUpdate }) => {
-  const [userName, setUserName] = useState(userInfo.userName);
-  const [email, setEmail] = useState(userInfo.email);
-  const [address, setAddress] = useState(userInfo.address);
+  const [userName, setUserName] = useState('');
+  const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (userInfo) {
+      setUserName(userInfo.userName);
+      setEmail(userInfo.email);
+      setAddress(userInfo.address);
+    }
+  }, [userInfo]);
 
   const openPasswordModal = () => {
     setPasswordModalVisible(true);
+  };
+
+  const updateProfile = async () => {
+    try {
+      const client = await AsyncStorage.getItem('user');
+      const token = await AsyncStorage.getItem('token');
+      const decodedToken = jwtDecode(token);
+      const userType = decodedToken.userType;
+      const idClient = JSON.parse(client).idClient;
+      const idworker = JSON.parse(client).idworker;
+      const data = { userName, email, address };
+
+      let response;
+      if (userType === 'worker') {
+        response = await axios.put(
+          `http://192.168.11.35:3000/workers/${idworker}`,
+          data,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } else {
+        response = await axios.put(
+          `http://192.168.11.35:3000/clients/${idClient}`,
+          data,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+
+      await AsyncStorage.setItem('user', JSON.stringify(response.data));
+      setModalVisible(false);
+      Alert.alert('Success', 'Profile updated successfully.');
+      onUpdate(response.data);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update info.');
+      console.error('Error updating info:', error);
+    }
   };
 
   return (
@@ -26,32 +70,35 @@ const EditProfileModal = ({ modalVisible, setModalVisible, userInfo, onUpdate })
         <TextInput
           style={styles.input}
           placeholder="User Name"
-          defaultValue={userInfo.userName}
+          value={userName}
           onChangeText={setUserName}
         />
         <TextInput
           style={styles.input}
           placeholder="Email"
-          defaultValue={userInfo.email}
+          value={email}
           onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}
           placeholder="Address"
-          defaultValue={userInfo.address}
+          value={address}
           onChangeText={setAddress}
         />
-        <TouchableOpacity style={styles.button} onPress={() => updateProfile({ userName, email, address })}>
-          <Text style={styles.buttonText}>Save</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={openPasswordModal}>
+        
+        <TouchableOpacity style={[styles.button, styles.passwordButton]} onPress={openPasswordModal}>
           <Text style={styles.buttonText}>Change Password</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={() => setModalVisible(false)}>
-          <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
 
-        {/* Render ChangePasswordModal */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={updateProfile}>
+            <Text style={styles.buttonText}>Save</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={() => setModalVisible(false)}>
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      
         <ChangePasswordModal
           modalVisible={passwordModalVisible}
           setModalVisible={setPasswordModalVisible}
@@ -97,7 +144,6 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   button: {
-    backgroundColor: '#042630',
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 4,
@@ -108,8 +154,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
+  passwordButton: {
+    backgroundColor: '#042630',
+    width: '80%',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+  saveButton: {
+    backgroundColor: '#042630',
+    flex: 1,
+    marginRight: 10,
+  },
   cancelButton: {
     backgroundColor: '#dc3545',
+    flex: 1,
+    marginLeft: 10,
   },
 });
 

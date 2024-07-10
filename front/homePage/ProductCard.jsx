@@ -6,14 +6,14 @@ const ProductCard = ({ item, onReservePress, onFavoritePress }) => {
     <View style={styles.card}>
       <TouchableOpacity
         style={styles.favoriteIconContainer}
-        onPress={() => onFavoritePress(item.id)}
+        onPress={() => onFavoritePress(item.idproducts)}
       >
         <Image
           source={require('../assets/icons/favorite.png')}
           style={styles.favoriteIcon}
         />
       </TouchableOpacity>
-      <Image source={{ uri: item.image }} style={styles.image} />
+      <Image source={{ uri: item.picture }} style={styles.image} />
       <View style={styles.cardContent}>
         <Text style={styles.title}>{item.name}</Text>
         <Text style={styles.description}>{item.description}</Text>

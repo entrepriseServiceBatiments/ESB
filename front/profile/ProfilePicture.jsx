@@ -1,5 +1,4 @@
-// ProfilePictureModal.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,28 +10,50 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {jwtDecode} from "jwt-decode";
 
 const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate }) => {
   const [profilePicture, setProfilePicture] = useState(null);
+  const [userType, setUserType] = useState("");
+  
+ 
+  useEffect(() => {
+    const getUserType = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const decodedToken = jwtDecode(token);
+        setUserType(decodedToken.userType);
+      } catch (error) {
+        console.error("Error retrieving user type:", error);
+      }
+    };
+
+    getUserType();
+  }, []);
 
   const selectImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to make this work!");
-      return;
-    }
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need camera roll permissions to make this work!");
+        return;
+      }
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
 
-    if (!result.canceled) {
-      const source = { uri: result.assets[0].uri };
-      console.log('Selected image URI:', source.uri);
-      setProfilePicture(source);
+      if (!result.canceled) {
+        setProfilePicture(result.assets[0]);
+        await uploadImageToCloudinary(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Error selecting image:", error);
+      Alert.alert("Error", "Failed to select image. Please try again.");
     }
   };
 
@@ -41,7 +62,7 @@ const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate
     data.append("file", {
       uri,
       type: "image/jpeg",
-      name: uri.split("/").pop(),
+      name: uri.split('/').pop() ,
     });
     data.append("upload_preset", "Boughanmi");
 
@@ -56,7 +77,10 @@ const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate
           },
         }
       );
+      
       const response = await res.json();
+      console.log("Uploaded to Cloudinary:", response.secure_url);
+      setProfilePicture((prev) => ({ ...prev, url: response.secure_url }));
       return response.secure_url;
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -65,23 +89,22 @@ const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate
     }
   };
 
-  const handleSubmit = async () => {
+  const Submit = async () => {
     try {
-      let imageUrl = "";
-      if (profilePicture) {
-        imageUrl = await uploadImageToCloudinary(profilePicture.uri);
-      }
+      let imageUrl = profilePicture.uri || "";
 
-      const response = await axios.put(
-        `http://192.168.11.225:3000/clients/${clientId}`,
-        {
-          picture: imageUrl,
-        }
-      );
 
-      console.log("Response:", response.data);
+      const endpoint = userType === "client" ? `clients/${clientId}` : `workers/${clientId}`;
+      const response = await axios.put(`http://192.168.11.35:3000/${endpoint}`, {
+        picture: imageUrl,
+      });
+
+
       onUpdate({ picture: imageUrl });
       setModalVisible(false);
+      user=JSON.parse(await AsyncStorage.getItem('user'))
+      user.picture=imageUrl
+      AsyncStorage.setItem('user',JSON.stringify(user))
     } catch (error) {
       console.error("Error updating profile:", error);
       Alert.alert("Error", "Failed to update profile. Please try again.");
@@ -98,15 +121,15 @@ const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate
       <View style={styles.modalContainer}>
         <View style={styles.container}>
           <Text style={styles.title}>Add a Profile Picture</Text>
+          <TouchableOpacity style={styles.imagePicker} onPress={selectImage}>
           {profilePicture ? (
-            <Image source={{ uri: profilePicture.uri }} style={styles.image} onPress={selectImage} />
+            <Image source={{ uri: profilePicture.uri }} style={styles.image}  />
           ) : (
-            <TouchableOpacity style={styles.imagePicker} onPress={selectImage}>
               <Text style={styles.imagePickerText}>Select Image</Text>
-            </TouchableOpacity>
           )}
+          </TouchableOpacity>
           <View style={styles.buttons}>
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            <TouchableOpacity style={styles.button} onPress={Submit}>
               <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -121,7 +144,6 @@ const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate
     </Modal>
   );
 };
-
 
 const styles = StyleSheet.create({
   modalContainer: {

@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HomeScreen from "./HomeScreen.jsx";
-import FavoritesScreen from "./Favorites";
+import Favorites from "./Favorites.jsx";
 import CartScreen from "./Cart";
 import Shop from "./Shop";
 
@@ -79,7 +79,7 @@ const Navbar = () => {
       ) : (
         <Tab.Screen name="Login" component={LoginStack} />
       )}
-      <Tab.Screen name="Favorites" component={FavoritesScreen} />
+      <Tab.Screen name="Favorites" component={Favorites } />
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Shop" component={Shop} />
       <Tab.Screen name="Cart" component={CartScreen} />
