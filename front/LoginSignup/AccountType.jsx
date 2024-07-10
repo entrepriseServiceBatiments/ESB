@@ -19,8 +19,10 @@ const AccountType = ({ route, navigation }) => {
 
 
 
+
       const response = await fetch("http://192.168.11.225:3000/login", 
  {
+
 
         method: "POST",
 
@@ -66,6 +68,7 @@ const AccountType = ({ route, navigation }) => {
         phoneNum: parseInt(phoneNum),
         email: email,
         password: password,
+        status:false
       };
 
       const response = await axios.post(url, payload);

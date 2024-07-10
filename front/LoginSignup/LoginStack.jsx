@@ -6,7 +6,7 @@ import SignupPassword from "../LoginSignup/SignupPassword";
 import SignupDetails from "../LoginSignup/SignupDetails";
 import AccountType from "../LoginSignup/AccountType";
 import Profile from '../profile/profile'
-import ProfilePicture from "../profile/ProfilePicture";
+
 const Stack = createStackNavigator();
 
 function LoginStack() {
@@ -17,10 +17,7 @@ function LoginStack() {
       <Stack.Screen name="SignupPassword" component={SignupPassword} />
       <Stack.Screen name="SignupDetails" component={SignupDetails} />
       <Stack.Screen name="AccountType" component={AccountType} />
-      <Stack.Screen name="ProfilePicture" component={ProfilePicture} />
       <Stack.Screen name="Profile" component={Profile} />
-
-      {/* <Stack.Screen name="ProfessionalDetails" component={ProfessionalDetails} />  */}
     </Stack.Navigator>
   );
 }
