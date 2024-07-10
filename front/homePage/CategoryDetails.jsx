@@ -29,7 +29,7 @@ const CategoryDetails = ({ route, navigation }) => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `http://192.168.104.27:3000/products/${category}`
+          `http://192.168.11.225:3000/products/${category}`
         );
         const data = await response.json();
         setProducts(data);
@@ -41,7 +41,7 @@ const CategoryDetails = ({ route, navigation }) => {
     const fetchWorkers = async () => {
       try {
         const response = await fetch(
-          `http://192.168.104.27:3000/workers/${jobTitle}`
+          `http://192.168.11.225:3000/workers/${jobTitle}`
         );
         const data = await response.json();
         setWorkers(data);
@@ -81,7 +81,7 @@ const CategoryDetails = ({ route, navigation }) => {
     }
 
     try {
-      const response = await axios.post("http://192.168.104.27:3000/orders", {
+      const response = await axios.post("http://192.168.11.225:3000/orders", {
         clientId,
         startDate: startDate.toISOString().split("T")[0],
         endDate: endDate.toISOString().split("T")[0],
@@ -109,7 +109,7 @@ const CategoryDetails = ({ route, navigation }) => {
 
   const handleFavoritePress = async (productId) => {
     try {
-      const response = await fetch("http://192.168.104.9:3000/wishlist", {
+      const response = await fetch("http://192.168.11.225:3000/wishlist", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

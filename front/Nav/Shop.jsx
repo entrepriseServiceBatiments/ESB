@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, FlatList, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from "axios"
+import Calendar from "../homePage/Calendar";
 const categories = [
   { name: 'Plumbing', jobTitle: 'Plumber' },
   { name: 'Electricity', jobTitle: 'Electrician' },
@@ -105,6 +105,7 @@ const Shop = () => {
       if (favorites.includes(itemId)) {
         
         setFavorites(favorites.filter(id => id !== itemId));
+
         const response = await fetch(`http://192.168.104.11:3000/wishlist`, {
           method: 'DELETE',
           headers: {
@@ -117,6 +118,7 @@ const Shop = () => {
         if (response.ok) {
           console.log('Item removed from wishlist');
         } else {
+
           const responseText = await response.text();
           try {
             const data = JSON.parse(responseText);
@@ -134,7 +136,7 @@ const Shop = () => {
           },
           body: JSON.stringify({ clientId,productsId:itemId }),
         });
-        
+
   
         const responseText = await response.text();
   
