@@ -1,31 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, Button } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Cart = () => {
+const CartScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [clientId, setClientId] = useState(null);
 
-  const retrieveData = async () => {
-    try {
-      let user = await AsyncStorage.getItem("user");
-      if (user) {
-        user = JSON.parse(user);
-        setClientId(user.idClient || user.idworker);
-      }
-    } catch (error) {
-      console.error("Error retrieving data:", error);
-    }
-  };
-
   useEffect(() => {
-    retrieveData();
+    retrieveClientId();
   }, []);
 
   useEffect(() => {
+
     const fetchOrders = async () => {
       if (!clientId) return;
 
@@ -50,90 +45,93 @@ const Cart = () => {
       }
     };
 
-    fetchOrders();
+ 
+
+    if (clientId) {
+      fetchOrders();
+    }
+
   }, [clientId]);
 
-  const handleQuantityChange = (productId, delta) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((product) =>
-        product.productId === productId
-          ? {
-              ...product,
-              quantity: Math.max(
-                1,
-                Math.min(product.quantity + delta, product.Product.stock)
-              ),
-            }
-          : product
-      )
-    );
+  const retrieveClientId = async () => {
+    try {
+      const user = await AsyncStorage.getItem("user");
+      if (user) {
+        const parsedUser = JSON.parse(user);
+        setClientId(parsedUser.idClient || parsedUser.idworker);
+      }
+    } catch (error) {
+      console.error("Error retrieving client ID:", error);
+    }
   };
 
-  const calculateTotalPrice = () => {
-    return orders
-      .reduce(
-        (total, product) => total + product.Product.price * product.quantity,
-        0
-      )
-      .toFixed(2);
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(
+        `http://192.168.11.225:3000/orders/client/${clientId}`
+      );
+      setOrders(response.data);
+      calculateTotalAmount(response.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
   };
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
+  const calculateTotalAmount = (orderData) => {
+    const total = orderData.reduce((acc, order) => {
+      return (
+        acc +
+        order.Products.reduce((prodAcc, productItem) => {
+          return prodAcc + productItem.Product.price;
+        }, 0)
+      );
+    }, 0);
+    setTotalAmount(total);
+  };
 
-  if (error) {
-    return (
-      <View style={styles.center}>
-        <Text>Error: {error.message}</Text>
-      </View>
-    );
-  }
+  const renderOrderItem = ({ item: order }) => (
+    <View style={styles.orderItem}>
+      <Text style={styles.orderId}>Order ID: {order.idorders}</Text>
+      <Text>Start Date: {new Date(order.startDate).toLocaleDateString()}</Text>
+      <Text>End Date: {new Date(order.endDate).toLocaleDateString()}</Text>
+      <Text>Status: {order.status}</Text>
+      <Text style={styles.productsTitle}>Products:</Text>
+      {order.Products.map((productItem, index) => (
+        <View key={index} style={styles.productItem}>
+          <Image
+            source={{ uri: productItem.Product.picture }}
+            style={styles.productImage}
+          />
+          <View style={styles.productDetails}>
+            <Text style={styles.productName}>{productItem.Product.name}</Text>
+            <Text>Category: {productItem.Product.category}</Text>
+            <Text>Price: ${productItem.Product.price.toFixed(2)}</Text>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Your Orders</Text>
-      {orders.length === 0 ? (
-        <Text style={styles.noOrdersText}>No orders found.</Text>
-      ) : (
-        <>
-          <FlatList
-            data={orders}
-            keyExtractor={(item) => item.productId.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.orderItem}>
-                <Text>Order ID: {item.orderId}</Text>
-                <Text>{item.Product.picture}</Text>
-                <Text>{item.Product.category}</Text>
-                <Text>Price: ${item.Product.price}</Text>
-                <Text>Stock: {item.Product.stock}</Text>
-                <Text>Quantity: {item.quantity}</Text>
-                <View style={styles.buttonContainer}>
-                  <Button
-                    title="-"
-                    onPress={() => handleQuantityChange(item.productId, -1)}
-                    disabled={item.quantity <= 1}
-                  />
-                  <Button
-                    title="+"
-                    onPress={() => handleQuantityChange(item.productId, 1)}
-                    disabled={item.quantity >= item.Product.stock}
-                  />
-                </View>
-              </View>
-            )}
-          />
-          <View style={styles.totalPriceContainer}>
-            <Text style={styles.totalPriceText}>
-              Total Price: ${calculateTotalPrice()}
-            </Text>
-          </View>
-        </>
-      )}
+      <Text style={styles.title}>Your Cart</Text>
+      <FlatList
+        data={orders}
+        renderItem={renderOrderItem}
+        keyExtractor={(item) => item.idorders.toString()}
+      />
+      <View style={styles.totalContainer}>
+        <Text style={styles.totalText}>
+          Total Amount: ${totalAmount.toFixed(2)}
+        </Text>
+      </View>
+      <TouchableOpacity
+        style={styles.checkoutButton}
+        onPress={() => {
+        }}
+      >
+        <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -142,45 +140,71 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#f8f8f8",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center",
   },
   orderItem: {
+    backgroundColor: "#fff",
     padding: 15,
-    marginVertical: 8,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    backgroundColor: "#f9f9f9",
+    borderRadius: 8,
+    marginBottom: 15,
+    elevation: 3,
   },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+  orderId: {
+    fontWeight: "bold",
+    marginBottom: 5,
   },
-  noOrdersText: {
-    textAlign: "center",
-    fontSize: 18,
-    color: "#888",
+  productsTitle: {
+    fontWeight: "bold",
+    marginTop: 10,
+    marginBottom: 5,
   },
-  buttonContainer: {
+  productItem: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    width: 100,
+    marginLeft: 10,
+    marginTop: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    paddingBottom: 5,
   },
-  totalPriceContainer: {
+  productImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  productDetails: {
+    flex: 1,
+  },
+  productName: {
+    fontWeight: "bold",
+  },
+  totalContainer: {
     marginTop: 20,
-    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#e6f7ff",
+    borderRadius: 8,
   },
-  totalPriceText: {
-    fontSize: 20,
+  totalText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  checkoutButton: {
+    backgroundColor: "#007BFF",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  checkoutButtonText: {
+    color: "#fff",
+    fontSize: 18,
     fontWeight: "bold",
   },
 });
 
-export default Cart;
+export default CartScreen;

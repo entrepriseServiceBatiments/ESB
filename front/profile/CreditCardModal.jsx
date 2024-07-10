@@ -65,6 +65,9 @@ const CreditCardModal = ({ modalVisible, setModalVisible, clientId,  creditCard 
       };
       const endpoint = userType === "client" ? `clients/${clientId}` : `workers/${clientId}`;
       const response = await axios.put(`http://192.168.11.35:3000/${endpoint}`, 
+
+
+
         { creditCard: JSON.stringify(creditCardInfo) },
         { headers: { Authorization: `Bearer ${token}` } }
       );

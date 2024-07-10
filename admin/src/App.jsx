@@ -18,6 +18,8 @@ import Navbar from "./components/navbar/Navbar.jsx";
 import ProductDetails from "./components/products/ProductDetails.jsx";
 import AllOrders from "./components/orders/AllOrders.jsx";
 import Verify from "./components/verification/verify.jsx";
+import OneClient from "./components/clients/OneClient.jsx";
+import ClientOrders from "./components/clients/ClientOrders.jsx";
 function App() {
   const [data, setData] = useState([]);
   const [workers, setWorkers] = useState([]);
@@ -100,6 +102,8 @@ const AuthContent = ({ data, workers, clients, refresh, setRefresh }) => {
           element={<ProductDetails refresh={refresh} setRefresh={setRefresh} />}
         />
         <Route path="/verify" element={<Verify />} />
+        <Route path="/client/:clientId" element={<OneClient />} />
+        <Route path="/orders/client/:clientId" element={<ClientOrders />} />
       </Routes>
     </>
   );

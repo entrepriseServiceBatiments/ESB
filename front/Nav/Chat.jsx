@@ -25,7 +25,7 @@ const Chat = () => {
         const decodedToken = jwtDecode(token);
         setClientId(decodedToken.idClient);
 
-        const newSocket = io("http://192.168.104.3:3000");
+        const newSocket = io("http://192.168.11.225:3000");
         setSocket(newSocket);
 
         newSocket.emit("joinconvo", { conversationId: null });

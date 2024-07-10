@@ -26,6 +26,7 @@ const ChangePasswordModal = ({ modalVisible, setModalVisible, email }) => {
 
       const response = await axios.put(
         `http://192.168.11.35:3000/${endpoint}`,
+
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );

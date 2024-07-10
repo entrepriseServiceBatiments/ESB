@@ -93,10 +93,12 @@ const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate
     try {
       let imageUrl = profilePicture.uri || "";
 
+
       const endpoint = userType === "client" ? `clients/${clientId}` : `workers/${clientId}`;
       const response = await axios.put(`http://192.168.11.35:3000/${endpoint}`, {
         picture: imageUrl,
       });
+
 
       onUpdate({ picture: imageUrl });
       setModalVisible(false);

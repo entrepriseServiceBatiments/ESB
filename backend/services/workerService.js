@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs");
 
@@ -19,6 +19,7 @@ const updateworker = async (workerId, data) => {
     data,
   });
 };
+
 const updatePassword = async (workerId, newPassword) => {
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   return await prisma.worker.update({
@@ -31,15 +32,20 @@ const getClientById = async (clientId) => {
     where: { idworker: Number(clientId) },
   });
 };
-const getWorkersByJobTitle = async(jobTitle)=>{
-  return await prisma.worker.findMany({where:{jobTitle}})
-}
+
+const getWorkersByJobTitle = async (jobTitle) => {
+  return await prisma.worker.findMany({ where: { jobTitle } });
+};
+
 module.exports = {
   getWorkers,
   createWorker,
   getWorkerByEmail,
   updateworker,
   getWorkersByJobTitle,
+
   updatePassword,
   getClientById
+
+
 };
