@@ -8,6 +8,8 @@ import {
   Image,
 } from 'react-native';
 import Calendar from './Calendar';
+import ProductCard from './ProductCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CategoryDetails = ({ route, navigation }) => {
   const { category, jobTitle } = route.params;
@@ -20,14 +22,13 @@ const CategoryDetails = ({ route, navigation }) => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [clientId, setClientId] = useState(null);
-
   const [isClose, setIsClose] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `http://192.168.103.2:3000/products/${category}`
+          `http://localhost:3000/products/${category}`
         );
         const data = await response.json();
         setProducts(data);
@@ -39,7 +40,7 @@ const CategoryDetails = ({ route, navigation }) => {
     const fetchWorkers = async () => {
       try {
         const response = await fetch(
-          `http:///192.168.103.2:3000/workers/${jobTitle}`
+          `http://localhost:3000/workers/${jobTitle}`
         );
         const data = await response.json();
         setWorkers(data);
@@ -72,6 +73,7 @@ const CategoryDetails = ({ route, navigation }) => {
   };
 
   console.log(selectedProduct, 'adamadam');
+
   const handleSubmitOrder = async () => {
     if (selectedProduct.length === 0) {
       console.log('No product selected');
@@ -79,7 +81,7 @@ const CategoryDetails = ({ route, navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.104.27:3000/orders', {
+      const response = await axios.post('http://localhost:3000/orders', {
         clientId,
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
@@ -93,6 +95,7 @@ const CategoryDetails = ({ route, navigation }) => {
       console.error('Error creating order:', error);
     }
   };
+
   const handleStartDate = (selectedDate) => {
     setStartDate(selectedDate || startDate);
   };
@@ -105,57 +108,44 @@ const CategoryDetails = ({ route, navigation }) => {
     setIsClose(true);
   };
 
-  const addToFAvs = async (productId) => {
+  const addToFAvs = async (productsId) => {
+    if (!clientId) {
+      console.error('Error: clientId is not set');
+      return;
+    }
+
     try {
-      const response = await fetch('http:///192.168.103.2:3000/wishlist', {
+      const response = await fetch('http://localhost:3000/wishlist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ clientId, productsId: productId }),
+        body: JSON.stringify({ clientId, productsId: productsId }),
       });
 
       const responseData = await response.json();
       if (response.ok) {
-        setFavorites((prevFavorites) => [...prevFavorites, productId]);
+        setFavorites((prevFavorites) => [...prevFavorites, productsId]);
       } else {
         console.error('Error adding to wishlist:', responseData.error);
       }
     } catch (error) {
-      console.error('Error adding to wishlist:', error);
+      if (error instanceof Response) {
+        const responseText = await error.text();
+        console.error('Error adding to wishlist:', error);
+        console.error('Response text:', responseText);
+      } else {
+        console.error('Error adding to wishlist:', error.message);
+      }
     }
   };
 
   const renderProductItem = ({ item }) => (
-    <View style={styles.card}>
-      <TouchableOpacity
-        style={styles.favoriteIconContainer}
-        onPress={() => addToFAvs(item.id)}
-      >
-        <Image
-          source={require('../assets/icons/favorite.png')}
-          style={styles.favoriteIcon}
-        />
-      </TouchableOpacity>
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <View style={styles.cardContent}>
-        <Text style={styles.title}>{item.name}</Text>
-        <Text style={styles.description}>{item.description}</Text>
-        {item.price ? (
-          <Text style={styles.price}>
-            À PARTIR DE : {item.price.toFixed(2)} € TTC/JOUR
-          </Text>
-        ) : (
-          <Text style={styles.price}>Price not available</Text>
-        )}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => reserviiButt(item)}
-        >
-          <Text style={styles.buttonText}>Réserver</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <ProductCard
+      item={item}
+      onReservePress={reserviiButt}
+      onFavoritePress={addToFAvs}
+    />
   );
 
   const renderWorkerItem = ({ item }) => (
@@ -164,7 +154,7 @@ const CategoryDetails = ({ route, navigation }) => {
       onPress={() => navigation.navigate('WorkerDetails', { worker: item })}
     >
       <View style={styles.workerHeader}>
-        <Image source={{ uri: item.image }} style={styles.workerImage} />
+        <Image source={{ uri: item.picture }} style={styles.workerImage} />
         <View style={styles.workerInfo}>
           <Text style={styles.workerName}>{item.name}</Text>
           <Text style={styles.workerVerified}>Identité Vérifiée</Text>
@@ -178,13 +168,12 @@ const CategoryDetails = ({ route, navigation }) => {
           </Text>
         </View>
       </View>
-      <View style={styles.workerContent}>
+      <View style={styles.workerContent}> 
         <Text style={styles.workerDescription}>{item.description}</Text>
       </View>
     </TouchableOpacity>
   );
 
-  // Function to extract key from item for FlatList
   const keyExtractor = (item) => (item.id ? item.id.toString() : item.name);
 
   return (
