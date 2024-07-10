@@ -53,7 +53,7 @@ const CreditCardModal = ({ modalVisible, setModalVisible, clientId, onUpdate ,Cr
       };
 
       const response = await axios.put(
-        `http://192.168.104.9:3000/clients/${clientId}`,
+        `http://192.168.11.225:3000/clients/${clientId}`,
         { creditCard: JSON.stringify(creditCardInfo) },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -20,47 +20,14 @@ const getProductById = async (id) => {
   }
 };
 
-const createProduct = async (req, res) => {
+async function createProduct(data) {
   try {
-    const {
-      name,
-      category,
-      description,
-      price,
-      rating,
-      stock,
-      numOfRatings,
-      orderId,
-    } = req.body;
-
-    // Upload the picture to Cloudinary
-    let pictureUrl = "";
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "products",
-      });
-      pictureUrl = result.secure_url;
-    }
-
-    const newProduct = await prisma.product.create({
-      data: {
-        name,
-        category,
-        description,
-        price,
-        picture: pictureUrl,
-        rating,
-        stock,
-        numOfRatings,
-        orderId,
-      },
-    });
-
-    res.status(201).json(newProduct);
+    const product = await prisma.product.create({ data });
+    return product;
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    throw new Error(`Could not create product: ${error.message}`);
   }
-};
+}
 
 const getProductsByCateg = async (category) => {
   return await prisma.product.findMany({
@@ -82,14 +49,10 @@ const deleteProductById = async (id) => {
   }
 };
 
-
-
-
 module.exports = {
   getProducts,
   getProductById,
   getProductsByCateg,
   createProduct,
   deleteProductById,
-
 };
