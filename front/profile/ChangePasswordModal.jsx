@@ -7,7 +7,7 @@ const ChangePasswordModal = ({ modalVisible, setModalVisible, email }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+  const [userType,setUserType]=useState('')
   const updatePassword = async () => {
     try {
       if (newPassword !== confirmPassword) {
@@ -16,12 +16,16 @@ const ChangePasswordModal = ({ modalVisible, setModalVisible, email }) => {
       }
       
       const token = await AsyncStorage.getItem('token');
+      const decodedToken=jwtDecode(token)
+      setUserType(decodedToken.userType)
       const client=await AsyncStorage.getItem('user');
-      const idClient=JSON.parse(client).idClient
+      const idClient=JSON.parse(client).idClient||JSON.parse(client).idworker
       console.log(client);
       console.log(idClient);
+      const endpoint = userType === "client" ? `clients/updatePassword/${idClient}` : `workers/updatePassword/${idClient}`;
+
       const response = await axios.put(
-        `http://192.168.104.2:3000/clients/updatePassword/${idClient}`,
+        `http://192.168.11.35:3000/${endpoint}`,
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
