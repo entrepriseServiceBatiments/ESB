@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, FlatList, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import axios from "axios"
 const categories = [
   { name: 'Plumbing', jobTitle: 'Plumber' },
   { name: 'Electricity', jobTitle: 'Electrician' },
@@ -38,7 +38,6 @@ const Shop = () => {
       user = JSON.parse(user);
       if (user !== null) {
         setClientId(user.idClient);
-        console.log(user);
       }
     } catch (error) {
       console.error('Error retrieving data:', error);
@@ -100,56 +99,63 @@ const Shop = () => {
   };
 
   const toggleFavorite = async (itemId) => {
-
+    console.log(itemId,"item");
+    console.log(clientId);
+    try {
       if (favorites.includes(itemId)) {
-       
+        
         setFavorites(favorites.filter(id => id !== itemId));
-        try {
-          const response = await fetch('http://192.168.104.11:3000/wishlist', {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ clientId, itemId }),
-          });
-    
-          if (response.ok) {
-            setFavorites((prevFavorites) => prevFavorites.filter(item => item.id !== productId))}
-            else {
-              const data = await response.json();
-              throw new Error(data.error);
-            }
-          } catch (error) {
-            console.error('Error removing item from wishlist:', error);}
-      } else {
-        setFavorites([...favorites, itemId]);
-        try {
-          const response = await fetch('http://192.168.104.11:3000/wishlist', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ clientId,itemId}),
-          });
-    
+        const response = await fetch(`http://192.168.104.11:3000/wishlist`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+         
+          body: JSON.stringify({ clientId,productsId:itemId }),
+        });
+  
+        if (response.ok) {
+          console.log('Item removed from wishlist');
+        } else {
           const responseText = await response.text();
-    
           try {
             const data = JSON.parse(responseText);
-    
-            if (response.ok) {
-              setFavorites((prevFavorites) => [...prevFavorites, productId]);
-            } else {
-              console.error('Error adding to wishlist:', data.error);
-            }
+            throw new Error(data.error);
           } catch (jsonError) {
-            console.error('Invalid JSON response:', responseText);
+            throw new Error('Unexpected response: ' + responseText);
           }
-        } catch (error) {
-          console.error('Error adding to wishlist:', error);
+        }
+      } else {
+        setFavorites([...favorites, itemId]);
+        const response = await fetch(`http://192.168.104.11:3000/wishlist`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ clientId,productsId:itemId }),
+        });
+        
+  
+        const responseText = await response.text();
+  
+        try {
+          const data = JSON.parse(responseText);
+  
+          if (response.ok) {
+            console.log('Item added to wishlist');
+          } else {
+            console.error('Error adding to wishlist:', data.error);
+          }
+        } catch (jsonError) {
+          console.error('Invalid JSON response:', responseText);
         }
       }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      
+    }
   };
+ 
 
   const renderProductItem = ({ item }) => (
     <View style={styles.card}>
@@ -167,11 +173,11 @@ const Shop = () => {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Réserver</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
+        <TouchableOpacity onPress={() => toggleFavorite(item.idproducts)}>
           <Icon
-            name={favorites.includes(item.id) ? 'heart' : 'heart-outline'}
+            name={favorites.includes(item.idproducts) ? 'heart' : 'heart-outline'}
             size={30}
-            color={favorites.includes(item.id) ? 'red' : 'black'}
+            color={favorites.includes(item.idproducts) ? 'red' : 'black'}
           />
         </TouchableOpacity>
       </View>
@@ -192,7 +198,7 @@ const Shop = () => {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Réserver</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
+        <TouchableOpacity onPress={() => toggleFavorite(item.idproducts)}>
           <Icon
             name={favorites.includes(item.id) ? 'heart' : 'heart-outline'}
             size={30}
@@ -202,7 +208,7 @@ const Shop = () => {
       </View>
     </View>
   );
-
+  
   return (
     <View style={styles.container}>
       {!selectedCard && !selectedCategory && (
@@ -258,14 +264,16 @@ const Shop = () => {
           </Text>
           <FlatList
             data={data}
-            keyExtractor={(item) => item.id ? item.id.toString() : String(Math.random())} // Ensure unique key for each item
-            renderItem={selectedCard === 'Products' ? renderProductItem : renderWorkerItem}
+            keyExtractor={(item) => item.id ? item.id.toString() : String(Math.random())} 
+            renderItem={selectedCard === 'Products' ? renderProductItem : renderWorkerItem
+
+            }
           />
         </View>
       )}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

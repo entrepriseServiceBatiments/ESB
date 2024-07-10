@@ -20,7 +20,6 @@ const getFavorites = async (clientId) => {
 };
 
 const addToWishlist = async (clientId, productsId) => {
-  console.log(prisma);
   try {
     const existingWishlistItem = await prisma.favorite.findUnique({
       where: {
