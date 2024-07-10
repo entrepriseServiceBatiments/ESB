@@ -18,7 +18,6 @@ const CategoryDetails = ({ route, navigation }) => {
   const [workers, setWorkers] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [clientId, setClientId] = useState(null);

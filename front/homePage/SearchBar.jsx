@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, StyleSheet, Button, Image } from 'react-native';
+import Dropdown from './Dropdown'; 
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ data = [], onSearch }) => {
   const [query, setQuery] = useState('');
-  const [placeHolder, setPlaceHolder] = useState(
-    'Trouver plus de 5000 prestataires'
-  );
+  const [placeHolder, setPlaceHolder] = useState('Trouver plus de 5000 prestataires');
+  const [filteredData, setFilteredData] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     const phrases = ['5000 prestataires', '150 services'];
@@ -19,14 +20,38 @@ const SearchBar = ({ onSearch }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const searchii = () => {
+  const handleSearch = () => {
     onSearch(query);
+    setShowDropdown(false);
   };
-  const keyPress = (el)=>{
-    if (el.nativeEvent.key === 'Enter'){
-      searchii();
+
+  const handleChangeText = (text) => {
+    setQuery(text);
+    if (text.length > 0) {
+      const results = data.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()) ||
+        item.jobTitle.toLowerCase().includes(text.toLowerCase()) ||
+        item.category.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredData(results);
+      setShowDropdown(true);
+    } else {
+      setFilteredData([]);
+      setShowDropdown(false);
     }
-  }
+  };
+
+  const handleSelectItem = (item) => {
+    setQuery(item.name || item.jobTitle || item.category); 
+    setShowDropdown(false);
+    onSearch(item);
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.nativeEvent.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
     <View style={styles.searchContainer}>
@@ -36,11 +61,12 @@ const SearchBar = ({ onSearch }) => {
           style={styles.searchInput}
           placeholder={placeHolder}
           value={query}
-          onKeyPress={keyPress}
-          onChangeText={setQuery}
+          onChangeText={handleChangeText}
+          onKeyPress={handleKeyPress}
         />
       </View>
-      <Button title="Search" onPress={searchii} />
+      <Button title="Search" onPress={handleSearch} />
+      {showDropdown && <Dropdown data={filteredData} onSelect={handleSelectItem} />}
     </View>
   );
 };
@@ -50,6 +76,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
+    position: 'relative',
   },
   inputWrapper: {
     flexDirection: 'row',

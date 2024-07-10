@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,13 +13,13 @@ import {
 import { Dialog } from 'react-native-simple-dialogs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Favorites = ({ navigation, test }) => {
-  console.log(test);
+const Favorites = ({ navigation }) => {
   const [favorites, setFavorites] = useState([]);
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [clientId, setClientId] = useState(null);
   const [refresh, setRefresh] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const retrieveClientId = async () => {
@@ -97,7 +97,7 @@ const Favorites = ({ navigation, test }) => {
       return index.toString();
     }
   };
-  const [refreshing, setRefreshing] = React.useState(false);
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
@@ -135,19 +135,28 @@ const Favorites = ({ navigation, test }) => {
   );
 
   return (
-      <ScrollView
-        contentContainerStyle={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-    <View style={styles.container}>
-        <FlatList
-          data={favorites}
-          keyExtractor={keyExtractor}
-          renderItem={renderFavoriteItem}
-          contentContainerStyle={styles.listContent}
-        />
+    <ScrollView
+      contentContainerStyle={styles.scrollView}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <View style={styles.container}>
+        <Text style={styles.titleText}>Your Favorites</Text>
+        {favorites.length === 0 ? (
+          <View style={styles.noFavoritesContainer}>
+            <Text style={styles.noFavoritesText}>
+              You have no favorites yet. Start adding your favorite products!
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={favorites}
+            keyExtractor={keyExtractor}
+            renderItem={renderFavoriteItem}
+            contentContainerStyle={styles.listContent}
+          />
+        )}
         <Dialog
           visible={isDialogVisible}
           title="Delete Product"
@@ -175,8 +184,8 @@ const Favorites = ({ navigation, test }) => {
             </View>
           </View>
         </Dialog>
-    </View>
-      </ScrollView>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -242,6 +251,26 @@ const styles = StyleSheet.create({
   trashIcon: {
     width: 24,
     height: 24,
+  },
+  noFavoritesContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  noFavoritesText: {
+    fontSize: 18,
+    color: '#666',
+    textAlign: 'center',
+  },
+  scrollView: {
+    flexGrow: 1,
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    padding: 10,
+    alignSelf: 'flex-start',
   },
 });
 
