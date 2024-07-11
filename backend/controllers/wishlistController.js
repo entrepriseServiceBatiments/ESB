@@ -31,6 +31,7 @@ const addToWishlist = async (req, res) => {
 
 const removeFromWishlist = async (req, res) => {
   const { clientId, productsId } = req.body;
+  console.log(req.body);
 
   if (!clientId || !productsId) {
     return res.status(400).send("User ID and Product ID are required");

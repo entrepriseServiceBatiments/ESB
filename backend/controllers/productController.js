@@ -31,35 +31,26 @@ const getProductsByCateg = async (req, res) => {
   }
 };
 
-const createProduct = async (req, res) => {
+async function createProduct(req, res, next) {
+  const { name, category, description, price, pictureUrl, rating, stock, numOfRatings, orderId } = req.body;
+  
   try {
-    const {
+    const product = await productService.createProduct({
       name,
       category,
       description,
       price,
-      picture,
-      rating,
-      stock,
-      numOfRatings,
-      orderId,
-    } = req.body;
-    const newProduct = await productService.createProduct({
-      name,
-      category,
-      description,
-      price,
-      picture,
+      pictureUrl,
       rating,
       stock,
       numOfRatings,
       orderId,
     });
-    res.status(201).json(newProduct);
+    res.status(201).json(product);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
-};
+}
 
 const deleteProductById = async (req, res) => {
   try {

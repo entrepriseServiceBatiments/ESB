@@ -16,8 +16,16 @@ const AccountType = ({ route, navigation }) => {
 
   const automaticLogin = async () => {
     try {
-      const response = await fetch('http://localhost:3000/login', {
-        method: 'POST',
+
+
+
+
+      const response = await fetch("http://192.168.11.225:3000/login", 
+ {
+
+
+        method: "POST",
+
 
         headers: {
           'Content-Type': 'application/json',
@@ -43,9 +51,15 @@ const AccountType = ({ route, navigation }) => {
   const AccountSelection = async (type) => {
     try {
       const url =
-        type === 'Personal'
-          ? 'http://localhost:3000/clients/add'
-          : 'http://localhost:3000/workers/add';
+
+        type === "Personal"
+
+
+          ? "http://192.168.11.225:3000/clients/add"
+          : "http://192.168.11.225:3000/workers/add";
+
+
+
 
       const payload = {
         userName: username,
@@ -54,6 +68,7 @@ const AccountType = ({ route, navigation }) => {
         phoneNum: parseInt(phoneNum),
         email: email,
         password: password,
+        status:false
       };
 
       const response = await axios.post(url, payload);

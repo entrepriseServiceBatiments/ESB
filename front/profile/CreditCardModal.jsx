@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const CreditCardModal = ({ modalVisible, setModalVisible, clientId, onUpdate ,CreditCard}) => {
+import { jwtDecode } from 'jwt-decode';
+const CreditCardModal = ({ modalVisible, setModalVisible, clientId,  creditCard }) => {
   const [creditCardNumber, setCreditCardNumber] = useState('');
   const [expirationMonth, setExpirationMonth] = useState('');
   const [expirationYear, setExpirationYear] = useState('');
   const [cvv, setCvv] = useState('');
+  const [userType, setUserType] = useState("");
+
+  useEffect(() => {
+    if (creditCard) {
+      setCreditCardNumber(creditCard.creditCardNumber );
+      setExpirationMonth(creditCard.expirationMonth );
+      setExpirationYear(creditCard.expirationYear );
+      setCvv(creditCard.cvv );
+    }
+  }, [creditCard]);
 
   const validateCreditCardNumber = (number) => {
     const regex = new RegExp("^[0-9]{16}$");
@@ -44,22 +54,31 @@ const CreditCardModal = ({ modalVisible, setModalVisible, clientId, onUpdate ,Cr
     }
 
     try {
-      const token = await AsyncStorage.getItem('token');
-      const creditCardInfo = {
+      const token = await AsyncStorage.getItem("token");
+      const decodedToken = jwtDecode(token);
+      setUserType(decodedToken.userType);
+         const creditCardInfo = {
         creditCardNumber,
         expirationMonth,
         expirationYear,
         cvv,
       };
+      const endpoint = userType === "client" ? `clients/${clientId}` : `workers/${clientId}`;
+      const response = await axios.put(`http://192.168.11.35:3000/${endpoint}`, 
 
-      const response = await axios.put(
-        `http://192.168.104.9:3000/clients/${clientId}`,
+
+
         { creditCard: JSON.stringify(creditCardInfo) },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      onUpdate(response.data);
+      setCreditCardNumber(creditCardInfo.creditCardNumber );
+      setExpirationMonth(creditCardInfo.expirationMonth );
+      setExpirationYear(creditCardInfo.expirationYear );
+      setCvv(creditCardInfo.cvv );
       setModalVisible(false);
+      
+      AsyncStorage.setItem('user',JSON.stringify(response.data))
+
     } catch (error) {
       Alert.alert('Error', error.message);
       console.error('Error updating credit card:', error);
@@ -80,7 +99,7 @@ const CreditCardModal = ({ modalVisible, setModalVisible, clientId, onUpdate ,Cr
           placeholder="Credit Card Number"
           keyboardType="numeric"
           onChangeText={(text) => setCreditCardNumber(text)}
-          value={CreditCard.creditCardNumber}
+          value={creditCardNumber}
         />
         <Text style={styles.expitext}>Expiration Date</Text>
         <View style={styles.dropdownContainer}>
@@ -101,7 +120,7 @@ const CreditCardModal = ({ modalVisible, setModalVisible, clientId, onUpdate ,Cr
               { label: '12', value: '12' },
             ]}
             placeholder={{ label: 'Month', value: null }}
-            value={CreditCard.expirationMonth}
+            value={expirationMonth}
             style={pickerSelectStyles}
           />
           <RNPickerSelect
@@ -114,7 +133,7 @@ const CreditCardModal = ({ modalVisible, setModalVisible, clientId, onUpdate ,Cr
               { label: '2028', value: '2028' },
             ]}
             placeholder={{ label: 'Year', value: null }}
-            value={CreditCard.expirationYear}
+            value={expirationYear}
             style={pickerSelectStyles}
           />
         </View>
@@ -124,7 +143,7 @@ const CreditCardModal = ({ modalVisible, setModalVisible, clientId, onUpdate ,Cr
           keyboardType="numeric"
           secureTextEntry={true}
           onChangeText={(text) => setCvv(text)}
-          value={CreditCard.cvv}
+          value={cvv}
         />
         <TouchableOpacity style={styles.button} onPress={submitCreditCard}>
           <Text style={styles.buttonText}>Submit</Text>
@@ -224,7 +243,7 @@ const styles = StyleSheet.create({
   expitext: {
     fontSize: 12,
     color: "#042630",
-    textAlign:'left'
+    textAlign: 'left',
   },
 });
 
