@@ -31,6 +31,7 @@ CREATE TABLE `Order` (
     `idorders` INTEGER NOT NULL AUTO_INCREMENT,
     `startDate` VARCHAR(191) NULL,
     `endDate` VARCHAR(191) NULL,
+    `status` VARCHAR(191) NOT NULL DEFAULT 'pending',
     `clientId` INTEGER NOT NULL,
 
     PRIMARY KEY (`idorders`)
@@ -97,11 +98,22 @@ CREATE TABLE `Worker` (
 
 -- CreateTable
 CREATE TABLE `Message` (
-    `clientId` INTEGER NOT NULL,
-    `workerId` INTEGER NOT NULL,
-    `content` VARCHAR(191) NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `content` VARCHAR(191) NOT NULL,
+    `clientId` INTEGER NULL,
+    `workerId` INTEGER NULL,
+    `conversationId` INTEGER NOT NULL,
 
-    PRIMARY KEY (`clientId`, `workerId`)
+    INDEX `idx_conversationId`(`conversationId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Conversation` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
@@ -123,7 +135,10 @@ ALTER TABLE `Favorite` ADD CONSTRAINT `Favorite_productsId_fkey` FOREIGN KEY (`p
 ALTER TABLE `Worker` ADD CONSTRAINT `Worker_ordersId_fkey` FOREIGN KEY (`ordersId`) REFERENCES `Order`(`idorders`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Message` ADD CONSTRAINT `Message_clientId_fkey` FOREIGN KEY (`clientId`) REFERENCES `Client`(`idClient`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Message` ADD CONSTRAINT `Message_clientId_fkey` FOREIGN KEY (`clientId`) REFERENCES `Client`(`idClient`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Message` ADD CONSTRAINT `Message_workerId_fkey` FOREIGN KEY (`workerId`) REFERENCES `Worker`(`idworker`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Message` ADD CONSTRAINT `Message_workerId_fkey` FOREIGN KEY (`workerId`) REFERENCES `Worker`(`idworker`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Message` ADD CONSTRAINT `Message_conversationId_fkey` FOREIGN KEY (`conversationId`) REFERENCES `Conversation`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

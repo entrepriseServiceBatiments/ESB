@@ -1,9 +1,27 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+const getFavorites = async (clientId) => {
+  try {
+    const favorites = await prisma.favorite.findMany({
+      where: {
+        clientId: parseInt(clientId),
+      },
+      include: {
+        Product: true, 
+      },
+    });
+
+    return favorites.map(fav => fav.Product);
+  } catch (error) {
+    console.error('Error fetching favorites:', error);
+    throw new Error(`Error fetching favorites: ${error.message}`);
+  }
+};
+
 const addToWishlist = async (clientId, productsId) => {
   try {
-    const existingWishlistItem = await prisma.wishlist.findUnique({
+    const existingWishlistItem = await prisma.favorite.findUnique({
       where: {
         clientId_productsId: {
           clientId: parseInt(clientId),
@@ -16,7 +34,7 @@ const addToWishlist = async (clientId, productsId) => {
       throw new Error('Item is already in the wishlist');
     }
 
-    const wishlistItem = await prisma.wishlist.create({
+    const wishlistItem = await prisma.favorite.create({
       data: {
         clientId: parseInt(clientId),
         productsId: parseInt(productsId),
@@ -32,7 +50,7 @@ const addToWishlist = async (clientId, productsId) => {
 
 const removeFromWishlist = async (clientId, productsId) => {
   try {
-    const removedItem = await prisma.wishlist.deleteMany({
+    const removedItem = await prisma.favorite.deleteMany({
       where: {
         clientId: parseInt(clientId),
         productsId: parseInt(productsId),
@@ -53,4 +71,5 @@ const removeFromWishlist = async (clientId, productsId) => {
 module.exports = {
   addToWishlist,
   removeFromWishlist,
+  getFavorites
 };

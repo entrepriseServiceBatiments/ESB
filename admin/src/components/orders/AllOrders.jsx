@@ -6,34 +6,44 @@ const AllOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refresh, setRefresh] = useState(false);
   useEffect(() => {
     const fetchAllOrders = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/allOrders");
+        const response = await axios.get("http://localhost:3000/orders");
         setOrders(response.data);
         setLoading(false);
-        console.log(response.data, "orders useEff");
+        console.log(orders, "[0]");
       } catch (error) {
         setError("Failed to fetch orders");
         setLoading(false);
       }
     };
-    fetchAllOrders();
-  }, []);
 
-  const handleStatusChange = async (orderId, status) => {
-    try {
-      await axios.patch(`http://localhost:3000/orders/${orderId}`, {
-        status,
+    fetchAllOrders();
+  }, [refresh]);
+
+  const accept = async (orderId) => {
+    axios
+      .put(`http://localhost:3000/orders/accept/${orderId}`)
+      .then((res) => {
+        console.log(res.data);
+        setRefresh(!refresh);
+      })
+      .catch((err) => {
+        console.error(err);
       });
-      setOrders(
-        orders.map((order) =>
-          order.id === orderId ? { ...order, status } : order
-        )
-      );
-    } catch (error) {
-      console.error("Failed to update order status", error);
-    }
+  };
+  const decline = async (orderId) => {
+    axios
+      .put(`http://localhost:3000/orders/decline/${orderId}`)
+      .then((res) => {
+        console.log(res.data);
+        setRefresh(!refresh);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   if (loading) {
@@ -51,33 +61,37 @@ const AllOrders = () => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Client</th>
+            <th>Client ID</th>
             <th>Start Date</th>
             <th>End Date</th>
             <th>Status</th>
             <th>Actions</th>
+            <th>products</th>
           </tr>
         </thead>
         <tbody>
           {orders.map((order) => (
-            <tr key={order.id}>
-              <td>{order.id}</td>
-              <td>{order.Client.userName}</td>
+            <tr key={order.idorders}>
+              <td>{order.idorders}</td>
+              <td>{order.clientId}</td>
               <td>{order.startDate}</td>
               <td>{order.endDate}</td>
               <td>{order.status}</td>
               <td>
+                {order.Products.map((prod) => {
+                  return <p>{prod.Product.name}</p>;
+                })}
+              </td>
+              <td>
                 <button
                   className="accept-button"
-                  onClick={() => handleStatusChange(order.id, "accepted")}
-                  disabled={order.status === "accepted"}
+                  onClick={() => accept(order.idorders)}
                 >
                   Accept
                 </button>
                 <button
                   className="decline-button"
-                  onClick={() => handleStatusChange(order.id, "declined")}
-                  disabled={order.status === "declined"}
+                  onClick={() => decline(order.idorders)}
                 >
                   Decline
                 </button>

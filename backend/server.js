@@ -17,6 +17,9 @@ const authAdminRoutes = require("./routes/authAdminRoutes");
 const authRoutes = require("./routes/authRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const prisma = require("./prisma/index.js");
+
+const wishlistRoutes = require('./routes/wishlistRoutes');
+
 app.use(express.json());
 app.use(cors());
 
@@ -27,24 +30,14 @@ app.use(productRoutes);
 app.use(orderRoutes);
 app.use(authAdminRoutes);
 app.use(chatRoutes);
+app.use(wishlistRoutes);
 
-// app.get("/protected", authenticateToken, (req, res) => {
-//   res.json({ message: "This is a protected route" });
-// });
-
-// io.on("connect", (socket) => {
-//   console.log(`User connected: ${socket.id}`);
-
-//   socket.on("disconnect", () => {
-//     console.log(`User disconnected: ${socket.id}`);
-//   });
-// });
 io.on("connect", (socket) => {
   console.log(socket.id);
   socket.on("joinconvo", async ({ clientId, workerId }) => {
     try {
-      let existid;
-      const existconvo = await prisma.conversation.findFirst({
+      let existid 
+ const existconvo = await prisma.conversation.findFirst({
         where: {
           OR: [
             {
@@ -73,14 +66,14 @@ io.on("connect", (socket) => {
         const newconvo = await prisma.conversation.create({
           data: {
             title: "new conversation",
-          },
+          }
         });
-
+  
         existid = newconvo.id;
       }
 
-      socket.join(existid.toString());
-      socket.emit("conversationId", existid.toString());
+      socket.join(existid.toString())
+      socket.emit('conversationId', existid.toString())
     } catch (error) {
       console.log(error);
     }
@@ -96,64 +89,65 @@ io.on("connect", (socket) => {
       console.log(messages);
       socket.emit("messages", messages);
     } catch (error) {
-      console.log(error);
+     console.log(error)
     }
   });
 
-  socket.on(
-    "sendmsg",
-    async ({ workerId, clientId, content, conversationId }) => {
-      console.log({ workerId, clientId, content, conversationId });
+  socket.on("sendmsg", async ({ workerId, clientId, content, conversationId }) => {
+    console.log({workerId, clientId, content, conversationId })
 
-      try {
-        const message = await prisma.message.create({
-          data: {
-            content,
-            clientId,
-            workerId,
-            conversationId,
-          },
-          include: {
-            Client: true,
-            Worker: true,
-            Conversation: true,
-          },
-        });
+    try {
+      const message = await prisma.message.create({
+        data: {
+          content,
+          clientId, 
+          workerId,
+          conversationId,
+        },
+        include: {
+          Client: true,
+          Worker: true,
+          Conversation: true,
+        },
+      });
 
-        console.log(message);
+      console.log(message);
 
-        io.to(conversationId).emit("message", message);
-      } catch (error) {
-        console.log(error);
-      }
+      io.to(conversationId).emit("message", message);
+    } catch (error) {
+      console.log(error);
     }
-  );
+  });
 
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
 });
 
-app.get("/conversations/:clientId", async (req, res) => {
-  const { clientId } = req.params;
+
+
+app.get('/conversations/:clientId', async (req, res) => {
+  const { clientId } = req.params; 
 
   try {
     const messages = await prisma.message.findMany({
       where: {
         OR: [
           { clientId: parseInt(clientId) },
-          { workerId: parseInt(clientId) },
-        ],
+          { workerId: parseInt(clientId) }   
+        ]
       },
       include: {
-        Worker: true,
-        Conversation: true,
-      },
+        Worker: true,    
+        Conversation: true  
+      }
     });
+    
 
-    res.send(messages);
+      res.send(messages);
+
   } catch (error) {
-    console.log(error);
+   console.log(error);
   }
 });
 

@@ -26,17 +26,19 @@ model Client {
   picture     String?
   Orders      Order[]   @relation("ClientOrders")
   Favorites   Favorite[]
-    Messages    Message[] @relation("ClientMessages")
+  Messages    Message[] @relation("ClientMessages")
+  PendingOrders PendingOrder[] @relation("ClientPendingOrders")  // Add this line
 }
 
 model Order {
   idorders   Int           @id @default(autoincrement())
   startDate  String?
   endDate    String?
+  status     String        @default("pending")  
   clientId   Int
   Client     Client        @relation("ClientOrders", fields: [clientId], references: [idClient])
   Workers    Worker[]      @relation("OrderWorkers")
-  Products   OrderProduct[]   // Update relation field
+  Products   OrderProduct[]  
 }
 
 model Product {
@@ -51,9 +53,8 @@ model Product {
   numOfRatings Int
   Orders       OrderProduct[]   // Update relation field
   Favorites    Favorite[]
+  PendingOrderProducts PendingOrderProduct[]  // Add this line
 }
-
-
 
 model OrderProduct {
   orderId   Int
@@ -112,8 +113,29 @@ model Message {
 
   @@index([conversationId], name: "idx_conversationId")
 }
+
 model Conversation {
   id         Int       @id @default(autoincrement())
   title      String?
   Messages   Message[]
+}
+
+model PendingOrder {
+  id          Int           @id @default(autoincrement())
+  clientId    Int
+  startDate   String?
+  endDate     String?
+  status      String        @default("pending")
+  Products    PendingOrderProduct[]
+
+  Client      Client        @relation("ClientPendingOrders", fields: [clientId], references: [idClient])
+}
+
+model PendingOrderProduct {
+  pendingOrderId  Int
+  productId       Int
+  PendingOrder    PendingOrder @relation(fields: [pendingOrderId], references: [id])
+  Product         Product      @relation(fields: [productId], references: [idproducts])
+
+  @@id([pendingOrderId, productId])
 }

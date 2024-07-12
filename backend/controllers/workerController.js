@@ -141,6 +141,27 @@ const updateWorkerStatus = async (req, res) => {
     res.status(500).json({ error: "Failed to update worker status" });
   }
 };
+const updatePassword = async (req, res) => {
+  const { workerId } = req.params;
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const client = await workerService.getClientById(workerId);
+    if (!client) {
+      return res.status(404).json({ error: 'Client not found' });
+    }
+
+    const passwordMatch = await bcrypt.compare(currentPassword, client.password);
+    if (!passwordMatch) {
+      return res.status(400).json({ error: 'Current password is incorrect' });
+    }
+
+    await workerService.updatePassword(workerId, newPassword);
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const getWorkersByJobTitle = async (req, res) => {
   try {
     const workers = await workerService.getWorkersByJobTitle(req.params.jobTitle);
@@ -154,5 +175,6 @@ module.exports = {
   createWorker,
   updateWorker,
   updateWorkerStatus,
-  getWorkersByJobTitle
+  getWorkersByJobTitle,
+  updatePassword
 };

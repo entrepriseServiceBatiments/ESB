@@ -1,7 +1,8 @@
 import React from "react";
-import Card from "./Cards.jsx";
+import Card from "./Cards.jsx"; 
 import "../products/Products.css";
 import { useNavigate } from "react-router-dom";
+
 const Clients = ({ clients }) => {
   const navigate = useNavigate();
   return (
@@ -10,13 +11,13 @@ const Clients = ({ clients }) => {
       <div className="products-grid">
         {clients.map((item) => (
           <Card
-            key={item.id}
+            key={item.idClient}
             userName={item.userName}
             cin={item.cin}
             image={item.picture}
             phoneNum={item.phoneNum}
-            adress={item.adress}
-            // onClick={() => navigate(`/clients/${item.id}`)}
+            address={item.address}
+            click={() => navigate(`/client/${item.idClient}`)}
           />
         ))}
       </div>

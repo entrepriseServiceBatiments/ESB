@@ -18,6 +18,8 @@ import Navbar from "./components/navbar/Navbar.jsx";
 import ProductDetails from "./components/products/ProductDetails.jsx";
 import AllOrders from "./components/orders/AllOrders.jsx";
 import Verify from "./components/verification/verify.jsx";
+import OneClient from "./components/clients/OneClient.jsx";
+import ClientOrders from "./components/clients/ClientOrders.jsx";
 function App() {
   const [data, setData] = useState([]);
   const [workers, setWorkers] = useState([]);
@@ -79,32 +81,31 @@ const AuthContent = ({ data, workers, clients, refresh, setRefresh }) => {
   return (
     <>
       <Navbar />
-      <div className="big-container">
-        <Routes>
-          <Route path="/login" element={<Navigate to="/" />} />
-          <Route
-            path="/"
-            element={
-              <Dashboard data={data} workers={workers} clients={clients} />
-            }
-          />
-          <Route path="/allOrders" element={<AllOrders />} />
-          <Route path="/clients" element={<Clients clients={clients} />} />
-          <Route path="/workers" element={<Workers workers={workers} />} />
-          <Route path="/products" element={<Products products={data} />} />
-          <Route
-            path="/add"
-            element={<AddProduct refresh={refresh} setRefresh={setRefresh} />}
-          />
-          <Route
-            path="/products/:id"
-            element={
-              <ProductDetails refresh={refresh} setRefresh={setRefresh} />
-            }
-          />
-          <Route path="/verify" element={<Verify />} />
-        </Routes>
-      </div>
+
+      <Routes>
+        <Route path="/login" element={<Navigate to="/" />} />
+        <Route
+          path="/"
+          element={
+            <Dashboard data={data} workers={workers} clients={clients} />
+          }
+        />
+        <Route path="/allOrders" element={<AllOrders />} />
+        <Route path="/clients" element={<Clients clients={clients} />} />
+        <Route path="/workers" element={<Workers workers={workers} />} />
+        <Route path="/products" element={<Products products={data} />} />
+        <Route
+          path="/add"
+          element={<AddProduct refresh={refresh} setRefresh={setRefresh} />}
+        />
+        <Route
+          path="/products/:id"
+          element={<ProductDetails refresh={refresh} setRefresh={setRefresh} />}
+        />
+        <Route path="/verify" element={<Verify />} />
+        <Route path="/client/:clientId" element={<OneClient />} />
+        <Route path="/orders/client/:clientId" element={<ClientOrders />} />
+      </Routes>
     </>
   );
 };
