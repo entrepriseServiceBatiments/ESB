@@ -222,7 +222,7 @@ const Shop = () => {
             style={styles.card}
             onPress={() => handleCardPress('Products')}
           >
-            <ImageBackground source={{ uri: 'https://shorturl.at/ZwQVz' }} style={styles.imageBackground}>
+            <ImageBackground source={require('../assets/Products.jpg')} style={styles.imageBackground}>
               <View style={styles.titleContainer}>
                 <Text style={styles.cardTitle}>Products</Text>
               </View>
@@ -232,7 +232,7 @@ const Shop = () => {
             style={styles.card}
             onPress={() => handleCardPress('Services')}
           >
-            <ImageBackground source={{ uri: 'https://shorturl.at/4ZLN5' }} style={styles.imageBackground}>
+            <ImageBackground source={require('../assets/Services.png')} style={styles.imageBackground}>
               <View style={styles.titleContainer}>
                 <Text style={styles.cardTitle}>Services</Text>
               </View>
@@ -312,11 +312,13 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     padding: 10,
+    marginTop:240,
   },
   cardTitle: {
     fontSize: 18,
     color: '#fff',
     padding: 5,
+    
   },
   categoriesContainer: {
     flex: 1,
