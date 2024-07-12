@@ -36,13 +36,13 @@ const EditProfileModal = ({ modalVisible, setModalVisible, userInfo, onUpdate })
       let response;
       if (userType === 'worker') {
         response = await axios.put(
-          `http://192.168.11.35:3000/workers/${idworker}`,
+          `http://192.168.1.109:3000/workers/${idworker}`,
           data,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         response = await axios.put(
-          `http://192.168.11.35:3000/clients/${idClient}`,
+          `http://192.168.1.109:3000/clients/${idClient}`,
           data,
           { headers: { Authorization: `Bearer ${token}` } }
         );

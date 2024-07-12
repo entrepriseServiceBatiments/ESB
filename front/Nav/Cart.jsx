@@ -26,7 +26,7 @@ const CartScreen = ({ navigation }) => {
 
       try {
         const response = await axios.get(
-          `http://192.168.11.49:3000/orders/client/${clientId}`
+          `http://192.168.1.109:3000/orders/client/${clientId}`
         );
         const products =
           response.data[0].Products
@@ -68,7 +68,7 @@ const CartScreen = ({ navigation }) => {
   const fetchOrders = async () => {
     try {
       const response = await axios.get(
-        `http://192.168.11.225:3000/orders/client/${clientId}`
+        `http://192.168.1.109:3000/orders/client/${clientId}`
       );
       setOrders(response.data);
       calculateTotalAmount(response.data);

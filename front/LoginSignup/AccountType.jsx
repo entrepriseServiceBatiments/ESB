@@ -16,7 +16,7 @@ const AccountType = ({ route, navigation }) => {
 
   const automaticLogin = async () => {
     try {
-      const response = await fetch("http://192.168.11.225:3000/login", {
+      const response = await fetch("http://192.168.1.109:3000/login", {
         method: "POST",
 
         headers: {
@@ -44,8 +44,8 @@ const AccountType = ({ route, navigation }) => {
     try {
       const url =
         type === "Personal"
-          ? "http://192.168.11.225:3000/clients/add"
-          : "http://192.168.11.225:3000/workers/add";
+          ? "http://192.168.1.109:3000/clients/add"
+          : "http://192.168.1.109:3000/workers/add";
 
       const payload = {
         userName: username,
