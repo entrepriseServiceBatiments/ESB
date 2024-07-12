@@ -3,6 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Alert } fro
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {jwtDecode} from 'jwt-decode'
+import { BASE_URL } from "../private.json"; 
+
+
 const ChangePasswordModal = ({ modalVisible, setModalVisible, email }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -20,17 +23,14 @@ const ChangePasswordModal = ({ modalVisible, setModalVisible, email }) => {
       setUserType(decodedToken.userType)
       const client=await AsyncStorage.getItem('user');
       const idClient=JSON.parse(client).idClient||JSON.parse(client).idworker
-      console.log(client);
-      console.log(idClient);
       const endpoint = userType === "client" ? `clients/updatePassword/${idClient}` : `workers/updatePassword/${idClient}`;
 
       const response = await axios.put(
-        `http://192.168.11.35:3000/${endpoint}`,
+        `${BASE_URL}/${endpoint}`,
 
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-       console.log(response);
       Alert.alert('Success', 'Password updated successfully.');
       setModalVisible(false);
     } catch (error) {
@@ -66,12 +66,14 @@ const ChangePasswordModal = ({ modalVisible, setModalVisible, email }) => {
           secureTextEntry={true}
           onChangeText={setConfirmPassword}
         />
-        <TouchableOpacity style={styles.button} onPress={updatePassword}>
-          <Text style={styles.buttonText}>Save</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={() => setModalVisible(false)}>
-          <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={updatePassword}>
+            <Text style={styles.buttonText}>Save</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={() => setModalVisible(false)}>
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   );
@@ -111,6 +113,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#d0d6d6",
     width: '80%',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+    marginTop: 20,
+  },
   button: {
     backgroundColor: '#042630',
     paddingVertical: 12,
@@ -118,6 +126,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignItems: 'center',
     marginVertical: 10,
+    flex: 1,
+    marginRight: 15,
   },
   buttonText: {
     color: '#fff',
@@ -125,6 +135,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     backgroundColor: '#dc3545',
+    marginLeft: 15,
   },
 });
 

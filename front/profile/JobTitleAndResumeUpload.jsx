@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert ,Modal} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BASE_URL } from "../private.json"; 
 
 
 
-const JobTitleAndResumeUpload = () => {
+const JobTitleAndResumeUpload = ({modalVisible,setModalVisible}) => {
 
   const [jobTitle, setJobTitle] = useState('');
   const [hourlyRate, setHourlyRate] = useState('');
@@ -16,7 +17,6 @@ const JobTitleAndResumeUpload = () => {
   const FilePick = async () => {
     try {
       const file = await DocumentPicker.getDocumentAsync({ type: 'application/pdf' });
-      console.log(file, 'file');
 
       if (file.type !== 'cancel') {
         const cloudinaryUrl = await uploadFileToCloudinary(file);
@@ -52,7 +52,6 @@ const JobTitleAndResumeUpload = () => {
       );
 
       const responseData = await response.json();
-      console.log(responseData);
       if (responseData.secure_url) {
         return responseData.secure_url;
       } else {
@@ -79,7 +78,7 @@ const JobTitleAndResumeUpload = () => {
         };
 
         const response = await axios.put(
-          `http://192.168.11.35:3000/workers/${idworker}`,
+          `${BASE_URL}/workers/${idworker}`,
           data,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -100,8 +99,17 @@ const JobTitleAndResumeUpload = () => {
   };
 
   return (
-    <ScrollView>
+ 
+ <Modal
+      animationType="slide"
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={() => setModalVisible(false)}
+    >
       <View style={styles.container}>
+      <TouchableOpacity style={styles.closeButton} onPress={()=>setModalVisible(false)}>
+        <Text style={styles.closeButtonText}>Close</Text>
+      </TouchableOpacity>
         <Text style={styles.label}>Job Title</Text>
         <Picker
           style={styles.input}
@@ -144,17 +152,42 @@ const JobTitleAndResumeUpload = () => {
           <Text style={styles.uploadButtonText}>Submit</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+      </Modal>
+    
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 15,
+     paddingTop:150,
+     paddingBottom:240,
+     marginLeft:10,
+     marginRight:10,
+    backgroundColor: 'white',
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderRadius: 10,
+    
+  },closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: '#042630',
   },
   label: {
     fontSize: 16,
@@ -168,17 +201,18 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
     width: '80%',
+    backgroundColor:"#e6ede6"
   },
   button: {
-    backgroundColor: '#007bff',
-    padding: 10,
+    backgroundColor: '#fff',
+    padding: 15,
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 20,
     width: '80%',
   },
   buttonText: {
-    color: '#fff',
+    color: '#042630',
     fontSize: 16,
   },
   selectedFileContainer: {
@@ -187,11 +221,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '80%',
   },
-  pdfReader: {
-    width: '100%',
-    height: 400,
-    marginBottom: 10,
-  },
   selectedFileName: {
     flex: 1,
     fontSize: 16,
@@ -199,9 +228,11 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   uploadButton: {
-    backgroundColor: 'green',
-    padding: 10,
+    backgroundColor: '#042630',
+    padding: 15,
     borderRadius: 5,
+    width: '80%',
+    alignItems: 'center',
   },
   uploadButtonText: {
     color: '#fff',

@@ -3,6 +3,7 @@ const orderService = require("../services/orderService");
 const createOrder = async (req, res) => {
   try {
     const { clientId, products, startDate, endDate } = req.body;
+    console.log(req.body);
     const order = await orderService.createOrder(
       clientId,
       products,

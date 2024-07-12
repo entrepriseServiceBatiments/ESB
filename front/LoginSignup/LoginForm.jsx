@@ -11,6 +11,7 @@ import {
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BASE_URL } from "../private.json"; 
 
 const LoginForm = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -21,7 +22,7 @@ const LoginForm = ({ navigation }) => {
 
 
 
-      const response = await fetch("http://192.168.11.225:3000/login", {
+      const response = await fetch(`${ BASE_URL }/login`, {
 
 
 

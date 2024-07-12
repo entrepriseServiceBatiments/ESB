@@ -12,12 +12,12 @@ import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {jwtDecode} from "jwt-decode";
+import { BASE_URL } from "../private.json"; 
 
 const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate }) => {
   const [profilePicture, setProfilePicture] = useState(null);
   const [userType, setUserType] = useState("");
-  
- 
+
   useEffect(() => {
     const getUserType = async () => {
       try {
@@ -62,7 +62,7 @@ const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate
     data.append("file", {
       uri,
       type: "image/jpeg",
-      name: uri.split('/').pop() ,
+      name: uri.split('/').pop(),
     });
     data.append("upload_preset", "Boughanmi");
 
@@ -77,7 +77,7 @@ const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate
           },
         }
       );
-      
+
       const response = await res.json();
       console.log("Uploaded to Cloudinary:", response.secure_url);
       setProfilePicture((prev) => ({ ...prev, url: response.secure_url }));
@@ -93,18 +93,18 @@ const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate
     try {
       let imageUrl = profilePicture.uri || "";
 
-
       const endpoint = userType === "client" ? `clients/${clientId}` : `workers/${clientId}`;
-      const response = await axios.put(`http://192.168.11.35:3000/${endpoint}`, {
+      console.log(clientId);
+
+      const response = await axios.put(`${BASE_URL}/${endpoint}`, {
         picture: imageUrl,
       });
 
-
       onUpdate({ picture: imageUrl });
       setModalVisible(false);
-      user=JSON.parse(await AsyncStorage.getItem('user'))
-      user.picture=imageUrl
-      AsyncStorage.setItem('user',JSON.stringify(user))
+      const user = JSON.parse(await AsyncStorage.getItem('user'));
+      user.picture = imageUrl;
+      await AsyncStorage.setItem('user', JSON.stringify(user));
     } catch (error) {
       console.error("Error updating profile:", error);
       Alert.alert("Error", "Failed to update profile. Please try again.");
@@ -122,11 +122,11 @@ const ProfilePictureModal = ({ modalVisible, setModalVisible, clientId, onUpdate
         <View style={styles.container}>
           <Text style={styles.title}>Add a Profile Picture</Text>
           <TouchableOpacity style={styles.imagePicker} onPress={selectImage}>
-          {profilePicture ? (
-            <Image source={{ uri: profilePicture.uri }} style={styles.image}  />
-          ) : (
+            {profilePicture ? (
+              <Image source={{ uri: profilePicture.uri }} style={styles.image} />
+            ) : (
               <Text style={styles.imagePickerText}>Select Image</Text>
-          )}
+            )}
           </TouchableOpacity>
           <View style={styles.buttons}>
             <TouchableOpacity style={styles.button} onPress={Submit}>

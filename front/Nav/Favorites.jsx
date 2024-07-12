@@ -1,7 +1,4 @@
-
 import React, { useState, useEffect} from 'react';
-
-
 import {
   View,
   Text,
@@ -9,19 +6,14 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-
   RefreshControl,
-  SafeAreaView,
   ScrollView,
 } from 'react-native';
 import { Dialog } from 'react-native-simple-dialogs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-} from "react-native";
-import { Dialog } from "react-native-simple-dialogs";
+import { BASE_URL } from "../private.json"; 
 
-
-const Favorites = ({ navigation, test }) => {
-  console.log(test);
+const Favorites = ({ navigation }) => {
   const [favorites, setFavorites] = useState([]);
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
@@ -55,23 +47,22 @@ const Favorites = ({ navigation, test }) => {
   const fetchFavorites = async (clientId) => {
     try {
       const response = await fetch(
-
-        `http://192.168.11.225:3000/wishlist/${clientId}`
-
+        `${BASE_URL}/wishlist/${clientId}`
       );
       const data = await response.json();
+      console.log(data);
       setFavorites(data);
     } catch (error) {
-      console.error("Error fetching favorites:", error);
+      console.error('Error fetching favorites:', error);
     }
   };
 
   const removeFromFavorites = async (productId) => {
     try {
-      const response = await fetch("http://192.168.11.225:3000/wishlist", {
-        method: "DELETE",
+      const response = await fetch(`${BASE_URL}/wishlist`, {
+        method: 'DELETE',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ clientId, productsId: productId }),
       });
@@ -80,18 +71,14 @@ const Favorites = ({ navigation, test }) => {
         setFavorites((prevFavorites) =>
           prevFavorites.filter((item) => item.id !== productId)
         );
-
         alert('Item removed from favorites');
         setRefresh(!refresh);
-
-        alert("Item removed from favorites");
-
       } else {
         const data = await response.json();
         throw new Error(data.error);
       }
     } catch (error) {
-      console.error("Error removing item from wishlist:", error);
+      console.error('Error removing item from wishlist:', error);
       alert(`Error removing item: ${error.message}`);
     } finally {
       setDialogVisible(false);
@@ -124,17 +111,10 @@ const Favorites = ({ navigation, test }) => {
       <View style={styles.cardContent}>
         <TouchableOpacity
           style={styles.trashIconContainer}
-
           onPress={() => confirmRemove(item.idproducts)}
         >
           <Image
             source={require('../assets/icons/bin.png')}
-
-          onPress={() => confirmRemove(item.id)}
-        >
-          <Image
-            source={require("../assets/icons/bin.png")}
-
             style={styles.trashIcon}
           />
         </TouchableOpacity>
@@ -155,7 +135,6 @@ const Favorites = ({ navigation, test }) => {
   );
 
   return (
-
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
@@ -194,37 +173,6 @@ const Favorites = ({ navigation, test }) => {
                 <Text style={{ color: '#007BFF', fontSize: 18 }}>CANCEL</Text>
               </TouchableOpacity>
             </View>
-    <View style={styles.container}>
-      <FlatList
-        data={favorites}
-        keyExtractor={keyExtractor}
-        renderItem={renderFavoriteItem}
-        contentContainerStyle={styles.listContent}
-      />
-      <Dialog
-        visible={isDialogVisible}
-        title="Delete Product"
-        onTouchOutside={() => setDialogVisible(false)}
-        contentStyle={{ alignItems: "center", justifyContent: "center" }}
-        animationType="fade"
-      >
-        <View>
-          <Text>Would you like to delete this product?</Text>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-around",
-              marginTop: 20,
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => removeFromFavorites(selectedProductId)}
-            >
-              <Text style={{ color: "#FF0000", fontSize: 18 }}>DELETE</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setDialogVisible(false)}>
-              <Text style={{ color: "#007BFF", fontSize: 18 }}>CANCEL</Text>
-            </TouchableOpacity>
           </View>
         </Dialog>
     </View>
@@ -235,7 +183,7 @@ const Favorites = ({ navigation, test }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   listContent: {
     padding: 10,
@@ -243,52 +191,50 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     margin: 10,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 8,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 4,
     elevation: 2,
   },
   image: {
-    width: "100%",
+    width: '100%',
     height: 150,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
   cardContent: {
     padding: 10,
-
     position: 'relative',
-
   },
   title: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   description: {
     fontSize: 14,
-    color: "#666",
+    color: '#666',
   },
   price: {
     fontSize: 16,
-    color: "#000",
+    color: '#000',
     marginTop: 5,
   },
   button: {
     marginTop: 10,
-    backgroundColor: "#ff0000",
+    backgroundColor: '#ff0000',
     paddingVertical: 10,
     borderRadius: 4,
   },
   buttonText: {
-    color: "#fff",
-    textAlign: "center",
-    fontWeight: "bold",
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
   trashIconContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 10,
     right: 10,
     zIndex: 1,
