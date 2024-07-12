@@ -1,5 +1,5 @@
 .dashboard-container {
-    padding: 20px;
+    padding: 80px 120px;
 }
 
 .chart-container {
@@ -17,9 +17,7 @@
     text-align: center;
 }
 
-.dashboard-container {
-    padding: 20px;
-}
+
 
 .chart-container {
     display: flex;

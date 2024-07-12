@@ -10,7 +10,7 @@ const ProductScreen = ({ route }) => {
       try {
         console.log(`Fetching products for category: ${category}`);
         const response = await fetch(
-          `http://localhost:3000/products/${category}`
+          `http://192.168.1.109:3000/products/${category}`
         );
         const data = await response.json();
         console.log("Fetched products:", data);

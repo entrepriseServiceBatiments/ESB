@@ -5,6 +5,10 @@ body {
   background-color: #f4f4f4;
 }
 
+.big-container {
+  padding: 40px;
+}
+
 nav {
   background-color: #333;
   color: white;

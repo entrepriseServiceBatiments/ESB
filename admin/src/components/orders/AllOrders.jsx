@@ -23,7 +23,9 @@ const AllOrders = () => {
 
   const handleStatusChange = async (orderId, status) => {
     try {
-      await axios.patch(`http://localhost:3000/orders/${orderId}`, { status });
+      await axios.patch(`http://localhost:3000/orders/${orderId}`, {
+        status,
+      });
       setOrders(
         orders.map((order) =>
           order.id === orderId ? { ...order, status } : order

@@ -79,28 +79,32 @@ const AuthContent = ({ data, workers, clients, refresh, setRefresh }) => {
   return (
     <>
       <Navbar />
-      <Routes>
-        <Route path="/login" element={<Navigate to="/" />} />
-        <Route
-          path="/"
-          element={
-            <Dashboard data={data} workers={workers} clients={clients} />
-          }
-        />
-        <Route path="/allOrders" element={<AllOrders />} />
-        <Route path="/clients" element={<Clients clients={clients} />} />
-        <Route path="/workers" element={<Workers workers={workers} />} />
-        <Route path="/products" element={<Products products={data} />} />
-        <Route
-          path="/add"
-          element={<AddProduct refresh={refresh} setRefresh={setRefresh} />}
-        />
-        <Route
-          path="/products/:id"
-          element={<ProductDetails refresh={refresh} setRefresh={setRefresh} />}
-        />
-        <Route path="/verify" element={<Verify />} />
-      </Routes>
+      <div className="big-container">
+        <Routes>
+          <Route path="/login" element={<Navigate to="/" />} />
+          <Route
+            path="/"
+            element={
+              <Dashboard data={data} workers={workers} clients={clients} />
+            }
+          />
+          <Route path="/allOrders" element={<AllOrders />} />
+          <Route path="/clients" element={<Clients clients={clients} />} />
+          <Route path="/workers" element={<Workers workers={workers} />} />
+          <Route path="/products" element={<Products products={data} />} />
+          <Route
+            path="/add"
+            element={<AddProduct refresh={refresh} setRefresh={setRefresh} />}
+          />
+          <Route
+            path="/products/:id"
+            element={
+              <ProductDetails refresh={refresh} setRefresh={setRefresh} />
+            }
+          />
+          <Route path="/verify" element={<Verify />} />
+        </Routes>
+      </div>
     </>
   );
 };

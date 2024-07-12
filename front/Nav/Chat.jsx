@@ -44,8 +44,8 @@ const Chat = () => {
   const sendMessage = () => {
     if (socket && message.trim()) {
       socket.emit("sendmsg", {
-        recipientId: clientId, // Adjust according to your needs
-        senderId: clientId, // Adjust according to your needs
+        recipientId: clientId,
+        senderId: clientId, 
         content: message,
         conversationId: conversationId,
       });
