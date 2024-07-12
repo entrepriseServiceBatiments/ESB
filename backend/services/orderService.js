@@ -8,7 +8,7 @@ const createOrder = async (clientId, products, startDate, endDate) => {
         clientId,
         startDate,
         endDate,
-        status: "pending", // Default status
+        status: "pending", 
         Products: {
           create: products.map((product) => ({
             productId: product.idproducts,

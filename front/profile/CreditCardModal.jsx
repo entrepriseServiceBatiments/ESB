@@ -1,22 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import RNPickerSelect from 'react-native-picker-select';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { jwtDecode } from 'jwt-decode';
-const CreditCardModal = ({ modalVisible, setModalVisible, clientId,  creditCard }) => {
-  const [creditCardNumber, setCreditCardNumber] = useState('');
-  const [expirationMonth, setExpirationMonth] = useState('');
-  const [expirationYear, setExpirationYear] = useState('');
-  const [cvv, setCvv] = useState('');
-  const [userType, setUserType] = useState("");
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+} from "react-native";
+import RNPickerSelect from "react-native-picker-select";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
+import { BASE_URL } from "../private.json";
+
+const CreditCardModal = ({
+  modalVisible,
+  setModalVisible,
+  clientId,
+  creditCard,
+}) => {
+  const [creditCardNumber, setCreditCardNumber] = useState("");
+  const [expirationMonth, setExpirationMonth] = useState("");
+  const [expirationYear, setExpirationYear] = useState("");
+  const [cvv, setCvv] = useState("");
 
   useEffect(() => {
     if (creditCard) {
-      setCreditCardNumber(creditCard.creditCardNumber );
-      setExpirationMonth(creditCard.expirationMonth );
-      setExpirationYear(creditCard.expirationYear );
-      setCvv(creditCard.cvv );
+      setCreditCardNumber(creditCard.creditCardNumber);
+      setExpirationMonth(creditCard.expirationMonth);
+      setExpirationYear(creditCard.expirationYear);
+      setCvv(creditCard.cvv);
     }
   }, [creditCard]);
 
@@ -44,7 +58,10 @@ const CreditCardModal = ({ modalVisible, setModalVisible, clientId,  creditCard 
 
   const submitCreditCard = async () => {
     if (!validateCreditCardNumber(creditCardNumber)) {
-      Alert.alert("Invalid Credit Card Number", "Please enter a valid 16-digit credit card number.");
+      Alert.alert(
+        "Invalid Credit Card Number",
+        "Please enter a valid 16-digit credit card number."
+      );
       return;
     }
 
@@ -56,32 +73,31 @@ const CreditCardModal = ({ modalVisible, setModalVisible, clientId,  creditCard 
     try {
       const token = await AsyncStorage.getItem("token");
       const decodedToken = jwtDecode(token);
-      setUserType(decodedToken.userType);
-         const creditCardInfo = {
+      const creditCardInfo = {
         creditCardNumber,
         expirationMonth,
         expirationYear,
         cvv,
       };
-      const endpoint = userType === "client" ? `clients/${clientId}` : `workers/${clientId}`;
-      const response = await axios.put(`http://192.168.1.109:3000/${endpoint}`, 
-
-
-
+      const endpoint =
+        decodedToken.userType === "client"
+          ? `clients/${clientId}`
+          : `workers/${clientId}`;
+      const response = await axios.put(
+        `${BASE_URL}/${endpoint}`,
         { creditCard: JSON.stringify(creditCardInfo) },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `${token}` } }
       );
-      setCreditCardNumber(creditCardInfo.creditCardNumber );
-      setExpirationMonth(creditCardInfo.expirationMonth );
-      setExpirationYear(creditCardInfo.expirationYear );
-      setCvv(creditCardInfo.cvv );
+      setCreditCardNumber(creditCardInfo.creditCardNumber);
+      setExpirationMonth(creditCardInfo.expirationMonth);
+      setExpirationYear(creditCardInfo.expirationYear);
+      setCvv(creditCardInfo.cvv);
       setModalVisible(false);
-      
-      AsyncStorage.setItem('user',JSON.stringify(response.data))
 
+      AsyncStorage.setItem("user", JSON.stringify(response.data));
     } catch (error) {
-      Alert.alert('Error', error.message);
-      console.error('Error updating credit card:', error);
+      Alert.alert("Error", error.message);
+      console.error("Error updating credit card:", error);
     }
   };
 
@@ -106,33 +122,33 @@ const CreditCardModal = ({ modalVisible, setModalVisible, clientId,  creditCard 
           <RNPickerSelect
             onValueChange={(value) => setExpirationMonth(value)}
             items={[
-              { label: '01', value: '01' },
-              { label: '02', value: '02' },
-              { label: '03', value: '03' },
-              { label: '04', value: '04' },
-              { label: '05', value: '05' },
-              { label: '06', value: '06' },
-              { label: '07', value: '07' },
-              { label: '08', value: '08' },
-              { label: '09', value: '09' },
-              { label: '10', value: '10' },
-              { label: '11', value: '11' },
-              { label: '12', value: '12' },
+              { label: "01", value: "01" },
+              { label: "02", value: "02" },
+              { label: "03", value: "03" },
+              { label: "04", value: "04" },
+              { label: "05", value: "05" },
+              { label: "06", value: "06" },
+              { label: "07", value: "07" },
+              { label: "08", value: "08" },
+              { label: "09", value: "09" },
+              { label: "10", value: "10" },
+              { label: "11", value: "11" },
+              { label: "12", value: "12" },
             ]}
-            placeholder={{ label: 'Month', value: null }}
+            placeholder={{ label: "Month", value: null }}
             value={expirationMonth}
             style={pickerSelectStyles}
           />
           <RNPickerSelect
             onValueChange={(value) => setExpirationYear(value)}
             items={[
-              { label: '2024', value: '2024' },
-              { label: '2025', value: '2025' },
-              { label: '2026', value: '2026' },
-              { label: '2027', value: '2027' },
-              { label: '2028', value: '2028' },
+              { label: "2024", value: "2024" },
+              { label: "2025", value: "2025" },
+              { label: "2026", value: "2026" },
+              { label: "2027", value: "2027" },
+              { label: "2028", value: "2028" },
             ]}
-            placeholder={{ label: 'Year', value: null }}
+            placeholder={{ label: "Year", value: null }}
             value={expirationYear}
             style={pickerSelectStyles}
           />
@@ -145,55 +161,31 @@ const CreditCardModal = ({ modalVisible, setModalVisible, clientId,  creditCard 
           onChangeText={(text) => setCvv(text)}
           value={cvv}
         />
-        <TouchableOpacity style={styles.button} onPress={submitCreditCard}>
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={() => setModalVisible(false)}>
-          <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={submitCreditCard}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.cancelButton]}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   );
 };
 
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: '#d0d6d6',
-    borderRadius: 4,
-    color: 'black',
-    paddingRight: 30,
-    marginBottom: 10,
-    backgroundColor: "#d0d6d6",
-    width: '75%',
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#d0d6d6',
-    borderRadius: 4,
-    color: 'black',
-    paddingRight: 120,
-    marginBottom: 10,
-    backgroundColor: "#d0d6d6",
-    width: '75%',
-  },
-});
-
 const styles = StyleSheet.create({
   modalView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 22,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -205,45 +197,84 @@ const styles = StyleSheet.create({
   },
   modalText: {
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: "#042630",
   },
   input: {
     height: 50,
-    borderColor: '#d0d6d6',
+    borderColor: "#d0d6d6",
     borderWidth: 1,
     marginBottom: 16,
     paddingHorizontal: 8,
     backgroundColor: "#d0d6d6",
-    width: '80%',
+    width: "80%",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "80%",
+    marginTop: 20,
   },
   button: {
-    backgroundColor: '#042630',
+    backgroundColor: "#042630",
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 4,
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 10,
+    flex: 1,
+    marginRight: 10,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: '#dc3545',
+    backgroundColor: "#dc3545",
+    marginLeft: 10,
+    flex: 1,
   },
   dropdownContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 10,
-    width: '80%',
+    width: "80%",
   },
   expitext: {
     fontSize: 12,
     color: "#042630",
-    textAlign: 'left',
+    textAlign: "left",
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: "#d0d6d6",
+    borderRadius: 4,
+    color: "black",
+    paddingRight: 30,
+    marginBottom: 10,
+    backgroundColor: "#d0d6d6",
+    width: "75%",
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: "#d0d6d6",
+    borderRadius: 4,
+    color: "black",
+    paddingRight: 120,
+    marginBottom: 10,
+    backgroundColor: "#d0d6d6",
+    width: "75%",
   },
 });
 

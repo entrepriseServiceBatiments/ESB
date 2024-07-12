@@ -11,6 +11,7 @@ import {
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BASE_URL } from "../private.json";
 
 const LoginForm = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -18,11 +19,7 @@ const LoginForm = ({ navigation }) => {
 
   const Login = async () => {
     try {
-
-      const response = await fetch("http://192.168.1.109:3000/login", {
-
-
-   
+      const response = await fetch(`${BASE_URL}/login`, {
         method: "POST",
 
         headers: {
@@ -33,12 +30,10 @@ const LoginForm = ({ navigation }) => {
 
       const data = await response.json();
       if (response.ok) {
-
-        await AsyncStorage.setItem('token', data.token);
-        await AsyncStorage.setItem('user',JSON.stringify(data.user))
+        await AsyncStorage.setItem("token", data.token);
+        await AsyncStorage.setItem("user", JSON.stringify(data.user));
         console.log(data);
-        navigation.navigate('Profile');
-
+        navigation.navigate("Profile");
       } else {
         Alert.alert("Login Failed", data.message);
       }

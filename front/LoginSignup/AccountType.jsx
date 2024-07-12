@@ -10,13 +10,14 @@ import {
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BASE_URL } from "../private.json";
 
 const AccountType = ({ route, navigation }) => {
-  const { email, password, username, address, phoneNum, cin } = route.params;
+  const { email, password, username,  phoneNum, cin } = route.params;
 
   const automaticLogin = async () => {
     try {
-      const response = await fetch("http://192.168.1.109:3000/login", {
+      const response = await fetch(`${BASE_URL}/login`, {
         method: "POST",
 
         headers: {
@@ -44,12 +45,11 @@ const AccountType = ({ route, navigation }) => {
     try {
       const url =
         type === "Personal"
-          ? "http://192.168.1.109:3000/clients/add"
-          : "http://192.168.1.109:3000/workers/add";
+          ? `${BASE_URL}/clients/add`
+          : `${BASE_URL}/workers/add`;
 
       const payload = {
         userName: username,
-        address: address,
         cin: parseInt(cin),
         phoneNum: parseInt(phoneNum),
         email: email,
@@ -95,7 +95,6 @@ const AccountType = ({ route, navigation }) => {
       email,
       password,
       username,
-      address,
       phoneNum,
       cin,
     });

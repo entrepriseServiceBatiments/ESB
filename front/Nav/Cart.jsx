@@ -6,9 +6,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BASE_URL } from "../private.json";
 
 const CartScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
@@ -20,17 +22,15 @@ const CartScreen = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-
     const fetchOrders = async () => {
       if (!clientId) return;
 
       try {
         const response = await axios.get(
-          `http://192.168.1.109:3000/orders/client/${clientId}`
+          `${BASE_URL}/orders/client/${clientId}`
         );
         const products =
-          response.data[0].Products
-          .flatMap((order) =>
+          response.data[0].Products.flatMap((order) =>
             order.Products.map((product) => ({
               ...product,
               quantity: 1,
@@ -45,12 +45,9 @@ const CartScreen = ({ navigation }) => {
       }
     };
 
- 
-
     if (clientId) {
       fetchOrders();
     }
-
   }, [clientId]);
 
   const retrieveClientId = async () => {
@@ -67,9 +64,7 @@ const CartScreen = ({ navigation }) => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(
-        `http://192.168.1.109:3000/orders/client/${clientId}`
-      );
+      const response = await axios.get(`${BASE_URL}/orders/client/${clientId}`);
       setOrders(response.data);
       calculateTotalAmount(response.data);
     } catch (error) {
@@ -113,26 +108,24 @@ const CartScreen = ({ navigation }) => {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Your Cart</Text>
-      <FlatList
-        data={orders}
-        renderItem={renderOrderItem}
-        keyExtractor={(item) => item.idorders.toString()}
-      />
-      <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>
-          Total Amount: ${totalAmount.toFixed(2)}
-        </Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.title}>Your Cart</Text>
+        <FlatList
+          data={orders}
+          renderItem={renderOrderItem}
+          keyExtractor={(item) => item.idorders.toString()}
+        />
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalText}>
+            Total Amount: ${totalAmount.toFixed(2)}
+          </Text>
+        </View>
+        <TouchableOpacity style={styles.checkoutButton} onPress={() => {}}>
+          <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        style={styles.checkoutButton}
-        onPress={() => {
-        }}
-      >
-        <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 

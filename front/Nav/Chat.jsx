@@ -10,6 +10,7 @@ import {
 import io from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwtDecode from "jwt-decode";
+import { BASE_URL } from "../private.json";
 
 const Chat = () => {
   const [socket, setSocket] = useState(null);
@@ -25,7 +26,7 @@ const Chat = () => {
         const decodedToken = jwtDecode(token);
         setClientId(decodedToken.idClient);
 
-        const newSocket = io("http://192.168.1.109:3000");
+        const newSocket = io(`${BASE_URL}`);
         setSocket(newSocket);
 
         newSocket.emit("joinconvo", { conversationId: null });
@@ -44,8 +45,8 @@ const Chat = () => {
   const sendMessage = () => {
     if (socket && message.trim()) {
       socket.emit("sendmsg", {
-        recipientId: clientId,
-        senderId: clientId, 
+        recipientId: clientId, // Adjust according to your needs
+        senderId: clientId, // Adjust according to your needs
         content: message,
         conversationId: conversationId,
       });

@@ -18,7 +18,9 @@ model Client {
   idClient    Int       @id @default(autoincrement())
   userName    String
   creditCard  String?
-  address     String
+  address     String?
+  latitude     Decimal?
+  longitude    Decimal?
   cin         Int       @unique
   phoneNum    Int       @unique
   email       String    @unique

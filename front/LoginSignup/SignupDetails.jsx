@@ -11,7 +11,6 @@ import ErrorModal from "./ErrorModal";
 const SignupDetails = ({ route, navigation }) => {
   const { email, password } = route.params;
   const [username, setUsername] = useState("");
-  const [address, setAddress] = useState("");
   const [phoneNum, setPhoneNumber] = useState("");
   const [cin, setCin] = useState("");
   const [errorModalVisible, setErrorModalVisible] = useState(false);
@@ -20,7 +19,6 @@ const SignupDetails = ({ route, navigation }) => {
 
   const validateDetails = () => {
     if (username.trim() === "") return "Please enter a username.";
-    if (address.trim() === "") return "Please enter an address.";
     if (phoneNum.trim() === "") return "Please enter a phone number.";
     if (cin.trim() === "") return "Please enter a CIN.";
     if (!/^\d{8}$/.test(phoneNum)) return "Phone number must be 8 digits.";
@@ -40,7 +38,6 @@ const SignupDetails = ({ route, navigation }) => {
       email,
       password,
       username,
-      address,
       phoneNum,
       cin,
     });
@@ -61,13 +58,7 @@ const SignupDetails = ({ route, navigation }) => {
         onChangeText={setUsername}
         autoCapitalize="none"
       />
-      <Text style={styles.label}>Address*</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your address"
-        value={address}
-        onChangeText={setAddress}
-      />
+      
       <Text style={styles.label}>Phone Number*</Text>
       <TextInput
         style={styles.input}
