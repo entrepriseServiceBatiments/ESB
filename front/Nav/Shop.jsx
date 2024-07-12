@@ -1,28 +1,21 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ImageBackground,
-  FlatList,
-  Image,
-} from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, FlatList, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Calendar from "../homePage/Calendar";
-import { BASE_URL } from "../private.json";
+import { BASE_URL } from "../private.json"; 
+
 
 const categories = [
-  { name: "Plumbing", jobTitle: "Plumber" },
-  { name: "Electricity", jobTitle: "Electrician" },
-  { name: "Housekeeping", jobTitle: "Housekeeper" },
-  { name: "Masonry", jobTitle: "Mason" },
-  { name: "Air conditioning", jobTitle: "HVAC Technician" },
-  { name: "DIY and assembly", jobTitle: "Handyman" },
-  { name: "Washing machine", jobTitle: "Appliance Repair Technician" },
-  { name: "Painting", jobTitle: "Painter" },
-  { name: "Gardening", jobTitle: "Gardener" },
+  { name: 'Plumbing', jobTitle: 'Plumber' },
+  { name: 'Electricity', jobTitle: 'Electrician' },
+  { name: 'Housekeeping', jobTitle: 'Housekeeper' },
+  { name: 'Masonry', jobTitle: 'Mason' },
+  { name: 'Air conditioning', jobTitle: 'HVAC Technician' },
+  { name: 'DIY and assembly', jobTitle: 'Handyman' },
+  { name: 'Washing machine', jobTitle: 'Appliance Repair Technician' },
+  { name: 'Painting', jobTitle: 'Painter' },
+  { name: 'Gardening', jobTitle: 'Gardener' },
 ];
 
 const Shop = () => {
@@ -30,27 +23,27 @@ const Shop = () => {
   const [data, setData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [favorites, setFavorites] = useState([]);
-  const [clientId, setClientId] = useState("");
+  const [clientId, setClientId] = useState('');
 
   useEffect(() => {
     retrieveData();
-    if (selectedCard === "Products") {
+    if (selectedCard === 'Products') {
       fetchProducts();
-    } else if (selectedCard === "Services") {
+    } else if (selectedCard === 'Services') {
       fetchServices();
     }
   }, [selectedCard]);
 
   const retrieveData = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      let user = await AsyncStorage.getItem("user");
+      const token = await AsyncStorage.getItem('token');
+      let user = await AsyncStorage.getItem('user');
       user = JSON.parse(user);
       if (user !== null) {
         setClientId(user.idClient);
       }
     } catch (error) {
-      console.error("Error retrieving data:", error);
+      console.error('Error retrieving data:', error);
     }
   };
 
@@ -60,9 +53,9 @@ const Shop = () => {
 
   const handleCategoryPress = (category) => {
     setSelectedCategory(category);
-    if (selectedCard === "Products") {
+    if (selectedCard === 'Products') {
       fetchProducts(category);
-    } else if (selectedCard === "Services") {
+    } else if (selectedCard === 'Services') {
       fetchServices(category);
     }
   };
@@ -71,98 +64,103 @@ const Shop = () => {
     try {
       const response = await fetch(`${BASE_URL}/products/${category}`);
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error('Network response was not ok');
       }
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
         const data = await response.json();
         setData(data);
       } else {
-        throw new Error("Oops! Unexpected response from server");
+        throw new Error('Oops! Unexpected response from server');
       }
     } catch (error) {
-      console.error("Fetch Error:", error.message);
+      console.error('Fetch Error:', error.message);
       setData([]);
     }
   };
 
   const fetchServices = async (category) => {
-    const jobTitle = categories.find((cat) => cat.name === category)?.jobTitle;
+    const jobTitle = categories.find(cat => cat.name === category)?.jobTitle;
     if (!jobTitle) return;
 
     try {
       const response = await fetch(`${BASE_URL}/workers/${jobTitle}`);
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error('Network response was not ok');
       }
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
         const data = await response.json();
         setData(data);
       } else {
-        throw new Error("Oops! Unexpected response from server");
+        throw new Error('Oops! Unexpected response from server');
       }
     } catch (error) {
-      console.error("Fetch Error:", error.message);
+      console.error('Fetch Error:', error.message);
       setData([]);
     }
   };
 
   const toggleFavorite = async (itemId) => {
-    console.log(itemId, "item");
+    console.log(itemId,"item");
     console.log(clientId);
     try {
       if (favorites.includes(itemId)) {
-        setFavorites(favorites.filter((id) => id !== itemId));
+        
+        setFavorites(favorites.filter(id => id !== itemId));
 
         const response = await fetch(`${BASE_URL}/wishlist`, {
-          method: "DELETE",
+          method: 'DELETE',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-
-          body: JSON.stringify({ clientId, productsId: itemId }),
+         
+          body: JSON.stringify({ clientId,productsId:itemId }),
         });
-
+  
         if (response.ok) {
-          console.log("Item removed from wishlist");
+          console.log('Item removed from wishlist');
         } else {
+
           const responseText = await response.text();
           try {
             const data = JSON.parse(responseText);
             throw new Error(data.error);
           } catch (jsonError) {
-            throw new Error("Unexpected response: " + responseText);
+            throw new Error('Unexpected response: ' + responseText);
           }
         }
       } else {
         setFavorites([...favorites, itemId]);
         const response = await fetch(`${BASE_URL}/wishlist`, {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ clientId, productsId: itemId }),
+          body: JSON.stringify({ clientId,productsId:itemId }),
         });
 
+  
         const responseText = await response.text();
-
+  
         try {
           const data = JSON.parse(responseText);
-
+  
           if (response.ok) {
-            console.log("Item added to wishlist");
+            console.log('Item added to wishlist');
           } else {
-            console.error("Error adding to wishlist:", data.error);
+            console.error('Error adding to wishlist:', data.error);
           }
         } catch (jsonError) {
-          console.error("Invalid JSON response:", responseText);
+          console.error('Invalid JSON response:', responseText);
         }
       }
     } catch (error) {
-      console.error("Error toggling favorite:", error);
+      console.error('Error toggling favorite:', error);
+      
     }
   };
+ 
 
   const renderProductItem = ({ item }) => (
     <View style={styles.card}>
@@ -182,11 +180,9 @@ const Shop = () => {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => toggleFavorite(item.idproducts)}>
           <Icon
-            name={
-              favorites.includes(item.idproducts) ? "heart" : "heart-outline"
-            }
+            name={favorites.includes(item.idproducts) ? 'heart' : 'heart-outline'}
             size={30}
-            color={favorites.includes(item.idproducts) ? "red" : "black"}
+            color={favorites.includes(item.idproducts) ? 'red' : 'black'}
           />
         </TouchableOpacity>
       </View>
@@ -209,27 +205,24 @@ const Shop = () => {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => toggleFavorite(item.idproducts)}>
           <Icon
-            name={favorites.includes(item.id) ? "heart" : "heart-outline"}
+            name={favorites.includes(item.id) ? 'heart' : 'heart-outline'}
             size={30}
-            color={favorites.includes(item.id) ? "red" : "black"}
+            color={favorites.includes(item.id) ? 'red' : 'black'}
           />
         </TouchableOpacity>
       </View>
     </View>
   );
-
+  
   return (
     <View style={styles.container}>
       {!selectedCard && !selectedCategory && (
         <>
           <TouchableOpacity
             style={styles.card}
-            onPress={() => handleCardPress("Products")}
+            onPress={() => handleCardPress('Products')}
           >
-            <ImageBackground
-              source={{ uri: "https://shorturl.at/ZwQVz" }}
-              style={styles.imageBackground}
-            >
+            <ImageBackground source={require('../assets/Products.jpg')} style={styles.imageBackground}>
               <View style={styles.titleContainer}>
                 <Text style={styles.cardTitle}>Products</Text>
               </View>
@@ -237,12 +230,9 @@ const Shop = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.card}
-            onPress={() => handleCardPress("Services")}
+            onPress={() => handleCardPress('Services')}
           >
-            <ImageBackground
-              source={{ uri: "https://shorturl.at/4ZLN5" }}
-              style={styles.imageBackground}
-            >
+            <ImageBackground source={require('../assets/Services.png')} style={styles.imageBackground}>
               <View style={styles.titleContainer}>
                 <Text style={styles.cardTitle}>Services</Text>
               </View>
@@ -264,125 +254,117 @@ const Shop = () => {
               </TouchableOpacity>
             )}
           />
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => setSelectedCard(null)}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={() => setSelectedCard(null)}>
             <Text style={styles.backButtonText}>Back</Text>
           </TouchableOpacity>
         </View>
       )}
       {selectedCategory && (
         <View style={styles.listContainer}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => setSelectedCategory(null)}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={() => setSelectedCategory(null)}>
             <Text style={styles.backButtonText}>Back to Categories</Text>
           </TouchableOpacity>
           <Text style={styles.listTitle}>
-            {selectedCard === "Products"
-              ? `Products in ${selectedCategory}`
-              : `Workers in ${selectedCategory}`}
+            {selectedCard === 'Products' ? `Products in ${selectedCategory}` : `Workers in ${selectedCategory}`}
           </Text>
           <FlatList
             data={data}
-            keyExtractor={(item) =>
-              item.id ? item.id.toString() : String(Math.random())
-            }
-            renderItem={
-              selectedCard === "Products" ? renderProductItem : renderWorkerItem
+            keyExtractor={(item) => item.id ? item.id.toString() : String(Math.random())} 
+            renderItem={selectedCard === 'Products' ? renderProductItem : renderWorkerItem
+
             }
           />
         </View>
       )}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
     padding: 20,
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     margin: 10,
     borderRadius: 10,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
-    width: "100%",
+    width: '100%',
     flex: 1,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   imageBackground: {
     flex: 1,
-    width: "100%",
-    height: "100%",
-    justifyContent: "flex-start",
-    alignItems: "center",
+    width: '100%',
+    height: '100%',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
   titleContainer: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    width: "100%",
-    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    width: '100%',
+    alignItems: 'center',
     padding: 10,
+    marginTop:240,
   },
   cardTitle: {
     fontSize: 18,
-    color: "#fff",
+    color: '#fff',
     padding: 5,
+    
   },
   categoriesContainer: {
     flex: 1,
-    width: "100%",
+    width: '100%',
   },
   categoryContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     padding: 15,
     marginBottom: 10,
     borderRadius: 10,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 5,
-    width: "100%",
+    width: '100%',
   },
   categoryText: {
     fontSize: 16,
   },
   backButton: {
-    backgroundColor: "#2196F3",
+    backgroundColor: '#2196F3',
     padding: 15,
     borderRadius: 10,
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 20,
   },
   backButtonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
   },
   listContainer: {
     flex: 1,
-    width: "100%",
+    width: '100%',
     padding: 20,
   },
   listTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
   },
   itemContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     padding: 15,
     marginBottom: 10,
     borderRadius: 10,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 5,
@@ -392,44 +374,44 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     padding: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 5,
   },
   description: {
     fontSize: 14,
-    color: "#777",
+    color: '#777',
     marginBottom: 10,
-    textAlign: "center",
+    textAlign: 'center',
   },
   details: {
     fontSize: 14,
-    color: "#555",
+    color: '#555',
     marginBottom: 5,
   },
   price: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
-    color: "#000",
+    color: '#000',
   },
   button: {
-    backgroundColor: "#2196F3",
+    backgroundColor: '#2196F3',
     padding: 10,
     borderRadius: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
   buttonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
   },
   image: {
-    width: "100%",
+    width: '100%',
     height: 150,
-    resizeMode: "cover",
+    resizeMode: 'cover',
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
   },
