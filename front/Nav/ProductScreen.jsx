@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
+import { BASE_URL } from "../private.json"; 
 
 const ProductScreen = ({ route }) => {
   const { category } = route.params;
@@ -10,7 +11,7 @@ const ProductScreen = ({ route }) => {
       try {
         console.log(`Fetching products for category: ${category}`);
         const response = await fetch(
-          `http://192.168.11.225:3000/products/${category}`
+          `${BASE_URL}/products/${category}`
 
 
         );

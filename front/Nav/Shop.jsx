@@ -3,6 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, FlatList, Im
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Calendar from "../homePage/Calendar";
+import { BASE_URL } from "../private.json"; 
+
+
 const categories = [
   { name: 'Plumbing', jobTitle: 'Plumber' },
   { name: 'Electricity', jobTitle: 'Electrician' },
@@ -59,7 +62,7 @@ const Shop = () => {
 
   const fetchProducts = async (category) => {
     try {
-      const response = await fetch(`http://192.168.104.11:3000/products/${category}`);
+      const response = await fetch(`${BASE_URL}/products/${category}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -81,7 +84,7 @@ const Shop = () => {
     if (!jobTitle) return;
 
     try {
-      const response = await fetch(`http://192.168.104.11:3000/workers/${jobTitle}`);
+      const response = await fetch(`${BASE_URL}/workers/${jobTitle}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -106,7 +109,7 @@ const Shop = () => {
         
         setFavorites(favorites.filter(id => id !== itemId));
 
-        const response = await fetch(`http://192.168.104.11:3000/wishlist`, {
+        const response = await fetch(`${BASE_URL}/wishlist`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -129,7 +132,7 @@ const Shop = () => {
         }
       } else {
         setFavorites([...favorites, itemId]);
-        const response = await fetch(`http://192.168.104.11:3000/wishlist`, {
+        const response = await fetch(`${BASE_URL}/wishlist`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -13,13 +13,10 @@ const getClients = async (req, res) => {
 const createClient = async (req, res) => {
   const {
     userName,
-    creditCard,
-    address,
     cin,
     phoneNum,
     email,
     password,
-    picture,
   } = req.body;
 
   try {
@@ -27,7 +24,6 @@ const createClient = async (req, res) => {
 
     const client = await clientService.createClient({
       userName,
-      address,
       cin,
       phoneNum,
       email,
@@ -49,9 +45,10 @@ const updateClient = async (req, res) => {
     phoneNum,
     email,
     password,
-    picture
+    picture,
+    latitude,
+      longitude,
   } = req.body; 
-
   try {
     const { clientId } = req.params;
 
@@ -64,7 +61,9 @@ const updateClient = async (req, res) => {
       cin,
       phoneNum,
       email,
-      picture
+      picture,
+      latitude,
+      longitude,
     };
 
     if (hashedPassword) {
@@ -75,6 +74,7 @@ const updateClient = async (req, res) => {
 
     res.json(client);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 }
