@@ -80,7 +80,7 @@ async function main() {
           ],
         description: faker.commerce.productDescription(),
         price: parseInt(faker.commerce.price()),
-        picture: faker.image.imageUrl(),
+        picture: faker.image.url(),
         rating: faker.number.int({ min: 1, max: 5 }),
         stock: faker.number.int({ min: 1, max: 100 }),
         numOfRatings: faker.number.int({ min: 1, max: 1000 }),
