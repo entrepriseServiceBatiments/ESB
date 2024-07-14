@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  ScrollView,
+  RefreshControl,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -16,35 +16,13 @@ const CartScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [clientId, setClientId] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     retrieveClientId();
   }, []);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (!clientId) return;
-
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/orders/client/${clientId}`
-        );
-        const products =
-          response.data[0].Products.flatMap((order) =>
-            order.Products.map((product) => ({
-              ...product,
-              quantity: 1,
-            }))
-          ) || [];
-        setOrders(products);
-        setLoading(false);
-        console.log(response.data, "orders useEff");
-      } catch (err) {
-        setError(err);
-        setLoading(false);
-      }
-    };
-
     if (clientId) {
       fetchOrders();
     }
@@ -64,11 +42,14 @@ const CartScreen = ({ navigation }) => {
 
   const fetchOrders = async () => {
     try {
+      setRefreshing(true);
       const response = await axios.get(`${BASE_URL}/orders/client/${clientId}`);
       setOrders(response.data);
       calculateTotalAmount(response.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -107,25 +88,30 @@ const CartScreen = ({ navigation }) => {
     </View>
   );
 
+  const onRefresh = () => {
+    fetchOrders();
+  };
+
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Text style={styles.title}>Your Cart</Text>
-        <FlatList
-          data={orders}
-          renderItem={renderOrderItem}
-          keyExtractor={(item) => item.idorders.toString()}
-        />
-        <View style={styles.totalContainer}>
-          <Text style={styles.totalText}>
-            Total Amount: ${totalAmount.toFixed(2)}
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.checkoutButton} onPress={() => {}}>
-          <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
-        </TouchableOpacity>
+    <View style={styles.container}>
+      <Text style={styles.title}>Your Cart</Text>
+      <FlatList
+        data={orders}
+        renderItem={renderOrderItem}
+        keyExtractor={(item) => item.idorders.toString()}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
+      <View style={styles.totalContainer}>
+        <Text style={styles.totalText}>
+          Total Amount: ${totalAmount.toFixed(2)}
+        </Text>
       </View>
-    </ScrollView>
+      <TouchableOpacity style={styles.checkoutButton} onPress={() => {}}>
+        <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 

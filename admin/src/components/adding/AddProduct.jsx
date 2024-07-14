@@ -44,7 +44,7 @@ const AddProduct = ({ setRefresh, refresh }) => {
     data.append("stock", formData.stock);
     data.append("numOfRatings", formData.numOfRatings);
     data.append("picture", formData.picture);
-    // data.append("upload_preset", "ademsalah");
+    // data.append("upload_preset", "ademsalah"); 
 
     try {
       const response = await axios.post(

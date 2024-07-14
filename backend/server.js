@@ -18,7 +18,7 @@ const authRoutes = require("./routes/authRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const prisma = require("./prisma/index.js");
 
-const wishlistRoutes = require('./routes/wishlistRoutes');
+const wishlistRoutes = require("./routes/wishlistRoutes");
 
 app.use(express.json());
 app.use(cors());
@@ -33,51 +33,7 @@ app.use(chatRoutes);
 app.use(wishlistRoutes);
 
 io.on("connect", (socket) => {
-  console.log(socket.id);
-  socket.on("joinconvo", async ({ clientId, workerId }) => {
-    try {
-      let existid 
- const existconvo = await prisma.conversation.findFirst({
-        where: {
-          OR: [
-            {
-              Messages: {
-                some: {
-                  clientId: workerId,
-                  workerId: clientId,
-                },
-              },
-            },
-            {
-              Messages: {
-                some: {
-                  clientId: workerId,
-                  workerId: clientId,
-                },
-              },
-            },
-          ],
-        },
-      });
-      console.log(existconvo);
-      if (existconvo) {
-        existid = existconvo.id;
-      } else {
-        const newconvo = await prisma.conversation.create({
-          data: {
-            title: "new conversation",
-          }
-        });
-  
-        existid = newconvo.id;
-      }
-
-      socket.join(existid.toString())
-      socket.emit('conversationId', existid.toString())
-    } catch (error) {
-      console.log(error);
-    }
-  });
+  console.log("socket connected", socket.id);
 
   socket.on("oldmsgs", async ({ conversationId }) => {
     try {
@@ -86,68 +42,66 @@ io.on("connect", (socket) => {
           conversationId: parseInt(conversationId),
         },
       });
-      console.log(messages);
       socket.emit("messages", messages);
-    } catch (error) {
-     console.log(error)
-    }
-  });
-
-  socket.on("sendmsg", async ({ workerId, clientId, content, conversationId }) => {
-    console.log({workerId, clientId, content, conversationId })
-
-    try {
-      const message = await prisma.message.create({
-        data: {
-          content,
-          clientId, 
-          workerId,
-          conversationId,
-        },
-        include: {
-          Client: true,
-          Worker: true,
-          Conversation: true,
-        },
-      });
-
-      console.log(message);
-
-      io.to(conversationId).emit("message", message);
     } catch (error) {
       console.log(error);
     }
   });
 
+  socket.on(
+    "sendmsg",
+    async ({ workerId, clientId, content, conversationId, sender }) => {
+      try {
+        const message = await prisma.message.create({
+          data: {
+            content,
+            clientId,
+            workerId,
+            conversationId,
+            sender,
+          },
+          include: {
+            Client: true,
+            Worker: true,
+            Conversation: true,
+          },
+        });
+
+        console.log(message);
+
+        io.emit("messagecoming", message);
+      } catch (error) {
+        console.log(error);
+        socket.emit("error", { message: "error" });
+      }
+    }
+  );
+
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log(`disonnected ${socket.id}`);
   });
 });
 
-
-
-app.get('/conversations/:clientId', async (req, res) => {
-  const { clientId } = req.params; 
+app.get("/conversations/:clientId", async (req, res) => {
+  const { clientId } = req.params;
 
   try {
     const messages = await prisma.message.findMany({
       where: {
         OR: [
           { clientId: parseInt(clientId) },
-          { workerId: parseInt(clientId) }   
-        ]
+          { workerId: parseInt(clientId) },
+        ],
       },
       include: {
-        Worker: true,    
-        Conversation: true  
-      }
+        Worker: true,
+        Conversation: true,
+      },
     });
-    
 
-      res.send(messages);
-
+    res.send(messages);
   } catch (error) {
-   console.log(error);
+    console.log(error);
   }
 });
 

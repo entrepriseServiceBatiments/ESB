@@ -40,7 +40,7 @@ const EditProfileModal = ({
     try {
       const client = await AsyncStorage.getItem("user");
       const token = await AsyncStorage.getItem("token");
-      const id = JSON.parse(client).idworker || JSON.parse(client).idClient;
+      const id = JSON.parse(client).idworker||JSON.parse(client).idClient;
       const data = { userName, email, phoneNum: Number(phoneNum) };
       const response = await axios.put(
         `${BASE_URL}/${userInfo.userType}s/${id}`,

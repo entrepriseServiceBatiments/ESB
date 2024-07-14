@@ -6,49 +6,23 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  RefreshControl,
-  ScrollView,
 } from "react-native";
 import { Dialog } from "react-native-simple-dialogs";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from "../private.json";
-
 const Favorites = ({ navigation }) => {
   const [favorites, setFavorites] = useState([]);
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
-  const [clientId, setClientId] = useState(null);
-  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
-    const retrieveClientId = async () => {
-      try {
-        let user = await AsyncStorage.getItem("user");
-        if (user) {
-          user = JSON.parse(user);
-          setClientId(user.idClient || user.idworker);
-          console.log("Retrieved user:", user);
-          console.log("Set clientId:", user.idClient || user.idworker);
-        }
-      } catch (error) {
-        console.error("Error retrieving data:", error);
-      }
-    };
-
-    retrieveClientId();
+    fetchFavorites();
   }, []);
 
-  useEffect(() => {
-    if (clientId) {
-      fetchFavorites(clientId);
-    }
-  }, [clientId, refresh]);
-
-  const fetchFavorites = async (clientId) => {
+  const fetchFavorites = async () => {
+    const clientId = 1;
     try {
       const response = await fetch(`${BASE_URL}/wishlist/${clientId}`);
       const data = await response.json();
-      console.log(data);
       setFavorites(data);
     } catch (error) {
       console.error("Error fetching favorites:", error);
@@ -56,6 +30,7 @@ const Favorites = ({ navigation }) => {
   };
 
   const removeFromFavorites = async (productId) => {
+    const clientId = 1;
     try {
       const response = await fetch(`${BASE_URL}/wishlist`, {
         method: "DELETE",
@@ -70,7 +45,6 @@ const Favorites = ({ navigation }) => {
           prevFavorites.filter((item) => item.id !== productId)
         );
         alert("Item removed from favorites");
-        setRefresh(!refresh);
       } else {
         const data = await response.json();
         throw new Error(data.error);
@@ -95,21 +69,14 @@ const Favorites = ({ navigation }) => {
       return index.toString();
     }
   };
-  const [refreshing, setRefreshing] = React.useState(false);
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  }, []);
 
   const renderFavoriteItem = ({ item }) => (
     <View style={styles.card}>
-      <Image source={{ uri: item.picture }} style={styles.image} />
+      <Image source={{ uri: item.image }} style={styles.image} />
       <View style={styles.cardContent}>
         <TouchableOpacity
           style={styles.trashIconContainer}
-          onPress={() => confirmRemove(item.idproducts)}
+          onPress={() => confirmRemove(item.id)}
         >
           <Image
             source={require("../assets/icons/bin.png")}
@@ -133,48 +100,41 @@ const Favorites = ({ navigation }) => {
   );
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.scrollView}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.container}>
-        <FlatList
-          data={favorites}
-          keyExtractor={keyExtractor}
-          renderItem={renderFavoriteItem}
-          contentContainerStyle={styles.listContent}
-        />
-        <Dialog
-          visible={isDialogVisible}
-          title="Delete Product"
-          onTouchOutside={() => setDialogVisible(false)}
-          contentStyle={{ alignItems: "center", justifyContent: "center" }}
-          animationType="fade"
-        >
-          <View>
-            <Text>Would you like to delete this product?</Text>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-around",
-                marginTop: 20,
-              }}
+    <View style={styles.container}>
+      <FlatList
+        data={favorites}
+        keyExtractor={keyExtractor}
+        renderItem={renderFavoriteItem}
+        contentContainerStyle={styles.listContent}
+      />
+      <Dialog
+        visible={isDialogVisible}
+        title="Delete Product"
+        onTouchOutside={() => setDialogVisible(false)}
+        contentStyle={{ alignItems: "center", justifyContent: "center" }}
+        animationType="fade"
+      >
+        <View>
+          <Text>Would you like to delete this product?</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-around",
+              marginTop: 20,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => removeFromFavorites(selectedProductId)}
             >
-              <TouchableOpacity
-                onPress={() => removeFromFavorites(selectedProductId)}
-              >
-                <Text style={{ color: "#FF0000", fontSize: 18 }}>DELETE</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setDialogVisible(false)}>
-                <Text style={{ color: "#007BFF", fontSize: 18 }}>CANCEL</Text>
-              </TouchableOpacity>
-            </View>
+              <Text style={{ color: "#FF0000", fontSize: 18 }}>DELETE</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setDialogVisible(false)}>
+              <Text style={{ color: "#007BFF", fontSize: 18 }}>CANCEL</Text>
+            </TouchableOpacity>
           </View>
-        </Dialog>
-      </View>
-    </ScrollView>
+        </View>
+      </Dialog>
+    </View>
   );
 };
 

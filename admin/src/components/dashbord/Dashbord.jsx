@@ -28,6 +28,7 @@ const Dashboard = ({ data, workers, clients }) => {
 
   return (
     <div className="dashboard-container">
+      <h2>Dashboard</h2>
       <div className="chart-container">
         <div className="chart pie-chart">
           <h3>Workers vs Clients</h3>

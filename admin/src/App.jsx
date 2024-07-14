@@ -81,7 +81,6 @@ const AuthContent = ({ data, workers, clients, refresh, setRefresh }) => {
   return (
     <>
       <Navbar />
-
       <Routes>
         <Route path="/login" element={<Navigate to="/" />} />
         <Route

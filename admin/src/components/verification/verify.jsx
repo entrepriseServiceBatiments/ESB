@@ -1,10 +1,12 @@
+
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./WorkersTable.css";
+import './WorkersTable.css'
 
 const WorkerTable = () => {
   const [workers, setWorkers] = useState([]);
-  const [refresh, setRefresh] = useState(false);
+const [refresh, setRefresh] = useState(false);
   useEffect(() => {
     fetchWorkers();
   }, [refresh]);
@@ -13,7 +15,7 @@ const WorkerTable = () => {
     try {
       const response = await axios.get("http://localhost:3000/workers");
       setWorkers(response.data);
-      setRefresh(!refresh);
+      setRefresh(!refresh)
     } catch (error) {
       console.error("Error fetching workers:", error);
     }
