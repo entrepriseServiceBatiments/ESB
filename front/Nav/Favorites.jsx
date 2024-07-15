@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect} from 'react';
+
+
 import {
   View,
   Text,
@@ -6,8 +9,8 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+
   RefreshControl,
-  SafeAreaView,
   ScrollView,
 } from 'react-native';
 import { Dialog } from 'react-native-simple-dialogs';
@@ -48,9 +51,12 @@ const Favorites = ({ navigation }) => {
   const fetchFavorites = async (clientId) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/wishlist/${clientId}`
+
+        `http://192.168.11.225:3000/wishlist/${clientId}`
+
       );
       const data = await response.json();
+      console.log(data);
       setFavorites(data);
     } catch (error) {
       console.error('Error fetching favorites:', error);
@@ -59,8 +65,8 @@ const Favorites = ({ navigation }) => {
 
   const removeFromFavorites = async (productId) => {
     try {
-      const response = await fetch('http://localhost:3000/wishlist', {
-        method: 'DELETE',
+      const response = await fetch("http://192.168.11.225:3000/wishlist", {
+        method: "DELETE",
         headers: {
           'Content-Type': 'application/json',
         },
@@ -135,28 +141,20 @@ const Favorites = ({ navigation }) => {
   );
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.scrollView}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.container}>
-        <Text style={styles.titleText}>Your Favorites</Text>
-        {favorites.length === 0 ? (
-          <View style={styles.noFavoritesContainer}>
-            <Text style={styles.noFavoritesText}>
-              You have no favorites yet. Start adding your favorite products!
-            </Text>
-          </View>
-        ) : (
-          <FlatList
-            data={favorites}
-            keyExtractor={keyExtractor}
-            renderItem={renderFavoriteItem}
-            contentContainerStyle={styles.listContent}
-          />
-        )}
+
+      <ScrollView
+        contentContainerStyle={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+    <View style={styles.container}>
+        <FlatList
+          data={favorites}
+          keyExtractor={keyExtractor}
+          renderItem={renderFavoriteItem}
+          contentContainerStyle={styles.listContent}
+        />
         <Dialog
           visible={isDialogVisible}
           title="Delete Product"

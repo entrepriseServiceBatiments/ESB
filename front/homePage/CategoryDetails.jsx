@@ -10,6 +10,8 @@ import {
 import Calendar from './Calendar';
 import ProductCard from './ProductCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { BASE_URL } from "../private.json"; 
 
 const CategoryDetails = ({ route, navigation }) => {
   const { category, jobTitle } = route.params;
@@ -27,7 +29,7 @@ const CategoryDetails = ({ route, navigation }) => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/products/${category}`
+          `${BASE_URL}/products/${category}`
         );
         const data = await response.json();
         setProducts(data);
@@ -39,7 +41,7 @@ const CategoryDetails = ({ route, navigation }) => {
     const fetchWorkers = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/workers/${jobTitle}`
+          `${BASE_URL}/workers/${jobTitle}`
         );
         const data = await response.json();
         setWorkers(data);
@@ -52,7 +54,7 @@ const CategoryDetails = ({ route, navigation }) => {
     fetchWorkers();
 
     retrieveData();
-  }, [category, jobTitle]);
+  }, [category, jobTitle,favorites]);
 
   const retrieveData = async () => {
     try {
@@ -80,7 +82,7 @@ const CategoryDetails = ({ route, navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/orders', {
+      const response = await axios.post(`${BASE_URL}/orders`, {
         clientId,
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
@@ -114,7 +116,7 @@ const CategoryDetails = ({ route, navigation }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/wishlist', {
+      const response = await fetch(`${BASE_URL}/wishlist`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -6,9 +6,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BASE_URL } from "../private.json"; 
 
 const CartScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
@@ -26,7 +28,7 @@ const CartScreen = ({ navigation }) => {
 
       try {
         const response = await axios.get(
-          `http://192.168.11.49:3000/orders/client/${clientId}`
+          `${BASE_URL}/orders/client/${clientId}`
         );
         const products =
           response.data[0].Products
@@ -68,7 +70,7 @@ const CartScreen = ({ navigation }) => {
   const fetchOrders = async () => {
     try {
       const response = await axios.get(
-        `http://192.168.11.225:3000/orders/client/${clientId}`
+        `${BASE_URL}/orders/client/${clientId}`
       );
       setOrders(response.data);
       calculateTotalAmount(response.data);
@@ -113,6 +115,7 @@ const CartScreen = ({ navigation }) => {
   );
 
   return (
+    <ScrollView>
     <View style={styles.container}>
       <Text style={styles.title}>Your Cart</Text>
       <FlatList
@@ -133,6 +136,7 @@ const CartScreen = ({ navigation }) => {
         <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
       </TouchableOpacity>
     </View>
+    </ScrollView>
   );
 };
 
