@@ -46,11 +46,13 @@ const CartScreen = ({ navigation }) => {
       const response = await axios.get(`${BASE_URL}/orders/client/${clientId}`);
       setOrders(response.data);
       calculateTotalAmount(response.data);
+      console.log("client id:", clientId);
     } catch (error) {
       console.error("Error fetching orders:", error);
     } finally {
       setRefreshing(false);
     }
+
   };
 
   const calculateTotalAmount = (orderData) => {
