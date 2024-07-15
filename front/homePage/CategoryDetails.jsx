@@ -84,7 +84,7 @@ const CategoryDetails = ({ route, navigation }) => {
 
     try {
       const response = await axios.post(`${BASE_URL}/orders`, {
-        clientId,
+        clientId:clientId,
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
         products: [{ idproducts: selectedProduct[0].idproducts }],

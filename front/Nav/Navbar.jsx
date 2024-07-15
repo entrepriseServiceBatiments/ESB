@@ -6,7 +6,6 @@ import HomeScreen from "./HomeScreen.jsx";
 import Favorites from "./Favorites.jsx";
 import CartScreen from "./Cart";
 import Shop from "./Shop";
-
 import LoginStack from "../LoginSignup/LoginStack.jsx";
 
 import Profile from "../profile/profile.jsx";

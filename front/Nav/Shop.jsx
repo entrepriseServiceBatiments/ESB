@@ -40,7 +40,7 @@ const Shop = () => {
       let user = await AsyncStorage.getItem('user');
       user = JSON.parse(user);
       if (user !== null) {
-        setClientId(user.idClient);
+        setClientId(user.idClient||user.idworker);
       }
     } catch (error) {
       console.error('Error retrieving data:', error);

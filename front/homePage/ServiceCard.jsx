@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 
 const ServiceCard = ({ imageUri, title, description, onPress }) => {
+  console.log('servicecard');
   return (
     <TouchableOpacity style={styles.card} onPress={onPress}>
       <Image

@@ -50,7 +50,7 @@ const Favorites = ({ navigation }) => {
         `${BASE_URL}/wishlist/${clientId}`
       );
       const data = await response.json();
-      console.log(data);
+      console.log(data,'data');
       setFavorites(data);
     } catch (error) {
       console.error('Error fetching favorites:', error);
