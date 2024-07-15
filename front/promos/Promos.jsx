@@ -2,13 +2,14 @@ import React from 'react';
 import {
   View,
   Text,
-  Image,
-  Button,
   FlatList,
   StyleSheet,
+  Button,
   ScrollView,
+  Image,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import PromoCard from './PromoCard';
 
 const Promos = () => {
   const navigation = useNavigation();
@@ -19,7 +20,7 @@ const Promos = () => {
     {
       id: '1',
       title: 'installation climatiseur',
-      location: ' Grand Tunis',
+      location: 'Grand Tunis',
       price: '70',
       oldPrice: '90',
       image:
@@ -37,7 +38,7 @@ const Promos = () => {
     {
       id: '3',
       title: 'Entretien général',
-      location: 'Gouvernorat de Bizerte, ',
+      location: 'Gouvernorat de Bizerte',
       price: '50',
       oldPrice: '65',
       image:
@@ -45,7 +46,7 @@ const Promos = () => {
     },
   ];
 
-  const handleSubscribePress = () => {
+  const subScription = () => {
     navigation.navigate('Subscribe', { promo: item });
   };
 
@@ -58,27 +59,22 @@ const Promos = () => {
         {item.price} DT <Text style={styles.oldPrice}>{item.oldPrice} DT</Text>
       </Text>
 
-      <Button title="Subscribe" onPress={handleSubscribePress} />
+      <Button title="Subscribe" onPress={subScription} />
 
       <Text style={styles.discoverMoreTitle}>Discover More</Text>
-      <FlatList
-        data={promoData}
-        renderItem={({ item }) => (
-          <View style={styles.promoContainer}>
-            <Image source={{ uri: item.image }} style={styles.promoImage} />
-            <Text style={styles.promoTitle}>{item.title}</Text>
-            <Text style={styles.promoLocation}>{item.location}</Text>
-            <Text>
-              {item.price} DT{' '}
-              <Text style={styles.oldPrice}>{item.oldPrice} DT</Text>
-            </Text>
-          </View>
-        )}
-        keyExtractor={(item) => item.id}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.promoList}
-      />
+      <View style={styles.promoSection}>
+        <Text style={styles.promoHeader}>Promotions</Text>
+        <View style={styles.promoBorder}>
+          <FlatList
+            data={promoData}
+            renderItem={({ item }) => <PromoCard item={item} />}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.promoList}
+          />
+        </View>
+      </View>
     </ScrollView>
   );
 };
@@ -119,28 +115,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 20,
   },
-  promoContainer: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 10,
-    marginBottom: 20,
-    marginHorizontal: 10,
-    overflow: 'hidden',
-    width: 150,
+  promoSection: {
+    marginVertical: 20,
   },
-  promoImage: {
-    width: '100%',
-    height: 100,
-  },
-  promoTitle: {
-    fontSize: 14,
+  promoHeader: {
+    fontSize: 18,
     fontWeight: 'bold',
-    padding: 10,
-  },
-  promoLocation: {
-    fontSize: 12,
-    color: '#888',
-    paddingHorizontal: 10,
     marginBottom: 10,
+  },
+  promoBorder: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   promoList: {
     paddingHorizontal: 10,

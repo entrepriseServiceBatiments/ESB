@@ -20,7 +20,7 @@ const AccountType = ({ route, navigation }) => {
 
 
 
-      const response = await fetch("http://192.168.11.225:3000/login", 
+      const response = await fetch("http://localhost:3000/login", 
  {
 
 
@@ -55,8 +55,8 @@ const AccountType = ({ route, navigation }) => {
         type === "Personal"
 
 
-          ? "http://192.168.11.225:3000/clients/add"
-          : "http://192.168.11.225:3000/workers/add";
+          ? "http://localhost:3000/clients/add"
+          : "http://localhost:3000/workers/add";
 
 
 

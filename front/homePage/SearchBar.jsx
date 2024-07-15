@@ -1,100 +1,161 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, StyleSheet, Button, Image } from 'react-native';
-import Dropdown from './Dropdown'; 
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  Button,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const SearchBar = ({ data = [], onSearch }) => {
   const [query, setQuery] = useState('');
-  const [placeHolder, setPlaceHolder] = useState('Trouver plus de 5000 prestataires');
+  const [placeHolder, setPlaceHolder] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
-    const phrases = ['5000 prestataires', '150 services'];
+    const phrases = [
+      '5000 prestataires',
+      '200 services',
+    ];
     let index = 0;
+    let currentIndex = 0;
+    let typingInterval = null;
 
-    const interval = setInterval(() => {
-      index = (index + 1) % phrases.length;
-      setPlaceHolder(`Trouver plus de ${phrases[index]}`);
-    }, 2000);
+    const updatePlaceholder = () => {
+      setPlaceHolder((prevPlaceholder) => {
+        if (currentIndex <= phrases[index].length) {
+          return phrases[index].slice(0, currentIndex);
+        } else {
+          return prevPlaceholder.slice(0, -1);
+        }
+      });
+      currentIndex++;
 
-    return () => clearInterval(interval);
+      if (currentIndex > phrases[index].length + 1) {
+        currentIndex = 0;
+        index = (index + 1) % phrases.length;
+      }
+    };
+
+    typingInterval = setInterval(updatePlaceholder, 150); // Adjust typing speed here
+
+    return () => clearInterval(typingInterval);
   }, []);
 
-  const handleSearch = () => {
-    onSearch(query);
-    setShowDropdown(false);
-  };
-
-  const handleChangeText = (text) => {
-    setQuery(text);
-    if (text.length > 0) {
-      const results = data.filter(item =>
-        item.name.toLowerCase().includes(text.toLowerCase()) ||
-        item.jobTitle.toLowerCase().includes(text.toLowerCase()) ||
-        item.category.toLowerCase().includes(text.toLowerCase())
-      );
-      setFilteredData(results);
-      setShowDropdown(true);
-    } else {
+  useEffect(() => {
+    if (query.trim() === '') {
       setFilteredData([]);
       setShowDropdown(false);
+    } else {
+      const filtered = data.filter((item) =>
+        item.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredData(filtered);
+      setShowDropdown(true);
+    }
+  }, [query, data]);
+
+  const handleSearch = () => {
+    onSearch(filteredData);
+    navigation.navigate('Home');
+  };
+
+  const handleInputChange = (text) => {
+    setQuery(text);
+    if (!text) {
+      onSearch(data);
     }
   };
 
-  const handleSelectItem = (item) => {
-    setQuery(item.name || item.jobTitle || item.category); 
+  const handleDropdownSelect = (item) => {
+    setQuery(item.name);
+    onSearch([item]);
     setShowDropdown(false);
-    onSearch(item);
-  };
-
-  const handleKeyPress = (event) => {
-    if (event.nativeEvent.key === 'Enter') {
-      handleSearch();
-    }
   };
 
   return (
-    <View style={styles.searchContainer}>
-      <View style={styles.inputWrapper}>
-        <Image source={require('../assets/icons/search.png')} style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder={placeHolder}
-          value={query}
-          onChangeText={handleChangeText}
-          onKeyPress={handleKeyPress}
+    <View style={styles.container}>
+      <View style={styles.inputContainer}>
+        <Image
+          source={require('../assets/icons/search.png')}
+          style={styles.searchIcon}
         />
+        <TextInput
+          style={styles.input}
+          placeholder={`Trouvez plus de ${placeHolder}`}
+          value={query}
+          onChangeText={handleInputChange}
+          onFocus={() => setShowDropdown(true)}
+          onBlur={() => setShowDropdown(false)}
+          onSubmitEditing={handleSearch}
+        />
+        <Button title="Search" onPress={handleSearch} />
       </View>
-      <Button title="Search" onPress={handleSearch} />
-      {showDropdown && <Dropdown data={filteredData} onSelect={handleSelectItem} />}
+      {showDropdown && filteredData.length > 0 && (
+        <View style={styles.dropdown}>
+          <FlatList
+            data={filteredData}
+            keyExtractor={(item) => item.name}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={() => handleDropdownSelect(item)}
+              >
+                <Text>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
+  container: {
     position: 'relative',
+    marginHorizontal: 10,
+    marginVertical: 20,
   },
-  inputWrapper: {
+  inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
-    borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 5,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    backgroundColor: '#fff',
+  },
+  input: {
+    flex: 1,
+    padding: 10,
   },
   searchIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
+    width: 24,
+    height: 24,
+    marginLeft: 10,
   },
-  searchInput: {
-    flex: 1,
-    padding: 5,
+  dropdown: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    zIndex: 1000,
+    maxHeight: 200,
+  },
+  dropdownItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
 });
 

@@ -40,7 +40,7 @@ const CartScreen = ({ navigation }) => {
         setLoading(false);
         console.log(response.data, "orders useEff");
       } catch (err) {
-        setError(err);
+        // setError(err);
         setLoading(false);
       }
     };

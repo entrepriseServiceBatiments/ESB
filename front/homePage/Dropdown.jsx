@@ -1,15 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 
 const Dropdown = ({ data, onSelect }) => {
   return (
-    <View style={styles.dropdown}>
+    <ScrollView style={styles.dropdown}>
       {data.map((item, index) => (
         <TouchableOpacity key={index} onPress={() => onSelect(item)}>
-          <Text style={styles.item}>{item}</Text>
+          <Text style={styles.item}>{item.name}</Text>
         </TouchableOpacity>
       ))}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     zIndex: 1000,
+    maxHeight: 200, 
   },
   item: {
     padding: 10,
