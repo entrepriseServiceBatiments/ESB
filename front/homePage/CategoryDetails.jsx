@@ -6,25 +6,23 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  Alert,
 } from "react-native";
-import Calendar from "./Calendar";
-import ProductCard from "./ProductCard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import { BASE_URL } from "../private.json";
+import ProductCard from "./ProductCard";
+import Calendar from "./Calendar";
 
 const CategoryDetails = ({ route, navigation }) => {
   const { category, jobTitle } = route.params;
   const [tab, setTab] = useState("products");
   const [products, setProducts] = useState([]);
   const [workers, setWorkers] = useState([]);
-  const [favorites, setFavorites] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [clientId, setClientId] = useState(null);
-  const [isClose, setIsClose] = useState(true);
+  const [isCalendarVisible, setIsCalendarVisible] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -33,7 +31,8 @@ const CategoryDetails = ({ route, navigation }) => {
         const data = await response.json();
         setProducts(data);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching products:", error);
+        Alert.alert("Error", "Failed to fetch products. Please try again.");
       }
     };
 
@@ -43,107 +42,69 @@ const CategoryDetails = ({ route, navigation }) => {
         const data = await response.json();
         setWorkers(data);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching workers:", error);
+        Alert.alert("Error", "Failed to fetch workers. Please try again.");
       }
     };
 
     fetchProducts();
     fetchWorkers();
-
     retrieveData();
-  }, [category, jobTitle, favorites]);
+  }, [category, jobTitle]);
 
   const retrieveData = async () => {
     try {
       let user = await AsyncStorage.getItem("user");
       if (user) {
         user = JSON.parse(user);
-        setClientId(user.idClient || user.idworker);
-        console.log(user);
+        setClientId(user.idClient || user.idworker || null);
       }
     } catch (error) {
-      console.error("Error retrieving data:", error);
+      console.error("Error retrieving user data:", error);
     }
   };
-  const reserviiButt = (product) => {
-    setSelectedProduct([product]);
-    setIsClose(false);
+
+  const handleToggleProduct = (product) => {
+    setSelectedProducts((prevSelected) => {
+      const isAlreadySelected = prevSelected.some(
+        (p) => p.idproducts === product.idproducts
+      );
+      if (isAlreadySelected) {
+        return prevSelected.filter((p) => p.idproducts !== product.idproducts);
+      } else {
+        return [...prevSelected, product];
+      }
+    });
   };
 
-  console.log(selectedProduct, "adamadam");
-
-  const handleSubmitOrder = async () => {
-    if (selectedProduct.length === 0) {
-      console.log("No product selected");
+  const handleOrder = async () => {
+    if (selectedProducts.length === 0) {
+      Alert.alert("Error", "Please select at least one product.");
       return;
     }
 
     try {
-      const response = await axios.post(`${BASE_URL}/orders`, {
-        clientId: clientId,
-        startDate: startDate.toISOString().split("T")[0],
-        endDate: endDate.toISOString().split("T")[0],
-        products: [{ idproducts: selectedProduct[0].idproducts }],
-      });
-
-      console.log("Order created:", response.data);
-      setSelectedProduct([]);
-      setIsClose(true);
-      console.log("categorie id:", clientId);
+      await AsyncStorage.setItem(
+        "selectedProducts",
+        JSON.stringify(selectedProducts)
+      );
+      navigation.navigate("Cart");
     } catch (error) {
-      console.error("Error creating order:", error);
-    }
-  };
-
-  const handleStartDate = (selectedDate) => {
-    setStartDate(selectedDate || startDate);
-  };
-
-  const handleEndDatee = (selectedDate) => {
-    setEndDate(selectedDate || endDate);
-  };
-
-  const CloseCalendar = () => {
-    setIsClose(true);
-  };
-
-  const addToFAvs = async (productsId) => {
-    if (!clientId) {
-      console.error("Error: clientId is not set");
-      return;
-    }
-
-    try {
-      const response = await fetch(`${BASE_URL}/wishlist`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ clientId, productsId: productsId }),
-      });
-
-      const responseData = await response.json();
-      if (response.ok) {
-        setFavorites((prevFavorites) => [...prevFavorites, productsId]);
-      } else {
-        console.error("Error adding to wishlist:", responseData.error);
-      }
-    } catch (error) {
-      if (error instanceof Response) {
-        const responseText = await error.text();
-        console.error("Error adding to wishlist:", error);
-        console.error("Response text:", responseText);
-      } else {
-        console.error("Error adding to wishlist:", error.message);
-      }
+      console.error("Error saving selected products:", error);
+      Alert.alert(
+        "Error",
+        "Failed to save selected products. Please try again."
+      );
     }
   };
 
   const renderProductItem = ({ item }) => (
     <ProductCard
       item={item}
-      onReservePress={reserviiButt}
-      onFavoritePress={addToFAvs}
+      onReservePress={handleToggleProduct}
+      isSelected={selectedProducts.some(
+        (p) => p.idproducts === item.idproducts
+      )}
     />
   );
 
@@ -173,7 +134,8 @@ const CategoryDetails = ({ route, navigation }) => {
     </TouchableOpacity>
   );
 
-  const keyExtractor = (item) => (item.id ? item.id.toString() : item.name);
+  const keyExtractor = (item) =>
+    item.idproducts ? item.idproducts.toString() : item.name;
 
   return (
     <View style={styles.container}>
@@ -204,17 +166,13 @@ const CategoryDetails = ({ route, navigation }) => {
         columnWrapperStyle={tab === "products" ? styles.columnWrapper : null}
         contentContainerStyle={styles.listContent}
       />
-      <Calendar
-        visible={!isClose}
-        startDate={startDate}
-        endDate={endDate}
-        onStartDateChange={handleStartDate}
-        onEndDateChange={handleEndDatee}
-        onClose={CloseCalendar}
-      />
-      <TouchableOpacity style={styles.orderButton} onPress={handleSubmitOrder}>
-        <Text style={styles.orderButtonText}>Order</Text>
-      </TouchableOpacity>
+      {tab === "products" && (
+        <TouchableOpacity style={styles.orderButton} onPress={handleOrder}>
+          <Text style={styles.orderButtonText}>
+            Order ({selectedProducts.length})
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
