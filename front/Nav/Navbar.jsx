@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HomeScreen from "./HomeScreen.jsx";
 import Favorites from "./Favorites.jsx";
+import Chat from "./Chat.jsx";
 import CartScreen from "./Cart";
 import Shop from "./Shop";
 
@@ -11,7 +12,6 @@ import LoginStack from "../LoginSignup/LoginStack.jsx";
 
 import Profile from "../profile/profile.jsx";
 // import NotificationsScreen from "./Notifications";
-
 
 const Tab = createBottomTabNavigator();
 
@@ -79,13 +79,11 @@ const Navbar = () => {
       ) : (
         <Tab.Screen name="Login" component={LoginStack} />
       )}
-      <Tab.Screen name="Favorites" component={Favorites } />
+      <Tab.Screen name="Favorites" component={Favorites} />
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Shop" component={Shop} />
       <Tab.Screen name="Cart" component={CartScreen} />
-     
-      
-     </Tab.Navigator>
+    </Tab.Navigator>
   );
 };
 

@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   RefreshControl,
+  SafeAreaView,
   ScrollView,
 } from 'react-native';
 import { Dialog } from 'react-native-simple-dialogs';
@@ -29,15 +30,15 @@ const Favorites = ({ navigation }) => {
   useEffect(() => {
     const retrieveClientId = async () => {
       try {
-        let user = await AsyncStorage.getItem('user');
+        let user = await AsyncStorage.getItem("user");
         if (user) {
           user = JSON.parse(user);
           setClientId(user.idClient || user.idworker);
-          console.log('Retrieved user:', user);
-          console.log('Set clientId:', user.idClient || user.idworker);
+          console.log("Retrieved user:", user);
+          console.log("Set clientId:", user.idClient || user.idworker);
         }
       } catch (error) {
-        console.error('Error retrieving data:', error);
+        console.error("Error retrieving data:", error);
       }
     };
 
@@ -58,7 +59,7 @@ const Favorites = ({ navigation }) => {
       const data = await response.json();
       setFavorites(data);
     } catch (error) {
-      console.error('Error fetching favorites:', error);
+      console.error("Error fetching favorites:", error);
     }
   };
 
@@ -67,7 +68,7 @@ const Favorites = ({ navigation }) => {
       const response = await fetch('http://localhost:3000/wishlist', {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ clientId, productsId: productId }),
       });
@@ -76,14 +77,14 @@ const Favorites = ({ navigation }) => {
         setFavorites((prevFavorites) =>
           prevFavorites.filter((item) => item.id !== productId)
         );
-        alert('Item removed from favorites');
+        alert("Item removed from favorites");
         setRefresh(!refresh);
       } else {
         const data = await response.json();
         throw new Error(data.error);
       }
     } catch (error) {
-      console.error('Error removing item from wishlist:', error);
+      console.error("Error removing item from wishlist:", error);
       alert(`Error removing item: ${error.message}`);
     } finally {
       setDialogVisible(false);
@@ -231,7 +232,7 @@ const Favorites = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   listContent: {
     padding: 10,
@@ -239,47 +240,47 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     margin: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 4,
     elevation: 2,
   },
   image: {
-    width: '100%',
+    width: "100%",
     height: 150,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
   cardContent: {
     padding: 10,
-    position: 'relative',
+    position: "relative",
   },
   title: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   description: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   price: {
     fontSize: 16,
-    color: '#000',
+    color: "#000",
     marginTop: 5,
   },
   button: {
     marginTop: 10,
-    backgroundColor: '#ff0000',
+    backgroundColor: "#ff0000",
     paddingVertical: 10,
     borderRadius: 4,
   },
   buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: 'bold',
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
   },
   rightAction: {
     backgroundColor: 'red',
@@ -296,27 +297,6 @@ const styles = StyleSheet.create({
   trashIcon: {
     width: 24,
     height: 24,
-    marginBottom: 5,
-  },
-  noFavoritesContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  noFavoritesText: {
-    fontSize: 18,
-    color: '#666',
-    textAlign: 'center',
-  },
-  scrollView: {
-    flexGrow: 1,
-  },
-  titleText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    padding: 10,
-    alignSelf: 'flex-start',
   },
 });
 
