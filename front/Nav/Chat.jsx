@@ -16,7 +16,7 @@ const Chat = () => {
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
-  const [clientId, setClientId] = useState(null);
+  const [clientId, setClientId] = useState(null); 
   const [conversationId, setConversationId] = useState(null);
 
   useEffect(() => {
@@ -45,8 +45,8 @@ const Chat = () => {
   const sendMessage = () => {
     if (socket && message.trim()) {
       socket.emit("sendmsg", {
-        recipientId: clientId, // Adjust according to your needs
-        senderId: clientId, // Adjust according to your needs
+        recipientId: clientId, 
+        senderId: clientId, 
         content: message,
         conversationId: conversationId,
       });

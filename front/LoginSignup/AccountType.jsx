@@ -48,12 +48,6 @@ const AccountType = ({ route, navigation }) => {
           ? `${BASE_URL}/clients/add`
           : `${BASE_URL}/workers/add`;
 
-
-
-
-
-
-
       const payload = {
         userName: username,
         cin: parseInt(cin),

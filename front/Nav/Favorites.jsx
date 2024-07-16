@@ -1,7 +1,4 @@
-
-import React, { useState, useEffect} from 'react';
-
-
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,12 +6,16 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-
   RefreshControl,
   ScrollView,
 } from 'react-native';
 import { Dialog } from 'react-native-simple-dialogs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  GestureHandlerRootView,
+  Swipeable,
+  RectButton,
+} from 'react-native-gesture-handler';
 
 const Favorites = ({ navigation }) => {
   const [favorites, setFavorites] = useState([]);
@@ -23,6 +24,7 @@ const Favorites = ({ navigation }) => {
   const [clientId, setClientId] = useState(null);
   const [refresh, setRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const swipeableRefs = useRef(new Map());
 
   useEffect(() => {
     const retrieveClientId = async () => {
@@ -51,12 +53,9 @@ const Favorites = ({ navigation }) => {
   const fetchFavorites = async (clientId) => {
     try {
       const response = await fetch(
-
-        `http://192.168.11.225:3000/wishlist/${clientId}`
-
+        `http://localhost:3000/wishlist/${clientId}`
       );
       const data = await response.json();
-      console.log(data);
       setFavorites(data);
     } catch (error) {
       console.error('Error fetching favorites:', error);
@@ -65,8 +64,8 @@ const Favorites = ({ navigation }) => {
 
   const removeFromFavorites = async (productId) => {
     try {
-      const response = await fetch("http://192.168.11.225:3000/wishlist", {
-        method: "DELETE",
+      const response = await fetch('http://localhost:3000/wishlist', {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -91,11 +90,6 @@ const Favorites = ({ navigation }) => {
     }
   };
 
-  const confirmRemove = (productId) => {
-    setSelectedProductId(productId);
-    setDialogVisible(true);
-  };
-
   const keyExtractor = (item, index) => {
     if (item && item.id) {
       return item.id.toString();
@@ -111,79 +105,126 @@ const Favorites = ({ navigation }) => {
     }, 2000);
   }, []);
 
+  const renderRightActions = (progress, dragX, itemId) => {
+    return (
+      <RectButton
+        style={styles.rightAction}
+        onPress={() => {
+          setSelectedProductId(itemId);
+          setDialogVisible(true);
+        }}
+      >
+        <Image
+          source={require('../assets/icons/bin.png')}
+          style={styles.trashIcon}
+        />
+        <Text style={styles.actionText}>DELETE</Text>
+      </RectButton>
+    );
+  };
+
   const renderFavoriteItem = ({ item }) => (
-    <View style={styles.card}>
-      <Image source={{ uri: item.picture }} style={styles.image} />
-      <View style={styles.cardContent}>
-        <TouchableOpacity
-          style={styles.trashIconContainer}
-          onPress={() => confirmRemove(item.idproducts)}
-        >
-          <Image
-            source={require('../assets/icons/bin.png')}
-            style={styles.trashIcon}
-          />
-        </TouchableOpacity>
-        <Text style={styles.title}>{item.name}</Text>
-        <Text style={styles.description}>{item.description}</Text>
-        {item.price ? (
-          <Text style={styles.price}>
-            À PARTIR DE : {item.price.toFixed(2)} € TTC/JOUR
-          </Text>
-        ) : (
-          <Text style={styles.price}>Price not available</Text>
-        )}
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Réserver</Text>
-        </TouchableOpacity>
+    <Swipeable
+      ref={(ref) => swipeableRefs.current.set(item.idproducts, ref)}
+      renderRightActions={(progress, dragX) =>
+        renderRightActions(progress, dragX, item.idproducts)
+      }
+      onSwipeableWillOpen={() => {
+        if (swipeableRefs.current && swipeableRefs.current.size > 0) {
+          swipeableRefs.current.forEach((ref, key) => {
+            if (key !== item.idproducts && ref) {
+              ref.close();
+            }
+          });
+        }
+      }}
+    >
+      <View style={styles.card}>
+        <Image source={{ uri: item.picture }} style={styles.image} />
+        <View style={styles.cardContent}>
+          <Text style={styles.title}>{item.name}</Text>
+          <Text style={styles.description}>{item.description}</Text>
+          {item.price ? (
+            <Text style={styles.price}>
+              À PARTIR DE : {item.price.toFixed(2)} € TTC/JOUR
+            </Text>
+          ) : (
+            <Text style={styles.price}>Price not available</Text>
+          )}
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Réserver</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </Swipeable>
   );
 
   return (
-
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-    <View style={styles.container}>
-        <FlatList
-          data={favorites}
-          keyExtractor={keyExtractor}
-          renderItem={renderFavoriteItem}
-          contentContainerStyle={styles.listContent}
-        />
-        <Dialog
-          visible={isDialogVisible}
-          title="Delete Product"
-          onTouchOutside={() => setDialogVisible(false)}
-          contentStyle={{ alignItems: 'center', justifyContent: 'center' }}
-          animationType="fade"
-        >
-          <View>
-            <Text>Would you like to delete this product?</Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-around',
-                marginTop: 20,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => removeFromFavorites(selectedProductId)}
-              >
-                <Text style={{ color: '#FF0000', fontSize: 18 }}>DELETE</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setDialogVisible(false)}>
-                <Text style={{ color: '#007BFF', fontSize: 18 }}>CANCEL</Text>
-              </TouchableOpacity>
+        <View style={styles.container}>
+          <Text style={styles.titleText}>Your Favorites</Text>
+          {favorites.length === 0 ? (
+            <View style={styles.noFavoritesContainer}>
+              <Text style={styles.noFavoritesText}>
+                You have no favorites yet. Start adding your favorite products!
+              </Text>
             </View>
-          </View>
-        </Dialog>
-      </View>
-    </ScrollView>
+          ) : (
+            <FlatList
+              data={favorites}
+              keyExtractor={keyExtractor}
+              renderItem={renderFavoriteItem}
+              contentContainerStyle={styles.listContent}
+            />
+          )}
+          <Dialog
+            visible={isDialogVisible}
+            title="Delete Product"
+            onTouchOutside={() => {
+              setDialogVisible(false);
+              if (selectedProductId && swipeableRefs.current.has(selectedProductId)) {
+                swipeableRefs.current.get(selectedProductId).close();
+              }
+            }}
+            contentStyle={{ alignItems: 'center', justifyContent: 'center' }}
+            animationType="fade"
+          >
+            <View>
+              <Text>Would you like to delete this product?</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-around',
+                  marginTop: 20,
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => removeFromFavorites(selectedProductId)}
+                >
+                  <Text style={{ color: '#FF0000', fontSize: 18 }}>DELETE</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setDialogVisible(false);
+                    if (selectedProductId && swipeableRefs.current.has(selectedProductId)) {
+                      swipeableRefs.current.get(selectedProductId).close();
+                    }
+                  }}
+                >
+                  <Text style={{ color: '#007BFF', fontSize: 18 }}>CANCEL</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Dialog>
+        </View>
+      </ScrollView>
+    </GestureHandlerRootView>
   );
 };
 
@@ -240,15 +281,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
   },
-  trashIconContainer: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 1,
+  rightAction: {
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    height: '100%',
+  },
+  actionText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   trashIcon: {
     width: 24,
     height: 24,
+    marginBottom: 5,
   },
   noFavoritesContainer: {
     flex: 1,
