@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,9 @@ import {
   Alert,
   ScrollView,
   Modal,
+  PanResponder,
+  Animated,
+  Dimensions,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome } from "@expo/vector-icons";
@@ -19,6 +22,8 @@ import AwesomeAlert from "react-native-awesome-alerts";
 import JobTitleAndResumeUpload from "./JobTitleAndResumeUpload";
 import MapView, { Marker } from "react-native-maps";
 import PositionModal from "./PositionModal";
+import AllChats from "./AllChat";
+import { Entypo } from '@expo/vector-icons';
 const Profile = ({ navigation }) => {
   const [userName, setUserName] = useState("");
   const [address, setAddress] = useState("");
@@ -43,7 +48,44 @@ const Profile = ({ navigation }) => {
   const [positionModalVisible, setPositionModalVisible] = useState(false);
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
+  const [allChatsModalVisible, setAllChatsModalVisible] = useState(false);
+  const [pan] = useState(new Animated.ValueXY());
+  const screenWidth = Dimensions.get('window').width;
+  const screenHeight = Dimensions.get('window').height;
+  const handleButtonPress = () => {
+    // Check if the button was actually dragged or just tapped
+    if (Math.abs(pan.x._value) < 5 && Math.abs(pan.y._value) < 5) {
+      openAllChatsModal();
+    }
+  };
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (event, gestureState) => {
+        const newX = Math.max(0, Math.min(screenWidth - 60, pan.x._value + gestureState.dx));
+        const newY = Math.max(0, Math.min(screenHeight - 60, pan.y._value + gestureState.dy));
+        pan.setValue({ x: newX, y: newY });
+      },
+      onPanResponderRelease: () => {
+        pan.flattenOffset();
+      },
+      onPanResponderGrant: () => {
+        pan.setOffset({
+          x: pan.x._value,
+          y: pan.y._value
+        });
+      }
+    })
+  ).current;
+  // Function to open the AllChats modal
+  const openAllChatsModal = () => {
+    setAllChatsModalVisible(true);
+  };
 
+  // Function to close the AllChats modal
+  const closeAllChatsModal = () => {
+    setAllChatsModalVisible(false);
+  };
   useEffect(() => {
     retrieveData();
   }, [
@@ -199,7 +241,7 @@ const Profile = ({ navigation }) => {
   
             <Text style={styles.label}>CIN:</Text>
             <Text style={styles.value}>{cin}</Text>
-  
+           
             {creditCardNumber ? (
               <>
                 <View style={styles.row}>
@@ -256,6 +298,7 @@ const Profile = ({ navigation }) => {
                 <View style={styles.row}>
               
             </View>
+            
             <Text style={styles.value}>{address}</Text>
                 <MapView
                   style={styles.map}
@@ -280,7 +323,17 @@ const Profile = ({ navigation }) => {
               </TouchableOpacity>
             )}
           </View>
-  
+          <Animated.View
+          style={[
+            styles.floatingButton,
+            { transform: [{ translateX: pan.x }, { translateY: pan.y }] }
+          ]}
+          {...panResponder.panHandlers}
+        >
+          <TouchableOpacity onPress={handleButtonPress} style={styles.buttonTouchable}>
+            <Entypo name="message" size={24} color="black" />
+          </TouchableOpacity>
+        </Animated.View>
           <CreditCardModal
             modalVisible={creditCardModalVisible}
             setModalVisible={setCreditCardModalVisible}
@@ -306,6 +359,12 @@ const Profile = ({ navigation }) => {
             clientId={clientId}
             onUpdate={handleUpdate}
           />
+          <AllChats
+        modalVisible={allChatsModalVisible}
+        setModalVisible={setAllChatsModalVisible}
+        navigation={navigation} 
+        
+      />
           <PositionModal
             userType={userType}
             clientId={clientId}
@@ -399,6 +458,7 @@ const Profile = ({ navigation }) => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
+      height:'100%',
       alignItems: "center",
       backgroundColor: "#e6ede6",
       padding: 20,
@@ -499,6 +559,28 @@ const Profile = ({ navigation }) => {
       backgroundColor: "#fff",
       borderRadius: 10,
       elevation: 3,
+    },floatingButton: {
+      position: 'absolute',
+      bottom: 30,
+      right: 20,
+      backgroundColor: '#e6ede6',
+      borderRadius: 30,
+      width: 60,
+      height: 60,
+      justifyContent: 'center',
+      alignItems: 'center',
+      elevation: 3,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+      zIndex: 1000,
+    },
+    buttonTouchable: {
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
   });
 

@@ -122,43 +122,50 @@ io.on("connect", (socket) => {
     }
   );
 
-  socket.on("getconvos", async ({ clientId }) => {
+  socket.on("getconvos", ({ clientId }) => {
     try {
-      const messages = await prisma.message.findMany({
-        where: {
-          OR: [
-            { clientId: parseInt(clientId) },
-            { workerId: parseInt(clientId) },
-          ],
-        },
-        include: {
-          Worker: true,
-          Conversation: true,
-        },
-      });
+      console.log(clientId);
+      prisma.message
+        .findMany({
+          where: {
+            OR: [
+              { clientId: parseInt(clientId) },
+              { workerId: parseInt(clientId) },
+            ],
+          },
+          include: {
+            Worker: true,
+            Conversation: true,
+          },
+        })
+        .then((messages) => {
+          let workers = [];
 
-      let workers = [];
-
-      messages.forEach((message) => {
-        const conversationId = message.conversationId;
-        console.log("messag", message);
-        if (
-          message.Client &&
-          message.Client.hasOwnProperty("idworker") &&
-          !workers.some((worker) => worker.idworker === message.Client.idworker)
-        ) {
-          workers.push({ ...message.Client, conversationId });
-        }
-        if (
-          message.Worker &&
-          message.Worker.hasOwnProperty("idworker") &&
-          !workers.some((worker) => worker.idworker === message.Worker.idworker)
-        ) {
-          workers.push({ ...message.Worker, conversationId });
-        }
-      });
-      console.log(workers, "workers");
-      socket.emit("convos", workers);
+          messages.forEach((message) => {
+            const conversationId = message.conversationId;
+            console.log("messag", message);
+            if (
+              message.Client &&
+              message.Client.hasOwnProperty("idworker") &&
+              !workers.some(
+                (worker) => worker.idworker === message.Client.idworker
+              )
+            ) {
+              workers.push({ ...message.Client, conversationId });
+            }
+            if (
+              message.Worker &&
+              message.Worker.hasOwnProperty("idworker") &&
+              !workers.some(
+                (worker) => worker.idworker === message.Worker.idworker
+              )
+            ) {
+              workers.push({ ...message.Worker, conversationId });
+            }
+          });
+          console.log(workers, "workers");
+          socket.emit("convos", workers);
+        });
     } catch (error) {
       console.log(error);
     }
