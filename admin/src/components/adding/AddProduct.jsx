@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./AddProducts.css";
 import { useNavigate } from "react-router-dom";
+
 const AddProduct = ({ setRefresh, refresh }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -9,7 +10,7 @@ const AddProduct = ({ setRefresh, refresh }) => {
     category: "",
     description: "",
     price: "",
-    picture: "",
+    picture: null,
     rating: "",
     stock: "",
     numOfRatings: "",
@@ -24,21 +25,36 @@ const AddProduct = ({ setRefresh, refresh }) => {
     });
   };
 
+  const handleFileChange = (e) => {
+    setFormData({
+      ...formData,
+      picture: e.target.files[0],
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const parsedFormData = {
-      ...formData,
-      price: parseInt(formData.price, 10),
-      rating: parseFloat(formData.rating),
-      stock: parseInt(formData.stock, 10),
-      numOfRatings: parseInt(formData.numOfRatings, 10),
-    };
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("category", formData.category);
+    data.append("description", formData.description);
+    data.append("price", formData.price);
+    data.append("rating", formData.rating);
+    data.append("stock", formData.stock);
+    data.append("numOfRatings", formData.numOfRatings);
+    data.append("picture", formData.picture);
+    // data.append("upload_preset", "ademsalah"); 
 
     try {
       const response = await axios.post(
         "http://localhost:3000/products",
-        parsedFormData
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       console.log(response.data);
       alert("Product added successfully!");
@@ -47,7 +63,7 @@ const AddProduct = ({ setRefresh, refresh }) => {
         category: "",
         description: "",
         price: "",
-        picture: "",
+        picture: null,
         rating: "",
         stock: "",
         numOfRatings: "",
@@ -115,13 +131,12 @@ const AddProduct = ({ setRefresh, refresh }) => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="picture">Picture URL:</label>
+          <label htmlFor="picture">Picture:</label>
           <input
-            type="text"
+            type="file"
             id="picture"
             name="picture"
-            value={formData.picture}
-            onChange={handleChange}
+            onChange={handleFileChange}
             required
           />
         </div>
@@ -158,14 +173,7 @@ const AddProduct = ({ setRefresh, refresh }) => {
             required
           />
         </div>
-        <button
-          type="submit"
-          onClick={() => {
-            navigate("/products");
-          }}
-        >
-          Add Product
-        </button>
+        <button type="submit">Add Product</button>
       </form>
     </div>
   );

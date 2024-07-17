@@ -4,7 +4,7 @@ import "../products/Card.css";
 const Card = ({ userName, address, image, email, jobTitle, cin }) => {
   return (
     <div className="card">
-      {image && <img src={image} className="card-image" />}
+      {image && <img src={image}  className="card-image" />}
       <div className="card-content">
         <h2 className="card-title">{userName}</h2>
         <p className="card-category">{address}</p>

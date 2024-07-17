@@ -1,4 +1,4 @@
-const productService = require("../services/productService");
+const productService = require('../services/productService');
 
 const getProducts = async (req, res) => {
   try {
@@ -8,46 +8,50 @@ const getProducts = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 const getProductById = async (req, res) => {
   try {
     const product = await productService.getProductById(req.params.id);
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
     res.json(product);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-const createProduct = async (req, res) => {
+
+const getProductsByCateg = async (req, res) => {
   try {
-    const {
+    const category = req.params.category;
+    const products = await productService.getProductsByCateg(category);
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+async function createProduct(req, res, next) {
+  const { name, category, description, price, pictureUrl, rating, stock, numOfRatings, orderId } = req.body;
+  
+  try {
+    const product = await productService.createProduct({
       name,
       category,
       description,
       price,
-      picture,
-      rating,
-      stock,
-      numOfRatings,
-      orderId,
-    } = req.body;
-    const newProduct = await productService.createProduct({
-      name,
-      category,
-      description,
-      price,
-      picture,
+      pictureUrl,
       rating,
       stock,
       numOfRatings,
       orderId,
     });
-    res.status(201).json(newProduct);
+    res.status(201).json(product);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
-};
+}
+
 const deleteProductById = async (req, res) => {
   try {
     const result = await productService.deleteProductById(req.params.id);
@@ -57,9 +61,12 @@ const deleteProductById = async (req, res) => {
   }
 };
 
+
 module.exports = {
   getProducts,
   getProductById,
+  getProductsByCateg,
   createProduct,
   deleteProductById,
+
 };

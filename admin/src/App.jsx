@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "./components/context/AuthContext";
 import "./App.css";
 import Login from "./components/login/Login.jsx";
@@ -11,7 +16,10 @@ import Products from "./components/products/Products.jsx";
 import AddProduct from "./components/adding/AddProduct.jsx";
 import Navbar from "./components/navbar/Navbar.jsx";
 import ProductDetails from "./components/products/ProductDetails.jsx";
-
+import AllOrders from "./components/orders/AllOrders.jsx";
+import Verify from "./components/verification/verify.jsx";
+import OneClient from "./components/clients/OneClient.jsx";
+import ClientOrders from "./components/clients/ClientOrders.jsx";
 function App() {
   const [data, setData] = useState([]);
   const [workers, setWorkers] = useState([]);
@@ -51,7 +59,13 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AuthContent data={data} workers={workers} clients={clients} refresh={refresh} setRefresh={setRefresh} />
+        <AuthContent
+          data={data}
+          workers={workers}
+          clients={clients}
+          refresh={refresh}
+          setRefresh={setRefresh}
+        />
       </AuthProvider>
     </Router>
   );
@@ -69,12 +83,27 @@ const AuthContent = ({ data, workers, clients, refresh, setRefresh }) => {
       <Navbar />
       <Routes>
         <Route path="/login" element={<Navigate to="/" />} />
-        <Route path="/" element={<Dashboard data={data} workers={workers} clients={clients} />} />
+        <Route
+          path="/"
+          element={
+            <Dashboard data={data} workers={workers} clients={clients} />
+          }
+        />
+        <Route path="/allOrders" element={<AllOrders />} />
         <Route path="/clients" element={<Clients clients={clients} />} />
         <Route path="/workers" element={<Workers workers={workers} />} />
         <Route path="/products" element={<Products products={data} />} />
-        <Route path="/add" element={<AddProduct refresh={refresh} setRefresh={setRefresh} />} />
-        <Route path="/products/:id" element={<ProductDetails refresh={refresh} setRefresh={setRefresh} />} />
+        <Route
+          path="/add"
+          element={<AddProduct refresh={refresh} setRefresh={setRefresh} />}
+        />
+        <Route
+          path="/products/:id"
+          element={<ProductDetails refresh={refresh} setRefresh={setRefresh} />}
+        />
+        <Route path="/verify" element={<Verify />} />
+        <Route path="/client/:clientId" element={<OneClient />} />
+        <Route path="/orders/client/:clientId" element={<ClientOrders />} />
       </Routes>
     </>
   );

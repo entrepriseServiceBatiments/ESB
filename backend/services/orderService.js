@@ -1,41 +1,98 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const createOrder = async (data) => {
+const createOrder = async (clientId, products, startDate, endDate) => {
   try {
-    const newOrder = await prisma.order.create({
+    const order = await prisma.order.create({
       data: {
-        startDate: data.startDate,
-        endDate: data.endDate,
-        clientId: data.clientId,
-        // You can add other fields as needed
+        clientId,
+        startDate,
+        endDate,
+        status: "pending", 
+        Products: {
+          create: products.map((product) => ({
+            productId: product.idproducts,
+          })),
+        },
+      },
+      include: {
+        Products: true,
       },
     });
-    return newOrder;
+    return order;
   } catch (error) {
-    throw new Error(`Failed to create order: ${error.message}`);
+    console.error("Error creating order:", error);
+    throw new Error("Failed to create order");
   }
 };
 
-const getOrdersByClientId = async (clientId) => {
+const getAllOrders = async () => {
   try {
     const orders = await prisma.order.findMany({
-      where: {
-        clientId: clientId,
-      },
       include: {
-        Client: true, // Include Client details if needed
-        Workers: true, // Include Workers associated with the order
-        Products: true, // Include Products associated with the order
+        Products: {
+          include: {
+            Product: true,
+          },
+        },
       },
     });
     return orders;
   } catch (error) {
-    throw new Error(`Failed to fetch orders: ${error.message}`);
+    console.error("Error retrieving orders:", error);
+    throw new Error("Failed to retrieve orders");
+  }
+};
+
+const getClientOrders = async (clientId) => {
+  try {
+    const clientOrders = await prisma.order.findMany({
+      where: { clientId },
+      include: {
+        Products: {
+          include: {
+            Product: true,
+          },
+        },
+      },
+    });
+    return clientOrders;
+  } catch (error) {
+    console.error("Error retrieving client orders:", error);
+    throw new Error("Failed to retrieve client orders");
+  }
+};
+
+const acceptOrder = async (orderId) => {
+  try {
+    const order = await prisma.order.update({
+      where: { idorders: orderId },
+      data: { status: "accepted" },
+    });
+    return order;
+  } catch (error) {
+    console.error("Error accepting order:", error);
+    throw new Error("Failed to accept order");
+  }
+};
+
+const declineOrder = async (orderId) => {
+  try {
+    const order = await prisma.order.update({
+      where: { idorders: orderId },
+      data: { status: "declined" },
+    });
+    return order;
+  } catch (error) {
+    console.error("Error declining order:", error);
+    throw new Error("Failed to decline order");
   }
 };
 
 module.exports = {
   createOrder,
-  getOrdersByClientId,
+  getAllOrders,
+  getClientOrders,
+  acceptOrder,
+  declineOrder,
 };

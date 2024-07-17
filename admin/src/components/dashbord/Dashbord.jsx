@@ -30,11 +30,11 @@ const Dashboard = ({ data, workers, clients }) => {
     <div className="dashboard-container">
       <h2>Dashboard</h2>
       <div className="chart-container">
-        <div className="chart">
+        <div className="chart pie-chart">
           <h3>Workers vs Clients</h3>
           <Pie data={pieData} />
         </div>
-        <div className="chart">
+        <div className="chart line-chart">
           <h3>Product Stock</h3>
           <Line data={lineData} />
         </div>

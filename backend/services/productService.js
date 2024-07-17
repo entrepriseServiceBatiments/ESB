@@ -1,9 +1,10 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const { cloudinary } = require("../cloudinaryConfig");
 
 const getProducts = async () => {
   return await prisma.product.findMany({
-    include: { Order: true, Favorites: true },
+    // include: { Order: true, Favorites: true },
   });
 };
 
@@ -19,27 +20,23 @@ const getProductById = async (id) => {
   }
 };
 
-const createProduct = async (data) => {
+async function createProduct(data) {
   try {
-    const newProduct = await prisma.product.create({
-      data: {
-        name: data.name,
-        category: data.category,
-        description: data.description,
-        price: data.price,
-        picture: data.picture,
-        rating: data.rating,
-        stock: data.stock,
-        numOfRatings: data.numOfRatings,
-        orderId: data.orderId,
-      },
-    });
-    return newProduct;
+    const product = await prisma.product.create({ data });
+    return product;
   } catch (error) {
-    console.error("Failed to create product:", error);
-    throw new Error(`Failed to create product: ${error.message}`);
+    throw new Error(`Could not create product: ${error.message}`);
   }
+}
+
+const getProductsByCateg = async (category) => {
+  return await prisma.product.findMany({
+    where: {
+      category: category,
+    },
+  });
 };
+
 const deleteProductById = async (id) => {
   try {
     await prisma.product.delete({
@@ -54,7 +51,8 @@ const deleteProductById = async (id) => {
 
 module.exports = {
   getProducts,
-  createProduct,
   getProductById,
+  getProductsByCateg,
+  createProduct,
   deleteProductById,
 };
