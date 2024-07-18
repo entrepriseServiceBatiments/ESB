@@ -5,6 +5,7 @@ import Subscribe from './Subscribe';
 import Promos from '../promos/Promos';
 import CategoryDetails from '../homePage/CategoryDetails';
 import WorkerDetails from '../homePage/WorkerDetails';
+import ServiceDetails from '../homePage/ServiceDetails';
 const Stack = createStackNavigator();
 
 function LoginStack() {
@@ -15,6 +16,7 @@ function LoginStack() {
       <Stack.Screen name="CategoryDetails" component={CategoryDetails} />
       <Stack.Screen name="WorkerDetails" component={WorkerDetails} />
       <Stack.Screen name="Promos" component={Promos} />
+      <Stack.Screen name="ServiceDetails" component={ServiceDetails} />
       <Stack.Screen name="Subscribe" component={Subscribe} />
 
     </Stack.Navigator>

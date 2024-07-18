@@ -30,24 +30,36 @@ const getProductsByCateg = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 async function createProduct(req, res, next) {
-  const { name, category, description, price, pictureUrl, rating, stock, numOfRatings, orderId } = req.body;
-  
+  const {
+    name,
+    category,
+    description,
+    price,
+    picture,
+    rating,
+    stock,
+    numOfRatings,
+    orderId,
+  } = req.body;
+
   try {
+    console.log('Request body:', req.body); // Added log
     const product = await productService.createProduct({
       name,
       category,
       description,
       price,
-      pictureUrl,
+      picture,
       rating,
       stock,
       numOfRatings,
       orderId,
     });
+    console.log('Product created:', product); // Added log
     res.status(201).json(product);
   } catch (error) {
+    console.error('Error in controller:', error.message); // Added log
     next(error);
   }
 }
@@ -61,12 +73,10 @@ const deleteProductById = async (req, res) => {
   }
 };
 
-
 module.exports = {
   getProducts,
   getProductById,
   getProductsByCateg,
   createProduct,
   deleteProductById,
-
 };

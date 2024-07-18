@@ -7,8 +7,14 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const ServicesDemand = ({ services, onServicePress }) => {
+const ServicesDemand = ({ services }) => {
+  const navigation = useNavigation();
+
+  const handleServicePress = (service) => {
+    navigation.navigate('ServiceDetails', { service, services });
+  };
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -22,7 +28,7 @@ const ServicesDemand = ({ services, onServicePress }) => {
           data={services}
           renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={() => onServicePress(item.id)}
+              onPress={() => handleServicePress(item)}
               style={styles.card}
             >
               <Image source={{ uri: item.imageUri }} style={styles.image} />
