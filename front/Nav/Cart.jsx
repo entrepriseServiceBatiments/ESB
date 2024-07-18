@@ -6,61 +6,43 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  ScrollView,
+  RefreshControl,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BASE_URL } from "../private.json"; 
+import { BASE_URL } from "../private.json";
 
 const CartScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [clientId, setClientId] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    retrieveClientId();
+    setClientId(null);
+    console.log("====================================");
+    console.log("reset");
+    console.log("====================================");
+    // retrieveClientId();
   }, []);
 
   useEffect(() => {
-
-    const fetchOrders = async () => {
-      if (!clientId) return;
-
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/orders/client/${clientId}`
-        );
-        const products =
-          response.data[0].Products
-          .flatMap((order) =>
-            order.Products.map((product) => ({
-              ...product,
-              quantity: 1,
-            }))
-          ) || [];
-        setOrders(products);
-        setLoading(false);
-        console.log(response.data, "orders useEff");
-      } catch (err) {
-        setError(err);
-        setLoading(false);
-      }
-    };
-
- 
-
-    if (clientId) {
-      fetchOrders();
-    }
-
-  }, [clientId]);
+    // setClientId(null)
+    retrieveClientId();
+    fetchOrders();
+  }, []);
 
   const retrieveClientId = async () => {
     try {
       const user = await AsyncStorage.getItem("user");
+      console.log("userr===>", user);
       if (user) {
         const parsedUser = JSON.parse(user);
+        console.log("user insde cond", user);
         setClientId(parsedUser.idClient || parsedUser.idworker);
+      } else {
+        setClientId(clientId);
+        setOrders([]);
       }
     } catch (error) {
       console.error("Error retrieving client ID:", error);
@@ -69,13 +51,16 @@ const CartScreen = ({ navigation }) => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(
-        `${BASE_URL}/orders/client/${clientId}`
-      );
+      setRefreshing(true);
+      const response = await axios.get(`${BASE_URL}/orders/client/${clientId}`);
       setOrders(response.data);
+
       calculateTotalAmount(response.data);
+      console.log("client id:", clientId);
     } catch (error) {
       console.error("Error fetching orders:", error);
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -114,29 +99,30 @@ const CartScreen = ({ navigation }) => {
     </View>
   );
 
+  const onRefresh = () => {
+    fetchOrders();
+  };
+
   return (
-    <ScrollView>
     <View style={styles.container}>
       <Text style={styles.title}>Your Cart</Text>
       <FlatList
         data={orders}
         renderItem={renderOrderItem}
         keyExtractor={(item) => item.idorders.toString()}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>
           Total Amount: ${totalAmount.toFixed(2)}
         </Text>
       </View>
-      <TouchableOpacity
-        style={styles.checkoutButton}
-        onPress={() => {
-        }}
-      >
+      <TouchableOpacity style={styles.checkoutButton} onPress={() => {}}>
         <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
       </TouchableOpacity>
     </View>
-    </ScrollView>
   );
 };
 

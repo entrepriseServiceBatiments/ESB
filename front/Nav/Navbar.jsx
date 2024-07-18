@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import HomeScreen from "./HomeScreen.jsx";
 import Favorites from "./Favorites.jsx";
 import CartScreen from "./Cart";
-import Shop from "./Shop";
+import Shop from "../Shop/Shoop.jsx";
 import LoginStack from "../LoginSignup/LoginStack.jsx";
 
 import Profile from "../profile/profile.jsx";
@@ -69,8 +69,8 @@ const Navbar = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "tomato",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: "#042630",
+        tabBarInactiveTintColor: "black",
       })}
     >
       {isLoggedIn ? (

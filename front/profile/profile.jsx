@@ -78,6 +78,7 @@ const Profile = ({ navigation }) => {
         setResume(user.resume || "");
         setLatitude(Number(user.latitude));
         setLongitude(Number(user.longitude));
+        console.log(latitude);
 
         if (
           !user.picture &&
