@@ -1,132 +1,117 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  ScrollView,
   TextInput,
+  FlatList,
+  StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
-  ScrollView,
-  StyleSheet,
+  Platform,
+  Animated,
+  Easing,
 } from "react-native";
 import io from "socket.io-client";
-import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
 import { BASE_URL } from "../private.json";
-const Chatpage = ({ route }) => {
-  const { conversationId, idworker } = route.params;
-  const [socket, setSocket] = useState(null);
-  const [message, setMessage] = useState("");
+
+const Chat = ({ route }) => {
+  const { workerId, clientId } = route.params;
   const [messages, setMessages] = useState([]);
-  const ScrollViewRef = useRef();
+  const [newMessage, setNewMessage] = useState("");
+  const [conversationId, setConversationId] = useState(null);
+  const socket = io(`${BASE_URL}`);
+  const opacity = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
-    const socket = io(`${BASE_URL}/`, {
-      transports: ["websocket"],
-    });
-    socket.on("connect", () => {
-      console.log(socket.id);
-    });
-    socket.on("messages", (messages) => {
-      console.log(messages);
-      setMessages(messages);
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+
+    socket.emit("joinconvo", { clientId, workerId });
+    socket.on("conversationId", (id) => {
+      setConversationId(id);
+      fetchOldMessages(id);
     });
 
-    socket.on("messagecoming", (newmessage) => {
-      console.log("new msg", newmessage);
-      setMessages((oldmsgs) => [...oldmsgs, newmessage]);
+    socket.on("messagecoming", (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
     });
 
-    socket.on("error", (error) => {
-      console.log(error);
-    });
-    setSocket(socket);
-
-    socket.emit("oldmsgs", { conversationId });
     return () => {
       socket.disconnect();
     };
-  }, [conversationId]);
+  }, []);
 
-  const sendmsg = () => {
-    if (!message.length) return;
-    socket.emit("sendmsg", {
-      content: message,
-      workerId: idworker,
-      clientId: 1,
-      conversationId,
-      sender: "CLIENT",
+  const fetchOldMessages = (id) => {
+    socket.emit("oldmsgs", { conversationid: id });
+    socket.on("messages", (msgs) => {
+      setMessages(msgs);
     });
-    setMessage("");
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      if (ScrollViewRef.current) {
-        ScrollViewRef.current.scrollToEnd({ animated: true });
-      }
-    }, [messages])
-  );
+  const handleSend = () => {
+    if (newMessage.trim()) {
+      socket.emit("sendmsg", {
+        workerId,
+        clientId,
+        content: newMessage,
+        conversationid: conversationId,
+        sender: "client",
+      });
+      setNewMessage("");
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <KeyboardAvoidingView
-        keyboardVerticalOffset={100}
-        style={styles.flex1}
-        enabled
-      >
-        <ScrollView style={styles.scrollView} ref={ScrollViewRef}>
-          {messages.map((message, index) => (
-            <View
-              style={
-                message.sender === "CLIENT"
-                  ? styles.itemsStart
-                  : styles.itemsEnd
-              }
-              key={index}
-            >
-              <View
+      <ScrollView contentContainerStyle={styles.messagesContainer}>
+        {messages.map((message, index) => (
+          <View
+            key={index}
+            style={
+              message.sender === "client"
+                ? styles.myMessage
+                : styles.theirMessage
+            }
+          >
+            {console.log(message, "message")}
+            <View>
+              <Text
                 style={
-                  message.sender === "CLIENT"
-                    ? styles.senderMessage
-                    : styles.receiverMessage
+                  message.sender === "client"
+                    ? styles.myMessageText
+                    : styles.theirMessageText
                 }
               >
-                <Text
-                  style={
-                    message.sender === "CLIENT"
-                      ? styles.senderText
-                      : styles.receiverText
-                  }
-                >
-                  {message.content}
-                </Text>
-              </View>
-              <Text style={styles.timestamp}>
-                {String(new Date(message.createdat).getHours()).padStart(
-                  2,
-                  "0"
-                )}
-                :
-                {String(new Date(message.createdat).getMinutes()).padStart(
-                  2,
-                  "0"
-                )}
+                {message.content}
               </Text>
             </View>
-          ))}
-        </ScrollView>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            value={message}
-            onChangeText={setMessage}
-            placeholder="type your message"
-          />
-          <TouchableOpacity style={styles.sendButton} onPress={sendmsg}>
-            <Ionicons name="send" size={24} />
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
+            <Text style={styles.timestamp}>
+              {String(new Date(message.createdat).getHours()).padStart(2, "0")}:
+              {String(new Date(message.createdat).getMinutes()).padStart(
+                2,
+                "0"
+              )}
+            </Text>
+          </View>
+        ))}
+      </ScrollView>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          value={newMessage}
+          onChangeText={setNewMessage}
+          placeholder="Type a message"
+          placeholderTextColor="#888"
+        />
+        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+          <Text style={styles.sendButtonText}>{">"}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -134,72 +119,92 @@ const Chatpage = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#042630",
+    backgroundColor: "#1c2733",
   },
-  flex1: {
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#2c3e50",
+  },
+  backButton: {
+    color: "#fff",
+    fontSize: 24,
+    marginRight: 10,
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
     flex: 1,
   },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: 16,
-    backgroundColor: "#ECEBEB",
+  infoButton: {
+    color: "#fff",
+    fontSize: 24,
   },
-  itemsStart: {
-    alignItems: "flex-start",
+  messagesContainer: {
+    padding: 10,
   },
-  itemsEnd: {
-    alignItems: "flex-end",
+  myMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#1c2733",
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 15,
+    maxWidth: "80%",
+    borderWidth: 1,
+    borderColor: "#2c3e50",
   },
-  senderMessage: {
-    backgroundColor: "#042630",
-    flex: 1,
-    marginBottom: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 24,
-    borderBottomLeftRadius: 0,
+  theirMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#2c3e50",
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 15,
+    maxWidth: "80%",
   },
-  receiverMessage: {
-    backgroundColor: "#bfbdbd",
-    flex: 1,
-    marginBottom: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 24,
-    borderBottomRightRadius: 0,
-  },
-  senderText: {
-    textAlign: "left",
-    color: "#ffffff",
+  myMessageText: {
+    color: "#fff",
     fontSize: 16,
   },
-  receiverText: {
-    textAlign: "left",
-    color: "#042630",
+  theirMessageText: {
+    color: "#fff",
     fontSize: 16,
   },
   timestamp: {
-    textAlign: "right",
-    color: "#808080",
-    marginBottom: 2,
-    marginRight: 8,
+    color: "#7f8c8d",
     fontSize: 12,
+    marginTop: 5,
+    alignSelf: "flex-end",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ffffff",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#2c3e50",
   },
   input: {
     flex: 1,
-    height: 30,
-    borderRadius: 10,
-    backgroundColor: "#ffffff",
-    color: "#111111",
-    paddingHorizontal: 10,
+    backgroundColor: "#2c3e50",
+    borderRadius: 20,
+    padding: 10,
+    color: "#fff",
+    marginRight: 10,
+  },
+  sendButton: {
+    backgroundColor: "#2c3e50",
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  sendButtonText: {
+    color: "#fff",
+    fontSize: 18,
   },
 });
 
-export default Chatpage;
+export default Chat;
