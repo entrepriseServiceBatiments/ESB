@@ -30,10 +30,8 @@ const CartScreen = ({ navigation }) => {
   const retrieveData = async () => {
     try {
       const user = await AsyncStorage.getItem("user");
-      console.log("userr===>", user);
       if (user) {
         const parsedUser = JSON.parse(user);
-        console.log("user insde cond", user);
         setClientId(parsedUser.idClient || parsedUser.idworker);
       }
 
@@ -146,10 +144,6 @@ const CartScreen = ({ navigation }) => {
       </View>
     </View>
   );
-
-  const onRefresh = () => {
-    fetchOrders();
-  };
 
   return (
     <ScrollView
