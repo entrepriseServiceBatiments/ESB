@@ -102,6 +102,7 @@ model Worker {
   @@index([ordersId], name: "idx_ordersId") // Optional: Index for faster lookups
 }
 
+
 model Message {
   id              Int            @id @default(autoincrement())
   content         String
