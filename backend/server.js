@@ -22,7 +22,7 @@ const wishlistRoutes = require("./routes/wishlistRoutes");
 
 app.use(express.json());
 app.use(cors());
-
+app.use(wishlistRoutes);
 app.use(authRoutes);
 app.use(clientRoutes);
 app.use(workerRoutes);
@@ -30,7 +30,7 @@ app.use(productRoutes);
 app.use(orderRoutes);
 app.use(authAdminRoutes);
 app.use(chatRoutes);
-app.use(wishlistRoutes);
+
 
 io.on("connect", (socket) => {
   console.log("socket connected", socket.id);

@@ -6,7 +6,7 @@ import HomeScreen from "./HomeScreen.jsx";
 import Favorites from "./Favorites.jsx";
 import Chat from "./Chat.jsx";
 import CartScreen from "./Cart";
-import Shop from "./Shop";
+import Shop from "../Shop/Shop.jsx";
 import AllChat from "../profile/AllChat.jsx";
 import LoginStack from "../LoginSignup/LoginStack.jsx";
 import ProfileStack from "./ProfileStack.jsx";
@@ -70,8 +70,8 @@ const Navbar = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "tomato",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: "#042630",
+        tabBarInactiveTintColor: "black",
       })}
     >
       {isLoggedIn ? (
