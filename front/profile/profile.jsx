@@ -53,7 +53,6 @@ const Profile = ({ navigation }) => {
   const screenWidth = Dimensions.get('window').width;
   const screenHeight = Dimensions.get('window').height;
   const handleButtonPress = () => {
-    // Check if the button was actually dragged or just tapped
     if (Math.abs(pan.x._value) < 5 && Math.abs(pan.y._value) < 5) {
       openAllChatsModal();
     }
@@ -77,12 +76,10 @@ const Profile = ({ navigation }) => {
       }
     })
   ).current;
-  // Function to open the AllChats modal
   const openAllChatsModal = () => {
     setAllChatsModalVisible(true);
   };
 
-  // Function to close the AllChats modal
   const closeAllChatsModal = () => {
     setAllChatsModalVisible(false);
   };

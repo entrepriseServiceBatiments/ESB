@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  ScrollView,
   TextInput,
   FlatList,
   StyleSheet,
@@ -59,36 +60,46 @@ const Chat = ({ route }) => {
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: clientId.toString(),
+        sender: "client",
       });
       setNewMessage("");
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View
-      style={item.sender === clientId ? styles.myMessage : styles.theirMessage}
-    >
-      <Text
-        style={
-          item.sender === clientId
-            ? styles.myMessageText
-            : styles.theirMessageText
-        }
-      >
-        {item.content}
-      </Text>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
-      <FlatList
-        data={messages}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-        contentContainerStyle={styles.messagesContainer}
-      />
+      <ScrollView contentContainerStyle={styles.messagesContainer}>
+        {messages.map((message, index) => (
+          <View
+            key={index}
+            style={
+              message.sender === "client"
+                ? styles.myMessage
+                : styles.theirMessage
+            }
+          >
+            {console.log(message, "message")}
+            <View>
+              <Text
+                style={
+                  message.sender === "client"
+                    ? styles.myMessageText
+                    : styles.theirMessageText
+                }
+              >
+                {message.content}
+              </Text>
+            </View>
+            <Text style={styles.timestamp}>
+              {String(new Date(message.createdat).getHours()).padStart(2, "0")}:
+              {String(new Date(message.createdat).getMinutes()).padStart(
+                2,
+                "0"
+              )}
+            </Text>
+          </View>
+        ))}
+      </ScrollView>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}

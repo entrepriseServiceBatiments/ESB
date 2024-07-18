@@ -7,7 +7,7 @@ import CategoryDetails from "../homePage/CategoryDetails";
 import WorkerDetails from "../homePage/WorkerDetails";
 import AllChats from "../profile/AllChat.jsx";
 import WorkerChat from "../profile/WorkerChat";
-
+import Chatpage from "../Nav/Chat.jsx";
 const Stack = createStackNavigator();
 
 function LoginStack() {
@@ -18,7 +18,7 @@ function LoginStack() {
       <Stack.Screen name="WorkerDetails" component={WorkerDetails} />
       <Stack.Screen name="Promos" component={Promos} />
       <Stack.Screen name="Subscribe" component={Subscribe} />
-      {/* <Stack.Screen name="Chat" component={Chatpage} /> */}
+      <Stack.Screen name="Chat" component={Chatpage} />
       {/* <Stack.Screen name="AllChats" component={AllChats} /> */}
       <Stack.Screen name="workerChat" component={WorkerChat} />
     </Stack.Navigator>

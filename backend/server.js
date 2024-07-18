@@ -140,7 +140,7 @@ io.on("connect", (socket) => {
         })
         .then((messages) => {
           let workers = [];
-
+          console.log(messages, "messages");
           messages.forEach((message) => {
             const conversationId = message.conversationId;
             console.log("messag", message);
