@@ -18,7 +18,7 @@ const authRoutes = require("./routes/authRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const prisma = require("./prisma/index.js");
 
-const wishlistRoutes = require('./routes/wishlistRoutes');
+const wishlistRoutes = require("./routes/wishlistRoutes");
 
 app.use(express.json());
 app.use(cors());
@@ -33,11 +33,12 @@ app.use(chatRoutes);
 
 
 io.on("connect", (socket) => {
-  console.log(socket.id);
+  console.log("socket connected", socket.id);
   socket.on("joinconvo", async ({ clientId, workerId }) => {
+    console.log(clientId, workerId);
     try {
-      let existid 
- const existconvo = await prisma.conversation.findFirst({
+      let existid;
+      const existconvo = await prisma.conversation.findFirst({
         where: {
           OR: [
             {
@@ -51,104 +52,127 @@ io.on("connect", (socket) => {
             {
               Messages: {
                 some: {
-                  clientId: workerId,
-                  workerId: clientId,
+                  clientId: clientId,
+                  workerId: workerId,
                 },
               },
             },
           ],
         },
       });
-      console.log(existconvo);
+      console.log("exist conco", existconvo);
       if (existconvo) {
         existid = existconvo.id;
       } else {
         const newconvo = await prisma.conversation.create({
           data: {
             title: "new conversation",
-          }
+            clientId: clientId,
+            workerId: workerId,
+          },
         });
-  
+
         existid = newconvo.id;
       }
 
-      socket.join(existid.toString())
-      socket.emit('conversationId', existid.toString())
+      socket.join(existid.toString());
+      socket.emit("conversationId", existid.toString());
     } catch (error) {
       console.log(error);
     }
   });
-
-  socket.on("oldmsgs", async ({ conversationId }) => {
+  socket.on("oldmsgs", async ({ conversationid }) => {
+    console.log(conversationid);
     try {
       const messages = await prisma.message.findMany({
         where: {
-          conversationId: parseInt(conversationId),
+          conversationId: parseInt(conversationid),
         },
       });
-      console.log(messages);
       socket.emit("messages", messages);
-    } catch (error) {
-     console.log(error)
-    }
-  });
-
-  socket.on("sendmsg", async ({ workerId, clientId, content, conversationId }) => {
-    console.log({workerId, clientId, content, conversationId })
-
-    try {
-      const message = await prisma.message.create({
-        data: {
-          content,
-          clientId, 
-          workerId,
-          conversationId,
-        },
-        include: {
-          Client: true,
-          Worker: true,
-          Conversation: true,
-        },
-      });
-
-      console.log(message);
-
-      io.to(conversationId).emit("message", message);
     } catch (error) {
       console.log(error);
     }
   });
 
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
-  });
-});
-
-
-
-app.get('/conversations/:clientId', async (req, res) => {
-  const { clientId } = req.params; 
-
-  try {
-    const messages = await prisma.message.findMany({
-      where: {
-        OR: [
-          { clientId: parseInt(clientId) },
-          { workerId: parseInt(clientId) }   
-        ]
-      },
-      include: {
-        Worker: true,    
-        Conversation: true  
+  socket.on(
+    "sendmsg",
+    async ({ workerId, clientId, content, conversationid, sender }) => {
+      console.log(workerId, clientId, content, conversationid, sender);
+      try {
+        const message = await prisma.message.create({
+          data: {
+            content: content,
+            clientId: clientId,
+            workerId: workerId,
+            conversationId: Number(conversationid),
+            sender: sender,
+          },
+          include: {
+            Client: true,
+            Worker: true,
+            Conversation: true,
+          },
+        });
+        io.emit("messagecoming", message);
+        console.log(message);
+      } catch (error) {
+        console.log(error);
       }
-    });
-    
+    }
+  );
 
-      res.send(messages);
-
-  } catch (error) {
-   console.log(error);
-  }
+  socket.on("getconvos", ({ clientId }) => {
+    try {
+      console.log(clientId);
+      prisma.message
+        .findMany({
+          where: {
+            OR: [
+              { clientId: parseInt(clientId) },
+              { workerId: parseInt(clientId) },
+            ],
+          },
+          include: {
+            Worker: true,
+            Conversation: true,
+          },
+        })
+        .then((messages) => {
+          let workers = [];
+          console.log(messages, "messages");
+          messages.forEach((message) => {
+            const conversationId = message.conversationId;
+            console.log("messag", message);
+            if (
+              message.Client &&
+              message.Client.hasOwnProperty("idworker") &&
+              !workers.some(
+                (worker) => worker.idworker === message.Client.idworker
+              )
+            ) {
+              workers.push({ ...message.Client, conversationId });
+            }
+            if (
+              message.Worker &&
+              message.Worker.hasOwnProperty("idworker") &&
+              !workers.some(
+                (worker) => worker.idworker === message.Worker.idworker
+              )
+            ) {
+              workers.push({ ...message.Worker, conversationId });
+            }
+          });
+          console.log(workers, "workers");
+          socket.emit("convos", workers);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  socket.on("disconnect", () => {
+    console.log(`disonnected ${socket.id}`);
+  });
 });
 
 const PORT = process.env.PORT || 3000;

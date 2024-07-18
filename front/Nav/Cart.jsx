@@ -6,33 +6,28 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
+  ScrollView,
   RefreshControl,
 } from "react-native";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BASE_URL } from "../private.json";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const CartScreen = ({ navigation }) => {
-  const [orders, setOrders] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
   const [totalAmount, setTotalAmount] = useState(0);
   const [clientId, setClientId] = useState(null);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [datePickerMode, setDatePickerMode] = useState("start");
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    setClientId(null);
-    console.log("====================================");
-    console.log("reset");
-    console.log("====================================");
-    // retrieveClientId();
+    retrieveData();
   }, []);
 
-  useEffect(() => {
-    // setClientId(null)
-    retrieveClientId();
-    fetchOrders();
-  }, []);
-
-  const retrieveClientId = async () => {
+  const retrieveData = async () => {
     try {
       const user = await AsyncStorage.getItem("user");
       console.log("userr===>", user);
@@ -40,62 +35,115 @@ const CartScreen = ({ navigation }) => {
         const parsedUser = JSON.parse(user);
         console.log("user insde cond", user);
         setClientId(parsedUser.idClient || parsedUser.idworker);
+      }
+
+      const products = await AsyncStorage.getItem("selectedProducts");
+      if (products) {
+        setSelectedProducts(JSON.parse(products));
       } else {
-        setClientId(clientId);
-        setOrders([]);
+        setSelectedProducts([]);
       }
     } catch (error) {
-      console.error("Error retrieving client ID:", error);
+      console.error("Error retrieving data:", error);
+      Alert.alert("Error", "Failed to load cart data. Please try again.");
     }
   };
 
-  const fetchOrders = async () => {
-    try {
-      setRefreshing(true);
-      const response = await axios.get(`${BASE_URL}/orders/client/${clientId}`);
-      setOrders(response.data);
-
-      calculateTotalAmount(response.data);
-      console.log("client id:", clientId);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  const calculateTotalAmount = (orderData) => {
-    const total = orderData.reduce((acc, order) => {
-      return (
-        acc +
-        order.Products.reduce((prodAcc, productItem) => {
-          return prodAcc + productItem.Product.price;
-        }, 0)
-      );
-    }, 0);
+  const calculateTotalAmount = () => {
+    let total = 0;
+    selectedProducts.forEach((product) => {
+      total += product.price;
+    });
+    const daysDifference = Math.max(
+      1,
+      Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24))
+    );
+    total *= daysDifference;
     setTotalAmount(total);
   };
 
-  const renderOrderItem = ({ item: order }) => (
-    <View style={styles.orderItem}>
-      <Text style={styles.orderId}>Order ID: {order.idorders}</Text>
-      <Text>Start Date: {new Date(order.startDate).toLocaleDateString()}</Text>
-      <Text>End Date: {new Date(order.endDate).toLocaleDateString()}</Text>
-      <Text>Status: {order.status}</Text>
-      <Text style={styles.productsTitle}>Products:</Text>
-      {order.Products.map((productItem, index) => (
-        <View key={index} style={styles.productItem}>
-          <Image
-            source={{ uri: productItem.Product.picture }}
-            style={styles.productImage}
-          />
-          <View style={styles.productDetails}>
-            <Text style={styles.productName}>{productItem.Product.name}</Text>
-            <Text>Category: {productItem.Product.category}</Text>
-            <Text>Price: ${productItem.Product.price.toFixed(2)}</Text>
-          </View>
-        </View>
-      ))}
+  const handleSubmitOrder = async () => {
+    if (!clientId) {
+      Alert.alert("Error", "Client ID not found. Please login again.");
+      return;
+    }
+
+    if (selectedProducts.length === 0) {
+      Alert.alert(
+        "Error",
+        "No products selected. Please add products to your cart."
+      );
+      return;
+    }
+
+    if (startDate >= endDate) {
+      Alert.alert("Error", "End date must be after start date.");
+      return;
+    }
+
+    const order = {
+      clientId: clientId,
+      startDate: startDate.toISOString().split("T")[0],
+      endDate: endDate.toISOString().split("T")[0],
+      products: selectedProducts.map((product) => ({
+        idproducts: product.idproducts,
+      })),
+      totalAmount: totalAmount,
+    };
+
+    try {
+      Alert.alert(
+        "Order Submitted",
+        `Order details:\n${JSON.stringify(order, null, 2)}`,
+        [
+          {
+            text: "OK",
+            onPress: async () => {
+              await AsyncStorage.removeItem("selectedProducts");
+              setSelectedProducts([]);
+              setTotalAmount(0);
+              navigation.navigate("Home");
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      Alert.alert("Error", "Failed to submit order. Please try again.");
+    }
+  };
+
+  const showDatePicker = (mode) => {
+    setDatePickerMode(mode);
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirmDate = (date) => {
+    if (datePickerMode === "start") {
+      setStartDate(date);
+    } else {
+      setEndDate(date);
+    }
+    hideDatePicker();
+  };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    retrieveData().then(() => setRefreshing(false));
+  }, []);
+
+  const renderProductItem = ({ item }) => (
+    <View style={styles.productItem}>
+      <Image source={{ uri: item.picture }} style={styles.productImage} />
+      <View style={styles.productDetails}>
+        <Text style={styles.productName}>{item.name}</Text>
+        <Text>Category: {item.category}</Text>
+        <Text>Price: ${item.price.toFixed(2)} per day</Text>
+      </View>
     </View>
   );
 
@@ -104,29 +152,67 @@ const CartScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Your Cart</Text>
-      <FlatList
-        data={orders}
-        renderItem={renderOrderItem}
-        keyExtractor={(item) => item.idorders.toString()}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      />
-      <View style={styles.totalContainer}>
+    <ScrollView
+      contentContainerStyle={styles.scrollView}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Your Cart</Text>
+        <FlatList
+          data={selectedProducts}
+          renderItem={renderProductItem}
+          keyExtractor={(item) => item.idproducts.toString()}
+          ListEmptyComponent={
+            <Text style={styles.emptyCartText}>Your cart is empty</Text>
+          }
+        />
+        <View style={styles.dateContainer}>
+          <TouchableOpacity
+            style={styles.dateButton}
+            onPress={() => showDatePicker("start")}
+          >
+            <Text>Start Date: {startDate.toLocaleDateString()}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.dateButton}
+            onPress={() => showDatePicker("end")}
+          >
+            <Text>End Date: {endDate.toLocaleDateString()}</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity
+          style={styles.calculateButton}
+          onPress={calculateTotalAmount}
+        >
+          <Text style={styles.calculateButtonText}>Calculate Total</Text>
+        </TouchableOpacity>
         <Text style={styles.totalText}>
           Total Amount: ${totalAmount.toFixed(2)}
         </Text>
+        <TouchableOpacity
+          style={styles.orderButton}
+          onPress={handleSubmitOrder}
+        >
+          <Text style={styles.orderButtonText}>Submit Order</Text>
+        </TouchableOpacity>
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirmDate}
+          onCancel={hideDatePicker}
+          minimumDate={new Date()}
+        />
       </View>
-      <TouchableOpacity style={styles.checkoutButton} onPress={() => {}}>
-        <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -137,60 +223,74 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
   },
-  orderItem: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-    elevation: 3,
-  },
-  orderId: {
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  productsTitle: {
-    fontWeight: "bold",
-    marginTop: 10,
-    marginBottom: 5,
-  },
   productItem: {
     flexDirection: "row",
-    marginLeft: 10,
-    marginTop: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    paddingBottom: 5,
+    alignItems: "center",
+    marginBottom: 15,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 10,
+    elevation: 2,
   },
   productImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    marginRight: 15,
   },
   productDetails: {
     flex: 1,
   },
   productName: {
     fontWeight: "bold",
+    fontSize: 16,
+    marginBottom: 5,
   },
-  totalContainer: {
+  emptyCartText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#666",
     marginTop: 20,
-    padding: 15,
-    backgroundColor: "#e6f7ff",
-    borderRadius: 8,
   },
-  totalText: {
-    fontSize: 18,
-    fontWeight: "bold",
+  dateContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
   },
-  checkoutButton: {
+  dateButton: {
+    padding: 10,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 5,
+    flex: 1,
+    marginHorizontal: 5,
+    alignItems: "center",
+  },
+  calculateButton: {
     backgroundColor: "#007BFF",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 20,
   },
-  checkoutButtonText: {
+  calculateButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  totalText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 15,
+    textAlign: "center",
+  },
+  orderButton: {
+    backgroundColor: "#28a745",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  orderButtonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",

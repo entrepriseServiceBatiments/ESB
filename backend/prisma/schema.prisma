@@ -102,23 +102,26 @@ model Worker {
   @@index([ordersId], name: "idx_ordersId") // Optional: Index for faster lookups
 }
 
+
 model Message {
   id              Int            @id @default(autoincrement())
   content         String
   clientId        Int?
   workerId        Int?
   conversationId  Int
-
+  sender          String
   Client          Client?        @relation("ClientMessages", fields: [clientId], references: [idClient])
   Worker          Worker?        @relation("WorkerMessages", fields: [workerId], references: [idworker])
   Conversation    Conversation   @relation(fields: [conversationId], references: [id])
-
+  createdat       DateTime       @default(now())
   @@index([conversationId], name: "idx_conversationId")
 }
 
 model Conversation {
   id         Int       @id @default(autoincrement())
   title      String?
+   clientId        Int?
+  workerId        Int?
   Messages   Message[]
 }
 
