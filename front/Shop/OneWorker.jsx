@@ -17,6 +17,7 @@ const WorkerDetailsScreen = ({ worker, onClose, visible, navigation }) => {
     try {
       const clientData = await AsyncStorage.getItem("user");
       const client = JSON.parse(clientData);
+      console.log(client, "worker");
       if (client) {
         console.log(worker);
         navigation.navigate('Home', { screen: 'Chat',
@@ -54,7 +55,7 @@ const WorkerDetailsScreen = ({ worker, onClose, visible, navigation }) => {
           </Text>
           <Text style={styles.jobTitle}>{worker.jobTitle}</Text>
           <Text style={styles.workerDescription}>
-            Hourly Rate: ${worker.hourlyRate.toFixed(2)}
+            Hourly Rate: ${worker.hourlyRate}
           </Text>
           <View style={styles.ratingContainer}>
             <AirbnbRating

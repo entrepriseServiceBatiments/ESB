@@ -31,7 +31,6 @@ app.use(orderRoutes);
 app.use(authAdminRoutes);
 app.use(chatRoutes);
 
-
 io.on("connect", (socket) => {
   console.log("socket connected", socket.id);
   socket.on("joinconvo", async ({ clientId, workerId }) => {
@@ -76,13 +75,13 @@ io.on("connect", (socket) => {
       }
 
       socket.join(existid.toString());
-      socket.emit("conversationId", existid.toString());
+      console.log(clientId, workerId, "fuck");
+      socket.emit("conversationId", existid.toString(), clientId, workerId);
     } catch (error) {
       console.log(error);
     }
   });
   socket.on("oldmsgs", async ({ conversationid }) => {
-    console.log(conversationid);
     try {
       const messages = await prisma.message.findMany({
         where: {
@@ -98,7 +97,14 @@ io.on("connect", (socket) => {
   socket.on(
     "sendmsg",
     async ({ workerId, clientId, content, conversationid, sender }) => {
-      console.log(workerId, clientId, content, conversationid, sender);
+      console.log(
+        workerId,
+        "client",
+        clientId,
+        content,
+        conversationid,
+        sender
+      );
       try {
         const message = await prisma.message.create({
           data: {
@@ -115,57 +121,47 @@ io.on("connect", (socket) => {
           },
         });
         io.emit("messagecoming", message);
-        console.log(message);
       } catch (error) {
         console.log(error);
       }
     }
   );
 
-  socket.on("getconvos", ({ clientId }) => {
+  socket.on("getconvos", async ({ user }) => {
     try {
-      console.log(clientId);
-      prisma.message
-        .findMany({
-          where: {
-            OR: [
-              { clientId: parseInt(clientId) },
-              { workerId: parseInt(clientId) },
-            ],
-          },
-          include: {
-            Worker: true,
-            Conversation: true,
-          },
-        })
-        .then((messages) => {
-          let workers = [];
-          console.log(messages, "messages");
-          messages.forEach((message) => {
-            const conversationId = message.conversationId;
-            console.log("messag", message);
-            if (
-              message.Client &&
-              message.Client.hasOwnProperty("idworker") &&
-              !workers.some(
-                (worker) => worker.idworker === message.Client.idworker
-              )
-            ) {
-              workers.push({ ...message.Client, conversationId });
-            }
-            if (
-              message.Worker &&
-              message.Worker.hasOwnProperty("idworker") &&
-              !workers.some(
-                (worker) => worker.idworker === message.Worker.idworker
-              )
-            ) {
-              workers.push({ ...message.Worker, conversationId });
-            }
-          });
-          console.log(workers, "workers");
-          socket.emit("convos", workers);
-        });
+      const messages = await prisma.message.findMany({
+        where: {
+          OR: [{ clientId: user }, { workerId: user }],
+        },
+        include: {
+          Worker: true,
+          Client: true,
+          Conversation: true,
+        },
+      });
+
+      let conversations = [];
+      messages.forEach((message) => {
+        const conversationId = message.conversationId;
+        if (user === message.clientId) {
+          if (
+            message.Worker &&
+            message.Worker.hasOwnProperty("idworker") &&
+            !conversations.some(
+              (conv) => conv.idworker === message.Worker.idworker
+            )
+          ) {
+            conversations.push({ ...message.Worker, conversationId });
+          }
+        } else console.log(message);
+        if (user === message.workerId) {
+          if (message.Client && message.Client.hasOwnProperty("idClient")) {
+            conversations.push({ ...message.Client, conversationId });
+          }
+        }
+      });
+      console.log("convos", conversations);
+      socket.emit("convos", conversations);
     } catch (error) {
       console.log(error);
     }
