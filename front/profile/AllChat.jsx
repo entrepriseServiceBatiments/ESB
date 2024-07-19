@@ -12,12 +12,14 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import io from "socket.io-client";
 import { BASE_URL } from "../private.json";
-const SERVER_URL = { BASE_URL };
+import WorkerChatModal from "./WorkerChat.jsx";
 
 const Conversationspage = ({ modalVisible, setModalVisible }) => {
   const [conversations, setConversations] = useState([]);
   const [socket, setSocket] = useState(null);
   const [user, setUser] = useState(null);
+  const [chatModalVisible, setChatModalVisible] = useState(false); // State for chat modal visibility
+  const [selectedConversation, setSelectedConversation] = useState(null); // State for selected conversation
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -34,7 +36,7 @@ const Conversationspage = ({ modalVisible, setModalVisible }) => {
               socket.disconnect();
             }
 
-            const newSocket = io(SERVER_URL, { transports: ["websocket"] });
+            const newSocket = io(BASE_URL, { transports: ["websocket"] });
             setSocket(newSocket);
 
             newSocket.emit("getconvos", {
@@ -42,13 +44,11 @@ const Conversationspage = ({ modalVisible, setModalVisible }) => {
             });
 
             newSocket.on("convos", (data) => {
-              console.log("Received conversations data:", data);
               const uniqueConversations = Array.from(
                 new Map(
                   data.map((item) => [item.conversationId, item])
                 ).values()
               );
-              console.log(uniqueConversations, "Unique Conversations");
               setConversations(uniqueConversations);
             });
 
@@ -68,29 +68,9 @@ const Conversationspage = ({ modalVisible, setModalVisible }) => {
     setupSocket();
   }, [modalVisible]);
 
-  const handleConversationPress = async (workerId, clientId) => {
-    if (socket) {
-      const isClient = user.idClient !== undefined;
-
-      const clientdd = isClient ? user.idClient : clientId;
-      const workerdd = isClient ? workerId : user.idworker;
-
-      socket.emit("joinconvo", {
-        clientId: clientdd,
-        workerId: workerdd,
-      });
-
-      socket.once("conversationId", (conversationId) => {
-        console.log(conversationId);
-        setModalVisible(false);
-        navigation.navigate("Chat", {
-          conversationId,
-          client: clientdd,
-          work: workerdd,
-          user: user,
-        });
-      });
-    }
+  const handleConversationPress = (workerId, clientId) => {
+    setSelectedConversation({ workerId, clientId }); // Set the selected conversation
+    setChatModalVisible(true); // Show the chat modal
   };
 
   const renderItem = ({ item }) => {
@@ -145,9 +125,18 @@ const Conversationspage = ({ modalVisible, setModalVisible }) => {
           <Text style={styles.noConversationsText}>No conversations found</Text>
         )}
       </View>
+      {selectedConversation && (
+        <WorkerChatModal
+          workerId={selectedConversation.workerId}
+          clientId={selectedConversation.clientId}
+          isVisible={chatModalVisible}
+          onClose={() => setChatModalVisible(false)}
+        />
+      )}
     </Modal>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -174,10 +163,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "white",
-  },
-  lastMessage: {
-    fontSize: 14,
-    color: "#cccccc",
   },
   closeButton: {
     alignSelf: "flex-end",
