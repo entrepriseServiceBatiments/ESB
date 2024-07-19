@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HomeScreen from "./HomeScreen.jsx";
-import Favorites from "./Favorites.jsx";
+import Favorites from "../Shop/Favorites.jsx";
 import Chat from "./Chat.jsx";
 import CartScreen from "./Cart";
 import Shop from "../Shop/Shop.jsx";
@@ -41,6 +41,7 @@ const Navbar = () => {
     <Tab.Navigator
       initialRouteName={initialScreen}
       screenOptions={({ route }) => ({
+        headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
