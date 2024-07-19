@@ -1,6 +1,6 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const { cloudinary } = require("../cloudinaryConfig");
+const { cloudinary } = require('../cloudinaryConfig');
 
 const getProducts = async () => {
   return await prisma.product.findMany({
@@ -20,14 +20,17 @@ const getProductById = async (id) => {
   }
 };
 
-async function createProduct(data) {
+const createProduct = async (data) => {
   try {
+    console.log('Creating product with data:', data);
     const product = await prisma.product.create({ data });
     return product;
   } catch (error) {
+    console.log('DATA===>', data);
+    console.error('Error creating product:', error.message);
     throw new Error(`Could not create product: ${error.message}`);
   }
-}
+};
 
 const getProductsByCateg = async (category) => {
   return await prisma.product.findMany({
@@ -42,7 +45,7 @@ const deleteProductById = async (id) => {
     await prisma.product.delete({
       where: { idproducts: parseInt(id) },
     });
-    return { message: "Product deleted successfully" };
+    return { message: 'Product deleted successfully' };
   } catch (error) {
     console.error(`Failed to delete product with ID ${id}:`, error);
     throw new Error(`Failed to delete product with ID ${id}: ${error.message}`);

@@ -1,24 +1,26 @@
-require("dotenv").config();
+require('dotenv').config();
 
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
+const cors = require('cors');
 
 const app = express();
-const http = require("http");
+const http = require('http');
 const server = http.createServer(app);
-const socket_io = require("socket.io");
+const socket_io = require('socket.io');
 const io = socket_io(server);
 
-const clientRoutes = require("./routes/clientRoutes");
-const workerRoutes = require("./routes/workerRoutes");
-const productRoutes = require("./routes/productRoutes");
-const orderRoutes = require("./routes/orderRoutes");
-const authAdminRoutes = require("./routes/authAdminRoutes");
-const authRoutes = require("./routes/authRoutes");
-const chatRoutes = require("./routes/chatRoutes");
-const prisma = require("./prisma/index.js");
+const paymentRoutes = require("./routes/paymentRoutes")
+const PenOrder = require('./routes/PenOrder.js');
+const clientRoutes = require('./routes/clientRoutes');
+const workerRoutes = require('./routes/workerRoutes');
+const productRoutes = require('./routes/productRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const authAdminRoutes = require('./routes/authAdminRoutes');
+const authRoutes = require('./routes/authRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const prisma = require('./prisma/index.js');
 
-const wishlistRoutes = require("./routes/wishlistRoutes");
+const wishlistRoutes = require('./routes/wishlistRoutes');
 
 app.use(express.json());
 app.use(cors());
@@ -59,13 +61,13 @@ io.on("connect", (socket) => {
           ],
         },
       });
-      console.log("exist conco", existconvo);
+      console.log('exist conco', existconvo);
       if (existconvo) {
         existid = existconvo.id;
       } else {
         const newconvo = await prisma.conversation.create({
           data: {
-            title: "new conversation",
+            title: 'new conversation',
             clientId: clientId,
             workerId: workerId,
           },
@@ -88,14 +90,14 @@ io.on("connect", (socket) => {
           conversationId: parseInt(conversationid),
         },
       });
-      socket.emit("messages", messages);
+      socket.emit('messages', messages);
     } catch (error) {
       console.log(error);
     }
   });
 
   socket.on(
-    "sendmsg",
+    'sendmsg',
     async ({ workerId, clientId, content, conversationid, sender }) => {
       console.log(
         workerId,
@@ -166,7 +168,7 @@ io.on("connect", (socket) => {
       console.log(error);
     }
   });
-  socket.on("disconnect", () => {
+  socket.on('disconnect', () => {
     console.log(`disonnected ${socket.id}`);
   });
 });

@@ -30,24 +30,36 @@ const getProductsByCateg = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 async function createProduct(req, res, next) {
-  const { name, category, description, price, pictureUrl, rating, stock, numOfRatings, orderId } = req.body;
-  
+  const {
+    name,
+    category,
+    description,
+    price,
+    picture,
+    rating,
+    stock,
+    numOfRatings,
+    orderId,
+  } = req.body;
+  console.log('req.body=====>', req.body);
   try {
+    console.log('Request body:', req.body);
     const product = await productService.createProduct({
-      name,
-      category,
-      description,
-      price,
-      pictureUrl,
-      rating,
-      stock,
-      numOfRatings,
-      orderId,
+      name: name,
+      category: category,
+      description: description,
+      price: Number(price),
+      picture: picture,
+      rating: Number(rating),
+      stock: Number(stock),
+      numOfRatings: Number(numOfRatings),
+      orderId: orderId,
     });
+    console.log('Product created:', product);
     res.status(201).json(product);
   } catch (error) {
+    console.error('Error in controller:', error.message);
     next(error);
   }
 }
@@ -61,12 +73,10 @@ const deleteProductById = async (req, res) => {
   }
 };
 
-
 module.exports = {
   getProducts,
   getProductById,
   getProductsByCateg,
   createProduct,
   deleteProductById,
-
 };
