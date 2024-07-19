@@ -70,7 +70,8 @@ const Conversationspage = ({ modalVisible, setModalVisible }) => {
 
   const handleConversationPress = (workerId, clientId) => {
     setSelectedConversation({ workerId, clientId }); // Set the selected conversation
-    setChatModalVisible(true); // Show the chat modal
+    setChatModalVisible(true);
+    console.log(workerId, clientId, "77777777");
   };
 
   const renderItem = ({ item }) => {
@@ -80,7 +81,12 @@ const Conversationspage = ({ modalVisible, setModalVisible }) => {
     return (
       <TouchableOpacity
         style={styles.messageItem}
-        onPress={() => handleConversationPress(item.idworker, item.idClient)}
+        onPress={() =>
+          handleConversationPress(
+            user.idworker || user.idClient,
+            item.idClient || item.idworker
+          )
+        }
       >
         <Image
           source={{
