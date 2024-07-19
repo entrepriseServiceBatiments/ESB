@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, StyleSheet, Button, Image } from 'react-native';
+import { View, TextInput, StyleSheet, Text, Image,TouchableOpacity } from 'react-native';
 
 const SearchBar = ({ onSearch }) => {
   const [query, setQuery] = useState('');
@@ -40,7 +40,9 @@ const SearchBar = ({ onSearch }) => {
           onChangeText={setQuery}
         />
       </View>
-      <Button title="Search" onPress={searchii} />
+      <TouchableOpacity  onPress={searchii}  style={styles.button}>
+        <Text style={styles.button}>SEARCH</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -55,7 +57,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    borderColor: '#ccc',
+    borderColor: '#042630',
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
@@ -69,6 +71,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 5,
   },
+  button:{
+    backgroundColor: "#042630",
+    color:'white',
+    padding:10
+  }
 });
 
 export default SearchBar;
