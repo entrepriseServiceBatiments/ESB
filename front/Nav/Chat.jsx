@@ -60,7 +60,7 @@ const Chat = ({ route,navigation }) => {
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: "client",
+        sender: "Client",
       });
       setNewMessage("");
     }
