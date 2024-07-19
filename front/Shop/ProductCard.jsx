@@ -95,7 +95,7 @@ const ProductCard = ({ item, onPress, onRentPress, onRemovePress, isInCart, togg
           <Icon 
             name={isFavorite ? 'trash-can' : 'heart'} 
             size={24} 
-            color={isFavorite ? '#FF0000' : '#2196F3'}
+            color={isFavorite ? 'darkred' : 'darkred'}
           />
         </TouchableOpacity>
       </View>
