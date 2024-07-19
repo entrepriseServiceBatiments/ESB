@@ -62,7 +62,8 @@ const CartScreen = ({ navigation }) => {
 
   const handleSubmitOrder = async () => {
     if (!clientId) {
-      Alert.alert("Error", "Client ID not found. Please login again.");
+      Alert.alert("Error", "Client ID not found. Please login.");
+      navigation.navigate('Login')
       return;
     }
 

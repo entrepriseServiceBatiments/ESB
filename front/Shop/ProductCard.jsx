@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from "../private.json";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; 
@@ -66,6 +66,9 @@ const ProductCard = ({ item, onPress, onRentPress, onRemovePress, isInCart, togg
           showAlert('added');
         }
         toggleFavorite(item.idproducts); 
+      } else {
+        Alert.alert('Please login to  be able to add product to favorites')
+        
       }
     } catch (error) {
       console.error("Error toggling favorite status:", error);
