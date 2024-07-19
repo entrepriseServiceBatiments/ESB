@@ -35,7 +35,7 @@ const CartScreen = ({ navigation }) => {
         setClientId(parsedUser.idClient || parsedUser.idworker);
       }
 
-      const products = await AsyncStorage.getItem("selectedProducts");
+      const products = await AsyncStorage.getItem("orders");
       if (products) {
         setSelectedProducts(JSON.parse(products));
       } else {

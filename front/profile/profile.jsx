@@ -52,7 +52,7 @@ const Profile = ({ navigation }) => {
   const [pan] = useState(new Animated.ValueXY());
   const screenWidth = Dimensions.get('window').width;
   const screenHeight = Dimensions.get('window').height;
-  const handleButtonPress = () => {
+  const ButtonPress = () => {
     if (Math.abs(pan.x._value) < 5 && Math.abs(pan.y._value) < 5) {
       openAllChatsModal();
     }
@@ -176,7 +176,7 @@ const Profile = ({ navigation }) => {
     setEditProfileModalVisible(true);
   };
 
-  const handleUpdate = (Info) => {
+  const Update = (Info) => {
     if (Info.picture) setPicture(Info.picture);
     if (Info.userName) setUserName(Info.userName);
     if (Info.address) setAddress(Info.address);
@@ -186,11 +186,11 @@ const Profile = ({ navigation }) => {
     if (Info.longitude) setLongitude(Info.longitude);
   };
 
-  const handleJobTitleModalOpen = () => {
+  const JobTitleModalOpen = () => {
     setJobTitleModalVisible(true);
   };
 
-  const handleJobTitleModalClose = () => {
+  const JobTitleModalClose = () => {
     setJobTitleModalVisible(false);
   };
   const togglePositionModalOpen = () => {
@@ -267,7 +267,7 @@ const Profile = ({ navigation }) => {
                   <Text style={styles.label}>Resume:</Text>
                   <TouchableOpacity
                     style={styles.editButton}
-                    onPress={handleJobTitleModalOpen}
+                    onPress={JobTitleModalOpen}
                   >
                     <FontAwesome name="pencil" size={24} color="#042630" />
                   </TouchableOpacity>
@@ -276,7 +276,7 @@ const Profile = ({ navigation }) => {
               </>
             ) : (
               userType === "worker" && (
-                <TouchableOpacity onPress={handleJobTitleModalOpen}>
+                <TouchableOpacity onPress={JobTitleModalOpen}>
                   <Text style={styles.addResume}>Add Resume</Text>
                 </TouchableOpacity>
               )
@@ -326,9 +326,9 @@ const Profile = ({ navigation }) => {
             styles.floatingButton,
             { transform: [{ translateX: pan.x }, { translateY: pan.y }] }
           ]}
-          {...panResponder.panHandlers}
+          {...panResponder.panrs}
         >
-          <TouchableOpacity onPress={handleButtonPress} style={styles.buttonTouchable}>
+          <TouchableOpacity onPress={ButtonPress} style={styles.buttonTouchable}>
             <Entypo name="message" size={24} color="black" />
           </TouchableOpacity>
         </Animated.View>
@@ -348,14 +348,14 @@ const Profile = ({ navigation }) => {
             modalVisible={editProfileModalVisible}
             setModalVisible={setEditProfileModalVisible}
             userInfo={{ userName, email, phoneNum, clientId, userType }}
-            onUpdate={handleUpdate}
+            onUpdate={Update}
           />
   
           <ProfilePictureModal
             modalVisible={profilePictureModalVisible}
             setModalVisible={setProfilePictureModalVisible}
             clientId={clientId}
-            onUpdate={handleUpdate}
+            onUpdate={Update}
           />
           <AllChats
         modalVisible={allChatsModalVisible}
@@ -369,7 +369,7 @@ const Profile = ({ navigation }) => {
             modalVisible={positionModalVisible}
             setModalVisible={setPositionModalVisible}
             onSave={(region) => {
-              handleUpdate({
+              Update({
                 latitude: region.latitude,
                 longitude: region.longitude,
               });
@@ -379,7 +379,7 @@ const Profile = ({ navigation }) => {
           <JobTitleAndResumeUpload
             modalVisible={jobTitleModalVisible}
             setModalVisible={setJobTitleModalVisible}
-            onUpdate={handleUpdate}
+            onUpdate={Update}
           />
           <AwesomeAlert
             show={showPictureAlert}
@@ -446,7 +446,7 @@ const Profile = ({ navigation }) => {
             onConfirmPressed={() => {
               setShowResumeAlert(false);
               AsyncStorage.setItem("resumeAlertShown", "true");
-              handleJobTitleModalOpen();
+              JobTitleModalOpen();
             }}
           />
         </View>
@@ -460,6 +460,8 @@ const Profile = ({ navigation }) => {
       alignItems: "center",
       backgroundColor: "#e6ede6",
       padding: 20,
+      marginTop:30,
+      paddingBottom:200
     },
     mapContainer: {
       marginTop: 20,
@@ -559,7 +561,8 @@ const Profile = ({ navigation }) => {
       elevation: 3,
     },floatingButton: {
       position: 'absolute',
-      bottom: 30,
+      marginTop:50,
+      Top: 10,
       right: 20,
       backgroundColor: '#e6ede6',
       borderRadius: 30,
