@@ -18,10 +18,16 @@ const WorkerDetailsScreen = ({ worker, onClose, visible, navigation }) => {
       const clientData = await AsyncStorage.getItem("user");
       const client = JSON.parse(clientData);
       if (client) {
-        navigation.navigate("Chat", {
+        console.log(worker);
+        navigation.navigate('Home', { screen: 'Chat',
+          params: { 
           workerId: parseInt(worker.idworker),
-          clientId: parseInt(client.idClient),
-        });
+          clientId: parseInt(client.idClient),}
+        } );
+        // navigation.navigate("Chat", {
+        //   workerId: parseInt(worker.idworker),
+        //   clientId: parseInt(client.idClient),
+        // });
       } else {
         console.error("Client ID not found");
       }
@@ -62,7 +68,6 @@ const WorkerDetailsScreen = ({ worker, onClose, visible, navigation }) => {
           <Text style={styles.workerDescription}>
             Address: {worker.address}
           </Text>
-          {/* Render map component using worker's latitude and longitude */}
           <MapView style={styles.map}>
             <Marker
               coordinate={{
