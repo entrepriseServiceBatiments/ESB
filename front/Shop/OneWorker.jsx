@@ -17,10 +17,14 @@ const WorkerDetailsScreen = ({ worker, onClose, visible, navigation }) => {
     try {
       const clientData = await AsyncStorage.getItem("user");
       const client = JSON.parse(clientData);
+      console.log(client, "worker");
       if (client) {
-        navigation.navigate("Chat", {
-          workerId: parseInt(worker.idworker),
-          clientId: parseInt(client.idClient),
+        navigation.navigate("Home", {
+          screen: "Chat",
+          params: {
+            workerId: parseInt(worker.idworker),
+            clientId: parseInt(client.idClient),
+          },
         });
       } else {
         console.error("Client ID not found");
@@ -48,7 +52,7 @@ const WorkerDetailsScreen = ({ worker, onClose, visible, navigation }) => {
           </Text>
           <Text style={styles.jobTitle}>{worker.jobTitle}</Text>
           <Text style={styles.workerDescription}>
-            Hourly Rate: ${worker.hourlyRate.toFixed(2)}
+            Hourly Rate: ${worker.hourlyRate}
           </Text>
           <View style={styles.ratingContainer}>
             <AirbnbRating
