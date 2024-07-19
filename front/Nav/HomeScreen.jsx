@@ -15,7 +15,7 @@ function LoginStack() {
     <Stack.Navigator initialRouteName="Login"   screenOptions={{
       headerShown: false
     }}>
-      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="HomeScreen" component={Home} />
       <Stack.Screen name="CategoryDetails" component={CategoryDetails} />
       <Stack.Screen name="WorkerDetails" component={WorkerDetails} />
       <Stack.Screen name="Promos" component={Promos} />
