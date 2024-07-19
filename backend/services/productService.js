@@ -22,11 +22,12 @@ const getProductById = async (id) => {
 
 const createProduct = async (data) => {
   try {
-    console.log('Creating product with data:', data); 
+    console.log('Creating product with data:', data);
     const product = await prisma.product.create({ data });
     return product;
   } catch (error) {
-    console.error('Error creating product:', error.message); 
+    console.log('DATA===>', data);
+    console.error('Error creating product:', error.message);
     throw new Error(`Could not create product: ${error.message}`);
   }
 };

@@ -47,7 +47,7 @@ const AddProduct = ({ setRefresh, refresh }) => {
       );
 
       // Get the image URL from Cloudinary response
-      const imageUrl = JSON.parse(cloudinaryResponse.data.secure_url);
+      const imageUrl = cloudinaryResponse.data.secure_url
 
       // Now send the product data along with the image URL to your backend
       const productData = {

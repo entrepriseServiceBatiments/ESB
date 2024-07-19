@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+} from 'react-native';
 
 const QuantitySelector = ({ visible, onConfirm, onCancel }) => {
   const [quantity, setQuantity] = useState(1);
@@ -24,7 +31,10 @@ const QuantitySelector = ({ visible, onConfirm, onCancel }) => {
         <View style={styles.content}>
           <Text style={styles.title}>Select Quantity</Text>
           <View style={styles.quantityContainer}>
-            <TouchableOpacity onPress={decreaseQuantity} style={styles.quantityButton}>
+            <TouchableOpacity
+              onPress={decreaseQuantity}
+              style={styles.quantityButton}
+            >
               <Text style={styles.quantityButtonText}>-</Text>
             </TouchableOpacity>
             <TextInput
@@ -33,12 +43,18 @@ const QuantitySelector = ({ visible, onConfirm, onCancel }) => {
               keyboardType="numeric"
               onChangeText={(text) => setQuantity(parseInt(text) || 1)}
             />
-            <TouchableOpacity onPress={increaseQuantity} style={styles.quantityButton}>
+            <TouchableOpacity
+              onPress={increaseQuantity}
+              style={styles.quantityButton}
+            >
               <Text style={styles.quantityButtonText}>+</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={handleConfirm} style={styles.confirmButton}>
+            <TouchableOpacity
+              onPress={handleConfirm}
+              style={styles.confirmButton}
+            >
               <Text style={styles.buttonText}>Confirm</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={onCancel} style={styles.cancelButton}>
@@ -54,6 +70,7 @@ const QuantitySelector = ({ visible, onConfirm, onCancel }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    zIndex: 1000,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

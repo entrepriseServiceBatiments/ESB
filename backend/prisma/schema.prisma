@@ -5,7 +5,6 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-
 }
 
 model Admin {
@@ -29,7 +28,8 @@ model Client {
   Orders      Order[]   @relation("ClientOrders")
   Favorites   Favorite[]
   Messages    Message[] @relation("ClientMessages")
-  PendingOrders PendingOrder[] @relation("ClientPendingOrders")  // Add this line
+  PendingOrders PendingOrder[] @relation("ClientPendingOrders")
+  Payments     Payment[]
 }
 
 model Order {
@@ -40,7 +40,7 @@ model Order {
   clientId   Int
   Client     Client        @relation("ClientOrders", fields: [clientId], references: [idClient])
   Workers    Worker[]      @relation("OrderWorkers")
-  Products   OrderProduct[]  
+  Products   OrderProduct[]
 }
 
 model Product {
@@ -53,9 +53,9 @@ model Product {
   rating       Int
   stock        Int
   numOfRatings Int
-  Orders       OrderProduct[]   // Update relation field
+  Orders       OrderProduct[]
   Favorites    Favorite[]
-  PendingOrderProducts PendingOrderProduct[]  // Add this line
+  PendingOrderProducts PendingOrderProduct[]
 }
 
 model OrderProduct {
@@ -99,9 +99,8 @@ model Worker {
   comments     String?
   Order        Order?    @relation("OrderWorkers", fields: [ordersId], references: [idorders])
   Messages     Message[] @relation("WorkerMessages")
-  @@index([ordersId], name: "idx_ordersId") // Optional: Index for faster lookups
+  @@index([ordersId], name: "idx_ordersId")
 }
-
 
 model Message {
   id              Int            @id @default(autoincrement())
@@ -120,8 +119,8 @@ model Message {
 model Conversation {
   id         Int       @id @default(autoincrement())
   title      String?
-   clientId        Int?
-  workerId        Int?
+  clientId   Int?
+  workerId   Int?
   Messages   Message[]
 }
 
@@ -131,9 +130,11 @@ model PendingOrder {
   startDate   String?
   endDate     String?
   status      String        @default("pending")
+  amount      Int
   Products    PendingOrderProduct[]
 
   Client      Client        @relation("ClientPendingOrders", fields: [clientId], references: [idClient])
+  Payments    Payment[]
 }
 
 model PendingOrderProduct {
@@ -143,4 +144,17 @@ model PendingOrderProduct {
   Product         Product      @relation(fields: [productId], references: [idproducts])
 
   @@id([pendingOrderId, productId])
+}
+
+model Payment {
+  id            Int           @id @default(autoincrement())
+  clientId      Int
+  pendingOrderId Int
+  amount        Int
+  status        String        @default("pending")
+  Client        Client        @relation(fields: [clientId], references: [idClient])
+  PendingOrder  PendingOrder  @relation(fields: [pendingOrderId], references: [id])
+
+  @@index([clientId], name: "idx_clientId")
+  @@index([pendingOrderId], name: "idx_pendingOrderId")
 }

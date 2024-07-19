@@ -1,24 +1,26 @@
-require("dotenv").config();
+require('dotenv').config();
 
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
+const cors = require('cors');
 
 const app = express();
-const http = require("http");
+const http = require('http');
 const server = http.createServer(app);
-const socket_io = require("socket.io");
+const socket_io = require('socket.io');
 const io = socket_io(server);
 
-const clientRoutes = require("./routes/clientRoutes");
-const workerRoutes = require("./routes/workerRoutes");
-const productRoutes = require("./routes/productRoutes");
-const orderRoutes = require("./routes/orderRoutes");
-const authAdminRoutes = require("./routes/authAdminRoutes");
-const authRoutes = require("./routes/authRoutes");
-const chatRoutes = require("./routes/chatRoutes");
-const prisma = require("./prisma/index.js");
+const paymentRoutes = require("./routes/paymentRoutes")
+const PenOrder = require('./routes/PenOrder.js');
+const clientRoutes = require('./routes/clientRoutes');
+const workerRoutes = require('./routes/workerRoutes');
+const productRoutes = require('./routes/productRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const authAdminRoutes = require('./routes/authAdminRoutes');
+const authRoutes = require('./routes/authRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const prisma = require('./prisma/index.js');
 
-const wishlistRoutes = require("./routes/wishlistRoutes");
+const wishlistRoutes = require('./routes/wishlistRoutes');
 
 app.use(express.json());
 app.use(cors());
@@ -30,11 +32,11 @@ app.use(productRoutes);
 app.use(orderRoutes);
 app.use(authAdminRoutes);
 app.use(chatRoutes);
-
-
-io.on("connect", (socket) => {
-  console.log("socket connected", socket.id);
-  socket.on("joinconvo", async ({ clientId, workerId }) => {
+app.use(PenOrder);
+app.use(paymentRoutes)
+io.on('connect', (socket) => {
+  console.log('socket connected', socket.id);
+  socket.on('joinconvo', async ({ clientId, workerId }) => {
     console.log(clientId, workerId);
     try {
       let existid;
@@ -60,13 +62,13 @@ io.on("connect", (socket) => {
           ],
         },
       });
-      console.log("exist conco", existconvo);
+      console.log('exist conco', existconvo);
       if (existconvo) {
         existid = existconvo.id;
       } else {
         const newconvo = await prisma.conversation.create({
           data: {
-            title: "new conversation",
+            title: 'new conversation',
             clientId: clientId,
             workerId: workerId,
           },
@@ -76,12 +78,12 @@ io.on("connect", (socket) => {
       }
 
       socket.join(existid.toString());
-      socket.emit("conversationId", existid.toString());
+      socket.emit('conversationId', existid.toString());
     } catch (error) {
       console.log(error);
     }
   });
-  socket.on("oldmsgs", async ({ conversationid }) => {
+  socket.on('oldmsgs', async ({ conversationid }) => {
     console.log(conversationid);
     try {
       const messages = await prisma.message.findMany({
@@ -89,14 +91,14 @@ io.on("connect", (socket) => {
           conversationId: parseInt(conversationid),
         },
       });
-      socket.emit("messages", messages);
+      socket.emit('messages', messages);
     } catch (error) {
       console.log(error);
     }
   });
 
   socket.on(
-    "sendmsg",
+    'sendmsg',
     async ({ workerId, clientId, content, conversationid, sender }) => {
       console.log(workerId, clientId, content, conversationid, sender);
       try {
@@ -114,7 +116,7 @@ io.on("connect", (socket) => {
             Conversation: true,
           },
         });
-        io.emit("messagecoming", message);
+        io.emit('messagecoming', message);
         console.log(message);
       } catch (error) {
         console.log(error);
@@ -122,7 +124,7 @@ io.on("connect", (socket) => {
     }
   );
 
-  socket.on("getconvos", ({ clientId }) => {
+  socket.on('getconvos', ({ clientId }) => {
     try {
       console.log(clientId);
       prisma.message
@@ -140,13 +142,13 @@ io.on("connect", (socket) => {
         })
         .then((messages) => {
           let workers = [];
-          console.log(messages, "messages");
+          console.log(messages, 'messages');
           messages.forEach((message) => {
             const conversationId = message.conversationId;
-            console.log("messag", message);
+            console.log('messag', message);
             if (
               message.Client &&
-              message.Client.hasOwnProperty("idworker") &&
+              message.Client.hasOwnProperty('idworker') &&
               !workers.some(
                 (worker) => worker.idworker === message.Client.idworker
               )
@@ -155,7 +157,7 @@ io.on("connect", (socket) => {
             }
             if (
               message.Worker &&
-              message.Worker.hasOwnProperty("idworker") &&
+              message.Worker.hasOwnProperty('idworker') &&
               !workers.some(
                 (worker) => worker.idworker === message.Worker.idworker
               )
@@ -163,14 +165,14 @@ io.on("connect", (socket) => {
               workers.push({ ...message.Worker, conversationId });
             }
           });
-          console.log(workers, "workers");
-          socket.emit("convos", workers);
+          console.log(workers, 'workers');
+          socket.emit('convos', workers);
         });
     } catch (error) {
       console.log(error);
     }
   });
-  socket.on("disconnect", () => {
+  socket.on('disconnect', () => {
     console.log(`disonnected ${socket.id}`);
   });
 });
