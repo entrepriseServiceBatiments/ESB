@@ -5,133 +5,174 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Image,
   Alert,
+  ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from 'axios';
 import { BASE_URL } from "../private.json";
-import ProductCard from "./ProductCard";
-import Calendar from "./Calendar";
+import ProductCard from "../Shop/ProductCard";
+import WorkerCard from "../Shop/WorkerCard";
+import WorkerDetailsScreen from '../Shop/OneWorker';
+import ProductDetailsModal from '../Shop/OneProduct';
+import QuantitySelector from '../Shop/QuantitySelector';
 
 const CategoryDetails = ({ route, navigation }) => {
   const { category, jobTitle } = route.params;
   const [tab, setTab] = useState("products");
   const [products, setProducts] = useState([]);
   const [workers, setWorkers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedWorker, setSelectedWorker] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState([]);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
   const [clientId, setClientId] = useState(null);
-  const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+  const [quantitySelectorVisible, setQuantitySelectorVisible] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const getClientID = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/products/${category}`);
-        const data = await response.json();
-        setProducts(data);
+        const client = await AsyncStorage.getItem('user');
+        if (client) {
+          const parsedClient = JSON.parse(client);
+          console.log('Client ID:', parsedClient.idClient || parsedClient.idworker);
+          setClientId(parsedClient.idClient || parsedClient.idworker);
+        }
       } catch (error) {
-        console.error("Error fetching products:", error);
-        Alert.alert("Error", "Failed to fetch products. Please try again.");
+        console.error('Error retrieving client ID from AsyncStorage:', error);
       }
     };
+    getClientID();
+  }, []);
 
-    const fetchWorkers = async () => {
+  useEffect(() => {
+    const fetchItems = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/workers/${jobTitle}`);
-        const data = await response.json();
-        setWorkers(data);
+        let response;
+        if (tab === 'products') {
+          response = await axios.get(`${BASE_URL}/products/${category}`);
+          setProducts(response.data);
+        } else if (tab === 'services') {
+          response = await axios.get(`${BASE_URL}/workers/${jobTitle}`);
+          setWorkers(response.data);
+        }
       } catch (error) {
-        console.error("Error fetching workers:", error);
-        Alert.alert("Error", "Failed to fetch workers. Please try again.");
+        console.error('Error fetching items:', error);
+        Alert.alert("Error", "Failed to fetch items. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
+    fetchItems();
+  }, [category, jobTitle, tab]);
 
-    fetchProducts();
-    fetchWorkers();
-    retrieveData();
-  }, [category, jobTitle]);
+  const toggleFavorite = async (itemId) => {
+    if (!clientId) {
+      console.error('Client ID is not available');
+      return;
+    }
 
-  const retrieveData = async () => {
     try {
-      let user = await AsyncStorage.getItem("user");
-      if (user) {
-        user = JSON.parse(user);
-        setClientId(user.idClient || user.idworker || null);
+      if (favorites.includes(itemId)) {
+        setFavorites(favorites.filter(id => id !== itemId));
+        await fetch(`${BASE_URL}/wishlist`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, productsId: itemId }),
+        });
+      } else {
+        setFavorites([...favorites, itemId]);
+        await fetch(`${BASE_URL}/wishlist`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, productsId: itemId }),
+        });
       }
     } catch (error) {
-      console.error("Error retrieving user data:", error);
+      console.error('Error toggling favorite:', error);
     }
   };
 
-  const handleToggleProduct = (product) => {
-    setSelectedProducts((prevSelected) => {
-      const isAlreadySelected = prevSelected.some(
-        (p) => p.idproducts === product.idproducts
-      );
-      if (isAlreadySelected) {
-        return prevSelected.filter((p) => p.idproducts !== product.idproducts);
-      } else {
-        return [...prevSelected, product];
-      }
-    });
+  const ProductCardPress = (product) => {
+    setSelectedProduct(product);
   };
 
-  const handleOrder = async () => {
+  const WorkerCardPress = (worker) => {
+    setSelectedWorker(worker);
+  };
+
+  const RentPress = (product) => {
+    openQuantitySelector(product);
+  };
+
+  const openQuantitySelector = (product) => {
+    setCurrentProduct(product);
+    setQuantitySelectorVisible(true);
+  };
+
+  const AddToCart = (product, quantity) => {
+    setSelectedProducts((prevSelected) => {
+      const existingProductIndex = prevSelected.findIndex(
+        (p) => p.idproducts === product.idproducts
+      );
+      if (existingProductIndex > -1) {
+        const updatedProducts = [...prevSelected];
+        updatedProducts[existingProductIndex].quantity += quantity;
+        return updatedProducts;
+      } else {
+        return [...prevSelected, { ...product, quantity }];
+      }
+    });
+    setQuantitySelectorVisible(false);
+    setSelectedProduct(null);
+  };
+
+  const RemoveFromCart = (productId) => {
+    setSelectedProducts((prevSelected) => 
+      prevSelected.filter((p) => p.idproducts !== productId)
+    );
+  };
+
+  const saveOrderToAsyncStorage = async () => {
     if (selectedProducts.length === 0) {
       Alert.alert("Error", "Please select at least one product.");
       return;
     }
 
     try {
-      await AsyncStorage.setItem(
-        "selectedProducts",
-        JSON.stringify(selectedProducts)
-      );
-      navigation.navigate("Cart");
+      await AsyncStorage.setItem('orders', JSON.stringify(selectedProducts));
+      console.log('Order saved to AsyncStorage');
+      Alert.alert("Success", "Order saved successfully.");
+      setSelectedProducts([]); // Clear the cart after saving
     } catch (error) {
-      console.error("Error saving selected products:", error);
-      Alert.alert(
-        "Error",
-        "Failed to save selected products. Please try again."
-      );
+      console.error('Error saving order to AsyncStorage:', error);
+      Alert.alert("Error", "Failed to save order. Please try again.");
     }
   };
 
-  const renderProductItem = ({ item }) => (
-    <ProductCard
-      item={item}
-      onReservePress={handleToggleProduct}
-      isSelected={selectedProducts.some(
-        (p) => p.idproducts === item.idproducts
-      )}
-    />
-  );
+  const renderProductItem = ({ item }) => {
+    const isInCart = selectedProducts.some(p => p.idproducts === item.idproducts);
+    return (
+      <ProductCard
+        key={item.idproducts}
+        item={item}
+        onPress={() => ProductCardPress(item)}
+        onRentPress={() => RentPress(item)}
+        onRemovePress={() => RemoveFromCart(item.idproducts)}
+        isInCart={isInCart}
+        toggleFavorite={toggleFavorite}
+      />
+    );
+  };
 
   const renderWorkerItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.workerCard}
-      onPress={() => navigation.navigate("WorkerDetails", { worker: item })}
-    >
-      <View style={styles.workerHeader}>
-        <Image source={{ uri: item.picture }} style={styles.workerImage} />
-        <View style={styles.workerInfo}>
-          <Text style={styles.workerName}>{item.name}</Text>
-          <Text style={styles.workerVerified}>Identité Vérifiée</Text>
-          <Text style={styles.workerRating}>
-            {item.rating ? `${item.rating} ★` : "No rating available"}
-          </Text>
-        </View>
-        <View style={styles.workerDistance}>
-          <Text style={styles.distanceText}>
-            {item.distance ? `${item.distance} KM` : "Distance not available"}
-          </Text>
-        </View>
-      </View>
-      <View style={styles.workerContent}>
-        <Text style={styles.workerDescription}>{item.description}</Text>
-      </View>
-    </TouchableOpacity>
+    <WorkerCard
+      key={item.idworker}
+      item={item}
+      onPress={() => WorkerCardPress(item)}
+    />
   );
 
   const keyExtractor = (item) =>
@@ -157,21 +198,53 @@ const CategoryDetails = ({ route, navigation }) => {
           </Text>
         </TouchableOpacity>
       </View>
-      <FlatList
-        key={tab}
-        data={tab === "products" ? products : workers}
-        keyExtractor={keyExtractor}
-        renderItem={tab === "products" ? renderProductItem : renderWorkerItem}
-        numColumns={tab === "products" ? 2 : 1}
-        columnWrapperStyle={tab === "products" ? styles.columnWrapper : null}
-        contentContainerStyle={styles.listContent}
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#2196F3" />
+        ) : (
+          <View style={styles.gridContainer}>
+            {tab === 'products' ? (
+              products.map((item) => (
+                <View key={item.idproducts} style={styles.cardContainer}>
+                  {renderProductItem({ item })}
+                </View>
+              ))
+            ) : (
+              workers.map((item) => (
+                <View key={item.idworker} style={styles.cardContainer}>
+                  {renderWorkerItem({ item })}
+                </View>
+              ))
+            )}
+          </View>
+        )}
+      </ScrollView>
+      <ProductDetailsModal
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        onRentPress={() => RentPress(selectedProduct)}
+        onRemovePress={() => RemoveFromCart(selectedProduct?.idproducts)}
+        isInCart={selectedProducts.some(p => p.idproducts === selectedProduct?.idproducts)}
+        visible={!!selectedProduct}
+        toggleFavorite={toggleFavorite}
       />
-      {tab === "products" && (
-        <TouchableOpacity style={styles.orderButton} onPress={handleOrder}>
-          <Text style={styles.orderButtonText}>
-            Order ({selectedProducts.length})
-          </Text>
+      <WorkerDetailsScreen
+        navigation={navigation}
+        worker={selectedWorker}
+        onClose={() => setSelectedWorker(null)}
+        visible={!!selectedWorker}
+      />
+      {tab === 'products' && (
+        <TouchableOpacity style={styles.orderButton} onPress={saveOrderToAsyncStorage}>
+          <Text style={styles.orderButtonText}>Order ({selectedProducts.length})</Text>
         </TouchableOpacity>
+      )}
+      {quantitySelectorVisible && (
+        <QuantitySelector
+          visible={quantitySelectorVisible}
+          onConfirm={(quantity) => AddToCart(currentProduct, quantity)}
+          onCancel={() => setQuantitySelectorVisible(false)}
+        />
       )}
     </View>
   );
@@ -181,6 +254,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f8f8",
+    marginTop: 30,
   },
   navbar: {
     flexDirection: "row",
@@ -202,125 +276,31 @@ const styles = StyleSheet.create({
     color: "#000",
     fontWeight: "bold",
   },
-  listContent: {
+  scrollView: {
+    paddingVertical: 20,
     paddingHorizontal: 10,
-    paddingBottom: 20,
   },
-  columnWrapper: {
-    justifyContent: "space-between",
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
-  card: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    margin: 10,
-    padding: 10,
-    elevation: 3,
-  },
-  selectedCard: {
-    borderColor: "#007BFF",
-    borderWidth: 2,
-  },
-  favoriteIconContainer: {
-    alignItems: "flex-end",
-  },
-  favoriteIcon: {
-    width: 24,
-    height: 24,
-    tintColor: "#ff0000",
-  },
-  image: {
-    width: "100%",
-    height: 150,
-    borderRadius: 8,
-  },
-  cardContent: {
-    marginTop: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  description: {
-    fontSize: 14,
-    color: "#666",
-    marginVertical: 5,
-  },
-  price: {
-    fontSize: 16,
-    color: "#000",
-    marginVertical: 5,
-  },
-  button: {
-    marginTop: 10,
-    backgroundColor: "#007BFF",
-    paddingVertical: 10,
-    borderRadius: 4,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  workerCard: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    margin: 10,
-    padding: 10,
-    elevation: 3,
-  },
-  workerHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  workerImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  workerInfo: {
-    flex: 1,
-  },
-  workerName: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  workerVerified: {
-    fontSize: 14,
-    color: "#4CAF50",
-  },
-  workerRating: {
-    fontSize: 14,
-    color: "#FFD700",
-  },
-  workerDistance: {
-    alignItems: "flex-end",
-  },
-  distanceText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  workerContent: {
-    marginTop: 10,
-  },
-  workerDescription: {
-    fontSize: 14,
-    color: "#666",
+  cardContainer: {
+    width: '48%',
+    marginBottom: 20,
   },
   orderButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: '#042630',
     paddingVertical: 15,
-    alignItems: "center",
-    position: "absolute",
+    alignItems: 'center',
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
   },
   orderButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 18,
+    color: '#fff',
+    fontSize: 16,
   },
 });
 

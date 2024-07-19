@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    borderColor:'#042630'
   },
 });
 

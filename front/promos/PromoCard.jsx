@@ -3,53 +3,56 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 
 const PromoCard = ({ item }) => {
   return (
-    <View style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.cardImage} />
-      <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardLocation}>{item.location}</Text>
-        <Text style={styles.cardPrice}>
-          {item.price} DT <Text style={styles.cardOldPrice}>{item.oldPrice} DT</Text>
-        </Text>
+    <View style={styles.cardContainer}>
+      <Image
+        source={{ uri: item.image }}
+        style={styles.image}
+        resizeMode="cover"
+      />
+      <View style={styles.overlay}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.price}>${item.price}</Text>
+        {item.oldPrice && <Text style={styles.oldPrice}>${item.oldPrice}</Text>}
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
+  cardContainer: {
+    width: 380, 
+    height: 250,
+    marginRight: 5,
+    marginBottom:15,
     borderRadius: 10,
     overflow: 'hidden',
-    margin: 10,
-    width: 180, 
+    position: 'relative',
   },
-  cardImage: {
+  image: {
     width: '100%',
-    height: 100,
+    height: '100%',
   },
-  cardContent: {
+  overlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     padding: 10,
+    backgroundColor: 'rgba(4, 38, 48, 0.9)', // Semi-transparent overlay
   },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  cardLocation: {
-    fontSize: 12,
-    color: '#777',
-    marginBottom: 5,
-  },
-  cardPrice: {
+  title: {
     fontSize: 16,
+    color: '#fff',
     fontWeight: 'bold',
-    color: '#000',
   },
-  cardOldPrice: {
+  price: {
     fontSize: 14,
+    color: '#fff',
+  },
+  oldPrice: {
+    fontSize: 12,
+    color: '#fff',
     textDecorationLine: 'line-through',
-    color: '#777',
   },
 });
 

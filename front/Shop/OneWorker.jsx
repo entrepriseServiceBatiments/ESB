@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   closeButtonText: {
-    color: "darkred",
+    color: "#042630",
     fontSize: 20,
     fontWeight: "bold",
   },

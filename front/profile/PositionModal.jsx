@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   title: {
+    marginTop:15,
     fontSize: 18,
     marginBottom: 10,
   },
