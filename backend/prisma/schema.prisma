@@ -18,8 +18,8 @@ model Client {
   userName    String
   creditCard  String?
   address     String?
-  latitude     Decimal?
-  longitude    Decimal?
+  latitude    Float?
+  longitude   Float?
   cin         Int       @unique
   phoneNum    Int       @unique
   email       String    @unique

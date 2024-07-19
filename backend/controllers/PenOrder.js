@@ -14,10 +14,10 @@ async function createPenOrders(req, res, next) {
   try {
     console.log('Request body:', req.body);
     const PenOrders = await PenOrder.createPenOrder({
-      clientId,
-      amount,
-      status,
-      products,
+      clientId:clientId,
+      amount:amount,
+      status: status,
+      Products: products,
     });
     console.log('PenOrders created:', PenOrders);
     res.status(201).json(PenOrders);
@@ -28,9 +28,9 @@ async function createPenOrders(req, res, next) {
 }
 async function updatePenOrders(req, res) {
   const { status } = req.body;
-  const { clientId } = req.params; // Extract clientId from request parameters
+  const { clientId } = req.params; 
   try {
-    const updatedPenOrders = await PenOrder.updatePenOrder(parseInt(clientId), { // Parse clientId to integer
+    const updatedPenOrders = await PenOrder.updatePenOrder(parseInt(clientId), { 
       status: status,
     });
     res.json(updatedPenOrders);
