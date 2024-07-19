@@ -15,7 +15,7 @@ import {
 import io from "socket.io-client";
 import { BASE_URL } from "../private.json";
 
-const Chat = ({ route }) => {
+const Chat = ({ route,navigation }) => {
   const { workerId, clientId } = route.params;
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -60,7 +60,7 @@ const Chat = ({ route }) => {
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: "client",
+        sender: "Client",
       });
       setNewMessage("");
     }

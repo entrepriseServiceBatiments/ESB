@@ -3,71 +3,56 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 
 const PromoCard = ({ item }) => {
   return (
-    <View style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <View style={styles.textContainer}>
-        <Text style={styles.title} numberOfLines={1}>
-          {item.title}
-        </Text>
-        <Text style={styles.location} numberOfLines={1}>
-          {item.location}
-        </Text>
-        <View style={styles.priceContainer}>
-          <Text style={styles.oldPrice}>{item.oldPrice} DT</Text>
-          <Text style={styles.price}>{item.price} DT</Text>
-        </View>
+    <View style={styles.cardContainer}>
+      <Image
+        source={{ uri: item.image }}
+        style={styles.image}
+        resizeMode="cover"
+      />
+      <View style={styles.overlay}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.price}>${item.price}</Text>
+        {item.oldPrice && <Text style={styles.oldPrice}>${item.oldPrice}</Text>}
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    width: 300,
-    height: 280,
-    backgroundColor: '#fff',
+  cardContainer: {
+    width: 380, 
+    height: 250,
+    marginRight: 5,
+    marginBottom:15,
     borderRadius: 10,
     overflow: 'hidden',
-    marginHorizontal: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    position: 'relative',
   },
   image: {
     width: '100%',
-    height: 160,
+    height: '100%',
   },
-  textContainer: {
+  overlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     padding: 10,
-    justifyContent: 'space-between',
-    flex: 1,
+    backgroundColor: 'rgba(4, 38, 48, 0.9)', // Semi-transparent overlay
   },
   title: {
     fontSize: 16,
+    color: '#fff',
     fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  location: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 10,
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  oldPrice: {
-    fontSize: 14,
-    textDecorationLine: 'line-through',
-    color: '#999',
   },
   price: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#e74c3c',
+    fontSize: 14,
+    color: '#fff',
+  },
+  oldPrice: {
+    fontSize: 12,
+    color: '#fff',
+    textDecorationLine: 'line-through',
   },
 });
 

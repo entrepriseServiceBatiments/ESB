@@ -1,88 +1,57 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const joinConversation = async (socket, data) => {
+const createMessage = async (req, res) => {
+  const { workerId, clientId } = req.body;
+  let result = [];
+
   try {
-    let convoid = data.conversationId;
-    if (!convoid) {
-      const newconvo = await prisma.conversation.create({
-        data: {
-          title: "new conversation",
-        },
+    if (workerId) {
+      const workerConv = await prisma.message.findMany({
+        where: { workerId: parseInt(workerId) },
       });
-      convoid = newconvo.id;
-    }
-    socket.join(convoid.toString());
-    console.log("User joined the conversation");
-  } catch (error) {
-    console.log(error);
-  }
-};
+      let arr = workerConv.map((conv) => conv.clientId);
+      let arrunique = Array.from(new Set(arr));
 
-const sendMessage = async (io, socket, data) => {
-  try {
-    let existid = data.conversationId;
-
-    if (!data.conversationId) {
-      const existconvo = await prisma.conversation.findFirst({
-        where: {
-          OR: [
-            {
-              Messages: {
-                some: {
-                  AND: [
-                    { senderId: data.senderId },
-                    { recipientId: data.recipientId },
-                  ],
-                },
-              },
-            },
-            {
-              Messages: {
-                some: {
-                  AND: [
-                    { senderId: data.recipientId },
-                    { recipientId: data.senderId },
-                  ],
-                },
-              },
-            },
-          ],
-        },
-      });
-
-      if (existconvo) {
-        existid = existconvo.id;
-      } else {
-        const newconvo = await prisma.conversation.create({
-          data: {
-            title: "new conversation",
-          },
+      for (let i = 0; i < arrunique.length; i++) {
+        const client = await prisma.client.findUnique({
+          where: { idClient: parseInt(arrunique[i]) },
         });
-        existid = newconvo.id;
+        const messages = await prisma.message.findMany({
+          where: {
+            workerId: parseInt(workerId),
+            clientId: parseInt(arrunique[i]),
+          },
+          orderBy: { createdAt: "asc" },
+        });
+        result.push({ client, messages });
+      }
+    } else {
+      const clientConv = await prisma.message.findMany({
+        where: { clientId: parseInt(clientId) },
+      });
+      let arr = clientConv.map((conv) => conv.workerId);
+      let arrunique = Array.from(new Set(arr));
+
+      for (let i = 0; i < arrunique.length; i++) {
+        const worker = await prisma.worker.findUnique({
+          where: { idworker: parseInt(arrunique[i]) },
+        });
+        const messages = await prisma.message.findMany({
+          where: {
+            clientId: parseInt(clientId),
+            workerId: parseInt(arrunique[i]),
+          },
+          orderBy: { createdAt: "asc" },
+        });
+        result.push({ worker, messages });
       }
     }
 
-    const message = await prisma.message.create({
-      data: {
-        content: data.content,
-        senderId: data.senderId,
-        recipientId: data.recipientId,
-        conversationId: existid,
-      },
-      include: {
-        Sender: true,
-        Recipient: true,
-        Conversation: true,
-      },
-    });
-    io.to(existid.toString()).emit("message", message);
+    res.json(result);
   } catch (error) {
-    console.log(error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = {
-  joinConversation,
-  sendMessage,
-};
+module.exports = { createMessage };

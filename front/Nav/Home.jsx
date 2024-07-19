@@ -28,78 +28,69 @@ const categoryData = [
 
 const promoData = [
   {
-    id: '1',
-    title: 'installation climatiseur',
-    location: ' Grand Tunis',
-    price: '70',
-    oldPrice: '90',
+    id: "1",
+    title: "Air Conditioner Installation",
+    location: "Greater Tunis",
+    price: "70",
+    oldPrice: "90",
     image:
       'https://ijenintechstorage.blob.core.windows.net/testv2/Promo-UserId-6dddac3d-1461-4eb9-5649-08dc32914590--144559fa-ee24-4dcf-98c4-5e2f78208914',
   },
   {
-    id: '2',
-    title: 'Etancheite avec le systeme horizon chimi',
-    location: "Gouvernorat de l'Ariana, Ariana",
-    oldPrice: '175',
-    price: '150',
+    id: "2",
+    title: "Waterproofing with Horizon Chemi System",
+    location: "Ariana Governorate, Ariana",
+    oldPrice: "175",
+    price: "150",
     image:
       'https://st.depositphotos.com/62628780/59500/i/450/depositphotos_595006128-stock-photo-passing-safety-inspections-every-single.jpg',
   },
   {
-    id: '3',
-    title: 'Entretien général',
-    location: 'Gouvernorat de Bizerte, ',
-    price: '90',
-    oldPrice: '100',
+    id: "3",
+    title: "General Maintenance",
+    location: "Bizerte Governorate",
+    price: "90",
+    oldPrice: "100",
     image:
       'https://ijenintechstorage.blob.core.windows.net/testv2/Promo-UserId-6dddac3d-1461-4eb9-5649-08dc32914590--144559fa-ee24-4dcf-98c4-5e2f78208914',
   },
 ];
 
-const services = [
-  {
-    id: 1,
-    imageUri:
-      'https://smte-44.fr/uploads/media/images/cms/medias/thumb_/cms/medias/6583053d8cd60_images_large.webp',
-    title: 'Entretien climatisateur',
-    description: 'Par nos meilleurs',
-  },
-  {
-    id: 2,
-    imageUri:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-Sp29fYjX7UoJA8jXo8lilkKzVvkxjoaSyg&s',
-    title: 'Mise en oeuvre',
-    description: 'Implémentation, implantation, utilisation effective',
-  },
-  {
-    id: 3,
-    imageUri:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7fwDyBIf0Ndh_BrJjvA8Ov_W7auyegp1f_A&s',
-    title: 'Réparation de plomberie',
-    description: 'Service rapide',
-  },
-  {
-    id: 4,
-    imageUri:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTpbR8dgVItlUeK2zgiiLLSU_7modQGCDvVw&s',
-    title: 'Entretien espace verts ',
-    description: ' Prestation assuré',
-  },
-];
 
-const announcementData = [
-  {
-    id: '1',
-    imageUri: 'https://www.maghrebia.com.tn/images/images_article/134_max.jpg',
-    url: 'https://www.maghrebia.com.tn/site/fr/packs-assurance-habitation.134.html',
-  },
-  {
-    id: '2',
-    imageUri:
-      'https://mir-s3-cdn-cf.behance.net/projects/404/8f3d85180072561.Y3JvcCwxNDA5LDExMDIsMCww.jpg',
-    url: 'https://www.facebook.com/Brico.m.mhirsi',
-  },
-];
+const services = [
+  
+    {
+      id: 1,
+      imageUri:
+        "https://smte-44.fr/uploads/media/images/cms/medias/thumb_/cms/medias/6583053d8cd60_images_large.webp",
+      title: "Air Conditioner Maintenance",
+      description: "By our best",
+    },
+    {
+      id: 2,
+      imageUri:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-Sp29fYjX7UoJA8jXo8lilkKzVvkxjoaSyg&s",
+      title: "Implementation",
+      description: "Implementation, installation, effective use",
+    },
+    {
+      id: 3,
+      imageUri:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7fwDyBIf0Ndh_BrJjvA8Ov_W7auyegp1f_A&s",
+      title: "Plumbing Repair",
+      description: "Fast service",
+    },
+    {
+      id: 4,
+      imageUri:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTpbR8dgVItlUeK2zgiiLLSU_7modQGCDvVw&s",
+      title: "Green Space Maintenance",
+      description: "Service guaranteed",
+    },
+  ];
+  
+
+
 
 const Home = () => {
   const navigation = useNavigation();
@@ -117,13 +108,7 @@ const Home = () => {
     setFilteredCategories(filteredData);
   };
 
-  const handleAnnouncementPress = (url) => {
-    window.open(url, '_blank');
-  };
 
-  const handleServiceVisit = (serviceId) => {
-    console.log('Service pressed:', serviceId);
-  };
 
   return (
     <View style={[styles.container, { backgroundColor: '#e6ede6' }]}>
@@ -146,24 +131,7 @@ const Home = () => {
           ))}
         </ScrollView>
 
-        <View style={styles.announcementContainer}>
-          <Text style={styles.announcementHeader}>Announcements</Text>
-          <View style={styles.announcementBorder}>
-            <FlatList
-              data={announcementData}
-              renderItem={({ item }) => (
-                <AnnouncementCard
-                  imageUri={item.imageUri}
-                  onPress={() => handleAnnouncementPress(item.url)}
-                />
-              )}
-              keyExtractor={(item) => item.id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.announcementList}
-            />
-          </View>
-        </View>
+        
 
         <View style={styles.promoContainer}>
           <Text style={styles.promoHeader}>Promotions</Text>
@@ -176,8 +144,7 @@ const Home = () => {
                 </TouchableOpacity>
               )}
               keyExtractor={(item) => item.id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.promoList}
             />
           </View>
@@ -185,7 +152,7 @@ const Home = () => {
 
         <ServicesDemand
           services={services}
-          onServicePress={handleServiceVisit}
+          
         />
 
         <View style={styles.needHelpContainer}>
@@ -196,10 +163,12 @@ const Home = () => {
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e6ede6',
+    backgroundColor: "#e6ede6",
+    marginTop: 30,
   },
   scrollView: {
     paddingHorizontal: 10,
@@ -207,7 +176,7 @@ const styles = StyleSheet.create({
   box: {
     width: 120,
     height: 50,
-    backgroundColor: '#fff',
+    backgroundColor: "#042630",
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -216,7 +185,8 @@ const styles = StyleSheet.create({
   },
   boxText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+    color: 'white'
   },
   announcementContainer: {
     marginVertical: 10,
@@ -259,6 +229,7 @@ const styles = StyleSheet.create({
   promoList: {
     paddingVertical: 10,
     paddingHorizontal: 5,
+    paddingBottom: 20, // Adds space below the last item
   },
   needHelpContainer: {
     marginVertical: 20,

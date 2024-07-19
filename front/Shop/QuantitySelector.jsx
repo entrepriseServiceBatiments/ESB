@@ -21,7 +21,7 @@ const QuantitySelector = ({ visible, onConfirm, onCancel }) => {
     }
   };
 
-  const handleConfirm = () => {
+  const Confirm = () => {
     onConfirm(quantity);
   };
 
@@ -51,10 +51,7 @@ const QuantitySelector = ({ visible, onConfirm, onCancel }) => {
             </TouchableOpacity>
           </View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              onPress={handleConfirm}
-              style={styles.confirmButton}
-            >
+            <TouchableOpacity onPress={Confirm} style={styles.confirmButton}>
               <Text style={styles.buttonText}>Confirm</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={onCancel} style={styles.cancelButton}>
@@ -74,6 +71,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 9999,
   },
   content: {
     backgroundColor: '#fff',

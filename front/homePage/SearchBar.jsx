@@ -3,13 +3,10 @@ import {
   View,
   TextInput,
   StyleSheet,
-  Button,
-  Image,
-  FlatList,
-  TouchableOpacity,
   Text,
+  Image,
+  TouchableOpacity,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 
 const SearchBar = ({ data = [], onSearch }) => {
   const [query, setQuery] = useState('');
@@ -19,10 +16,7 @@ const SearchBar = ({ data = [], onSearch }) => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const phrases = [
-      '5000 prestataires',
-      '200 services',
-    ];
+    const phrases = ['5000 prestataires', '200 services'];
     let index = 0;
     let currentIndex = 0;
     let typingInterval = null;
@@ -97,22 +91,9 @@ const SearchBar = ({ data = [], onSearch }) => {
         />
         <Button title="Search" onPress={handleSearch} />
       </View>
-      {showDropdown && filteredData.length > 0 && (
-        <View style={styles.dropdown}>
-          <FlatList
-            data={filteredData}
-            keyExtractor={(item) => item.name}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.dropdownItem}
-                onPress={() => handleDropdownSelect(item)}
-              >
-                <Text>{item.name}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      )}
+      <TouchableOpacity onPress={searchii} style={styles.button}>
+        <Text style={styles.button}>SEARCH</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -126,14 +107,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-  },
-  input: {
     flex: 1,
-    padding: 10,
+    borderColor: '#042630',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 5,
   },
   searchIcon: {
     width: 24,
@@ -156,6 +134,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+  },
+  button: {
+    backgroundColor: '#042630',
+    color: 'white',
+    padding: 10,
   },
 });
 

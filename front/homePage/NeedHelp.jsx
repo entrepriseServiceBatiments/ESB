@@ -15,7 +15,7 @@ const NeedHelp = () => {
   return (
     <View>
       <TouchableOpacity style={styles.helpButton} onPress={handleHelpPress}>
-        <Text style={styles.helpText}>Besoin d'aide?</Text>
+        <Text style={styles.helpText}>Need help?</Text>
       </TouchableOpacity>
 
       <Modal
@@ -54,14 +54,14 @@ const NeedHelp = () => {
 
 const styles = StyleSheet.create({
   helpButton: {
-    backgroundColor: '#FFD700', // Adjust color as needed
+    backgroundColor: "#042630", // Adjust color as needed
     padding: 10,
     borderRadius: 5,
     marginBottom: 20,
     alignSelf: 'center',
   },
   helpText: {
-    color: '#000',
+    color: "#fff",
     fontSize: 16,
   },
   modalContainer: {
@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     marginTop: 10,
-    alignSelf: 'center',
-    backgroundColor: '#FFD700', // Adjust color as needed
+    alignSelf: "center",
+    backgroundColor: "#FFD700", 
     padding: 10,
     borderRadius: 5,
   },
