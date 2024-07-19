@@ -3,10 +3,10 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HomeScreen from "./HomeScreen.jsx";
-import Favorites from "./Favorites.jsx";
+import Favorites from "../Shop/Favorites.jsx";
 import Chat from "./Chat.jsx";
 import CartScreen from "./Cart";
-import Shop from "./Shop";
+import Shop from "../Shop/Shop.jsx";
 import AllChat from "../profile/AllChat.jsx";
 import LoginStack from "../LoginSignup/LoginStack.jsx";
 import ProfileStack from "./ProfileStack.jsx";
@@ -41,6 +41,7 @@ const Navbar = () => {
     <Tab.Navigator
       initialRouteName={initialScreen}
       screenOptions={({ route }) => ({
+        headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -70,8 +71,8 @@ const Navbar = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "tomato",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: "#042630",
+        tabBarInactiveTintColor: "black",
       })}
     >
       {isLoggedIn ? (

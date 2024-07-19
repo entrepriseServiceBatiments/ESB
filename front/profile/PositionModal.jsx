@@ -57,7 +57,7 @@ const PositionModal = ({ modalVisible, setModalVisible, onSave, clientId, userTy
     }
   };
 
-  const handleMapPress = (event) => {
+  const MapPress = (event) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
     setRegion((prevRegion) => ({
       ...prevRegion,
@@ -77,7 +77,7 @@ const PositionModal = ({ modalVisible, setModalVisible, onSave, clientId, userTy
           <MapView
             style={styles.map}
             region={region}
-            onPress={handleMapPress}
+            onPress={MapPress}
           >
             <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
           </MapView>

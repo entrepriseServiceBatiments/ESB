@@ -35,7 +35,7 @@ const CartScreen = ({ navigation }) => {
         setClientId(parsedUser.idClient || parsedUser.idworker);
       }
 
-      const products = await AsyncStorage.getItem("selectedProducts");
+      const products = await AsyncStorage.getItem("orders");
       if (products) {
         setSelectedProducts(JSON.parse(products));
       } else {
@@ -62,7 +62,8 @@ const CartScreen = ({ navigation }) => {
 
   const handleSubmitOrder = async () => {
     if (!clientId) {
-      Alert.alert("Error", "Client ID not found. Please login again.");
+      Alert.alert("Error", "Client ID not found. Please login.");
+      navigation.navigate('Login')
       return;
     }
 
