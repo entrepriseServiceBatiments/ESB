@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,24 +6,24 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import PromoCard from "../promos/PromoCard";
-import AnnouncementCard from "../homePage/Announcement";
-import ServicesDemand from "../homePage/ServicesDemand";
-import SearchBar from "../homePage/SearchBar";
-import NeedHelp from "../homePage/NeedHelp";
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import PromoCard from '../promos/PromoCard';
+import AnnouncementCard from '../homePage/Announcement';
+import ServicesDemand from '../homePage/ServicesDemand';
+import SearchBar from '../homePage/SearchBar';
+import NeedHelp from '../homePage/NeedHelp';
 
 const categoryData = [
-  { name: "Plumbing", jobTitle: "Plumber" },
-  { name: "Electricity", jobTitle: "Electrician" },
-  { name: "Housekeeping", jobTitle: "Housekeeper" },
-  { name: "Masonry", jobTitle: "Mason" },
-  { name: "Air conditioning", jobTitle: "HVAC Technician" },
-  { name: "DIY and assembly", jobTitle: "Handyman" },
-  { name: "Washing machine", jobTitle: "Appliance Repair Technician" },
-  { name: "Painting", jobTitle: "Painter" },
-  { name: "Gardening", jobTitle: "Gardener" },
+  { name: 'Plumbing', jobTitle: 'Plumber' },
+  { name: 'Electricity', jobTitle: 'Electrician' },
+  { name: 'Housekeeping', jobTitle: 'Housekeeper' },
+  { name: 'Masonry', jobTitle: 'Mason' },
+  { name: 'Air conditioning', jobTitle: 'HVAC Technician' },
+  { name: 'DIY and assembly', jobTitle: 'Handyman' },
+  { name: 'Washing machine', jobTitle: 'Appliance Repair Technician' },
+  { name: 'Painting', jobTitle: 'Painter' },
+  { name: 'Gardening', jobTitle: 'Gardener' },
 ];
 
 const promoData = [
@@ -34,7 +34,7 @@ const promoData = [
     price: "70",
     oldPrice: "90",
     image:
-      "https://ijenintechstorage.blob.core.windows.net/testv2/Promo-UserId-6dddac3d-1461-4eb9-5649-08dc32914590--144559fa-ee24-4dcf-98c4-5e2f78208914",
+      'https://ijenintechstorage.blob.core.windows.net/testv2/Promo-UserId-6dddac3d-1461-4eb9-5649-08dc32914590--144559fa-ee24-4dcf-98c4-5e2f78208914',
   },
   {
     id: "2",
@@ -43,7 +43,7 @@ const promoData = [
     oldPrice: "175",
     price: "150",
     image:
-      "https://st.depositphotos.com/62628780/59500/i/450/depositphotos_595006128-stock-photo-passing-safety-inspections-every-single.jpg",
+      'https://st.depositphotos.com/62628780/59500/i/450/depositphotos_595006128-stock-photo-passing-safety-inspections-every-single.jpg',
   },
   {
     id: "3",
@@ -52,7 +52,7 @@ const promoData = [
     price: "90",
     oldPrice: "100",
     image:
-      "https://ijenintechstorage.blob.core.windows.net/testv2/Promo-UserId-6dddac3d-1461-4eb9-5649-08dc32914590--144559fa-ee24-4dcf-98c4-5e2f78208914",
+      'https://ijenintechstorage.blob.core.windows.net/testv2/Promo-UserId-6dddac3d-1461-4eb9-5649-08dc32914590--144559fa-ee24-4dcf-98c4-5e2f78208914',
   },
 ];
 
@@ -97,11 +97,11 @@ const Home = () => {
   const [filteredCategories, setFilteredCategories] = useState(categoryData);
 
   const handleCategoryPress = (category, jobTitle) => {
-    navigation.navigate("CategoryDetails", { category, jobTitle });
+    navigation.navigate('CategoryDetails', { category, jobTitle });
   };
 
   const handlePromoPress = (item) => {
-    navigation.navigate("Promos", { item, allPromos: promoData });
+    navigation.navigate('Promos', { item, allPromos: promoData });
   };
 
   const handleSearch = (filteredData) => {
@@ -111,7 +111,7 @@ const Home = () => {
 
 
   return (
-    <View style={[styles.container, { backgroundColor: "#e6ede6" }]}>
+    <View style={[styles.container, { backgroundColor: '#e6ede6' }]}>
       <ScrollView>
         <SearchBar data={categoryData} onSearch={handleSearch} />
 
@@ -178,8 +178,8 @@ const styles = StyleSheet.create({
     height: 50,
     backgroundColor: "#042630",
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     marginHorizontal: 5,
     marginVertical: 10,
   },
@@ -193,16 +193,16 @@ const styles = StyleSheet.create({
   },
   announcementHeader: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#042630",
+    fontWeight: 'bold',
+    color: '#042630',
     paddingHorizontal: 10,
     marginBottom: 10,
   },
   announcementBorder: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 10,
-    overflow: "hidden",
+    overflow: 'hidden',
     marginHorizontal: 10,
   },
   announcementList: {
@@ -214,16 +214,16 @@ const styles = StyleSheet.create({
   },
   promoHeader: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#042630",
+    fontWeight: 'bold',
+    color: '#042630',
     paddingHorizontal: 10,
     marginBottom: 10,
   },
   promoBorder: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 10,
-    overflow: "hidden",
+    overflow: 'hidden',
     marginHorizontal: 10,
   },
   promoList: {

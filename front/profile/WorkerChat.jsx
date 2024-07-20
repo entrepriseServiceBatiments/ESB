@@ -12,11 +12,12 @@ import {
   Easing,
   Modal,
   SafeAreaView,
-  StatusBar
+  StatusBar,
 } from "react-native";
 import io from "socket.io-client";
 import { BASE_URL } from "../private.json";
 import { FontAwesome } from "@expo/vector-icons";
+
 const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -26,7 +27,7 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
 
   useEffect(() => {
     if (isVisible) {
-      const newSocket = io(`${BASE_URL}`);
+      const newSocket = io(BASE_URL);
       setSocket(newSocket);
 
       Animated.timing(opacity, {
@@ -37,9 +38,10 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
       }).start();
 
       newSocket.emit("joinconvo", { clientId, workerId });
+
       newSocket.on("conversationId", (id) => {
         setConversationId(id);
-        fetchOldMessages(id);
+        fetchOldMessages(newSocket, id);
       });
 
       newSocket.on("messagecoming", (message) => {
@@ -52,10 +54,11 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
     }
   }, [isVisible]);
 
-  const fetchOldMessages = (id) => {
+  const fetchOldMessages = (socket, id) => {
     socket.emit("oldmsgs", { conversationid: id });
     socket.on("messages", (msgs) => {
       setMessages(msgs);
+      console.log(msgs, "hethom");
     });
   };
 
@@ -66,7 +69,7 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: workerId.toString(),
+        sender: "worker",
       });
       setNewMessage("");
     }
@@ -74,15 +77,11 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
 
   const renderItem = ({ item }) => (
     <View
-      style={
-        item.sender === workerId.toString()
-          ? styles.myMessage
-          : styles.theirMessage
-      }
+      style={item.sender === "worker" ? styles.myMessage : styles.theirMessage}
     >
       <Text
         style={
-          item.sender === workerId.toString()
+          item.sender === "worker"
             ? styles.myMessageText
             : styles.theirMessageText
         }
@@ -107,7 +106,7 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Chat</Text>
         </View>
-        <KeyboardAvoidingView 
+        <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.container}
         >
@@ -120,13 +119,12 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
+              placeholder="Type your message..."
               value={newMessage}
               onChangeText={setNewMessage}
-              placeholder="Type a message..."
-              placeholderTextColor="#888"
             />
-            <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-              <Text style={styles.sendButtonText}>Send</Text>
+            <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
+              <FontAwesome name="send" size={24} color="white" />
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -138,84 +136,70 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#e6ede6",
+    backgroundColor: "#f9f9f9",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  closeButton: {
+    marginRight: 15,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#042630",
   },
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e6ede6',
-  },
-  closeButton: {
-    padding: 10,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginLeft: 20,
-    color: '#042630',
-  },
   messagesContainer: {
-    paddingHorizontal: 10,
-    paddingBottom: 10,
+    padding: 15,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    padding: 15,
+    backgroundColor: "#fff",
     borderTopWidth: 1,
-    borderColor: "#d1d5db",
-    backgroundColor: "#e6ede6",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    borderTopColor: "#ddd",
   },
   input: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    padding: 10,
-    borderRadius: 30,
-    backgroundColor: "#d0d6d6",
+    height: 40,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    backgroundColor: "#f1f1f1",
     marginRight: 10,
-    fontSize: 16,
   },
   sendButton: {
-    backgroundColor: "#042630",
-    borderRadius: 30,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  sendButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
+    padding: 10,
+    backgroundColor: "#42a5f5",
+    borderRadius: 20,
   },
   myMessage: {
     alignSelf: "flex-end",
-    backgroundColor: "#042630",
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 20,
-    maxWidth: "80%",
-  },
-  theirMessage: {
-    alignSelf: "flex-start",
-    backgroundColor: "#042680",
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 20,
-    maxWidth: "80%",
+    backgroundColor: "#42a5f5",
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
   },
   myMessageText: {
     color: "#fff",
-    fontSize: 16,
+  },
+  theirMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#f1f1f1",
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
   },
   theirMessageText: {
     color: "#000",
-    fontSize: 16,
   },
 });
 

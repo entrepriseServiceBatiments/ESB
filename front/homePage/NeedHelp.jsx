@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 
 const NeedHelp = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 20,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   helpText: {
     color: "#fff",
@@ -66,13 +66,13 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "flex-end",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
-    width: "100%",
-    backgroundColor: "#fff",
+    width: '100%',
+    backgroundColor: '#fff',
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   contactItem: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: '#ccc',
   },
   closeButton: {
     marginTop: 10,
@@ -91,4 +91,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NeedHelp;
+
+export default NeedHelp
