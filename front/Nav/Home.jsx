@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   promoList: {
     paddingVertical: 10,
     paddingHorizontal: 5,
-    paddingBottom: 20, // Adds space below the last item
+    paddingBottom: 20,
   },
   needHelpContainer: {
     marginVertical: 20,

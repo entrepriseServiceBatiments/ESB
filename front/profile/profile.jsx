@@ -113,7 +113,7 @@ const Profile = ({ navigation }) => {
           text: "Logout",
           onPress: () => {
             AsyncStorage.clear();
-            // Add navigation to login screen if needed
+            
           },
         },
       ],
