@@ -30,21 +30,31 @@ const CategoryDetails = ({ route, navigation }) => {
   const [clientId, setClientId] = useState(null);
   const [quantitySelectorVisible, setQuantitySelectorVisible] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
-    const getClientID = async () => {
+    const getClientIDAndFavorites = async () => {
       try {
         const client = await AsyncStorage.getItem('user');
         if (client) {
           const parsedClient = JSON.parse(client);
-          console.log('Client ID:', parsedClient.idClient || parsedClient.idworker);
-          setClientId(parsedClient.idClient || parsedClient.idworker);
+          const clientId = parsedClient.idClient || parsedClient.idworker;
+          setClientId(clientId);
+
+          const response = await fetch(
+            `${BASE_URL}/wishlist/${clientId}`
+          );
+          
+          const data = await response.json();
+          console.log('data',data);
+          setFavorites(data.map(item => item.idproducts));
         }
       } catch (error) {
-        console.error('Error retrieving client ID from AsyncStorage:', error);
+        console.error('Error retrieving client ID or fetching favorites from AsyncStorage:', error);
       }
     };
-    getClientID();
+
+    getClientIDAndFavorites();
   }, []);
 
   useEffect(() => {
@@ -77,17 +87,13 @@ const CategoryDetails = ({ route, navigation }) => {
     try {
       if (favorites.includes(itemId)) {
         setFavorites(favorites.filter(id => id !== itemId));
-        await fetch(`${BASE_URL}/wishlist`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clientId, productsId: itemId }),
+        await axios.delete(`${BASE_URL}/wishlist`, {
+          data: { clientId:clientId, productsId: itemId },
         });
       } else {
         setFavorites([...favorites, itemId]);
-        await fetch(`${BASE_URL}/wishlist`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clientId, productsId: itemId }),
+        await axios.post(`${BASE_URL}/wishlist`, {
+          clientId:clientId, productsId: itemId,
         });
       }
     } catch (error) {
@@ -154,6 +160,7 @@ const CategoryDetails = ({ route, navigation }) => {
 
   const renderProductItem = ({ item }) => {
     const isInCart = selectedProducts.some(p => p.idproducts === item.idproducts);
+    const isFavorite = favorites.includes(item.idproducts);
     return (
       <ProductCard
         key={item.idproducts}
@@ -162,7 +169,8 @@ const CategoryDetails = ({ route, navigation }) => {
         onRentPress={() => RentPress(item)}
         onRemovePress={() => RemoveFromCart(item.idproducts)}
         isInCart={isInCart}
-        toggleFavorite={toggleFavorite}
+        isFavorite={isFavorite}
+        toggleFavorite={() => toggleFavorite(item.idproducts)}
       />
     );
   };
@@ -273,34 +281,39 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     fontSize: 16,
-    color: "#000",
-    fontWeight: "bold",
+    color: "#2196F3",
+    borderBottomWidth: 2,
+    borderBottomColor: "#2196F3",
+    paddingBottom: 5,
   },
   scrollView: {
-    paddingVertical: 20,
+    flexGrow: 1,
     paddingHorizontal: 10,
+    paddingVertical: 20,
   },
   gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   cardContainer: {
-    width: '48%',
-    marginBottom: 20,
+    width: "48%",
+    marginBottom: 15,
   },
   orderButton: {
-    backgroundColor: '#042630',
-    paddingVertical: 15,
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: "#2196F3",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
   },
   orderButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 

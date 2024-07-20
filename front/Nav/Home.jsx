@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import PromoCard from '../promos/PromoCard';
-import AnnouncementCard from '../homePage/Announcement';
 import ServicesDemand from '../homePage/ServicesDemand';
 import SearchBar from '../homePage/SearchBar';
 import NeedHelp from '../homePage/NeedHelp';

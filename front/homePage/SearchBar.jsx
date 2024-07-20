@@ -5,8 +5,9 @@ import {
   StyleSheet,
   Text,
   Image,
-  TouchableOpacity,
+  TouchableOpacity
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const SearchBar = ({ data = [], onSearch }) => {
   const [query, setQuery] = useState('');
@@ -89,11 +90,23 @@ const SearchBar = ({ data = [], onSearch }) => {
           onBlur={() => setShowDropdown(false)}
           onSubmitEditing={handleSearch}
         />
-        <Button title="Search" onPress={handleSearch} />
+        <TouchableOpacity onPress={handleSearch} style={styles.button}>
+          <Text style={styles.buttonText}>SEARCH</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={searchii} style={styles.button}>
-        <Text style={styles.button}>SEARCH</Text>
-      </TouchableOpacity>
+      {showDropdown && (
+        <View style={styles.dropdown}>
+          {filteredData.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleDropdownSelect(item)}
+              style={styles.dropdownItem}
+            >
+              <Text>{item.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
     </View>
   );
 };
@@ -107,16 +120,33 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
     borderColor: '#042630',
     borderWidth: 1,
     borderRadius: 5,
-    padding: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#fff',
   },
   searchIcon: {
     width: 24,
     height: 24,
-    marginLeft: 10,
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    fontSize: 13,
+  },
+  button: {
+    backgroundColor: '#042630',
+    paddingVertical: 7,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
   dropdown: {
     position: 'absolute',
@@ -135,13 +165,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
-  button:{
-    backgroundColor: "#042630",
-    color:'white',
-    padding:7,
-    borderRadius:5,
-    marginLeft:5
-  }
 });
 
 export default SearchBar;
