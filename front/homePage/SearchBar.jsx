@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -6,17 +6,19 @@ import {
   Text,
   Image,
   TouchableOpacity,
-} from 'react-native';
+  Button,
+} from "react-native";
 
+import { useNavigation } from "@react-navigation/native";
 const SearchBar = ({ data = [], onSearch }) => {
-  const [query, setQuery] = useState('');
-  const [placeHolder, setPlaceHolder] = useState('');
+  const [query, setQuery] = useState("");
+  const [placeHolder, setPlaceHolder] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
-    const phrases = ['5000 prestataires', '200 services'];
+    const phrases = ["5000 prestataires", "200 services"];
     let index = 0;
     let currentIndex = 0;
     let typingInterval = null;
@@ -43,7 +45,7 @@ const SearchBar = ({ data = [], onSearch }) => {
   }, []);
 
   useEffect(() => {
-    if (query.trim() === '') {
+    if (query.trim() === "") {
       setFilteredData([]);
       setShowDropdown(false);
     } else {
@@ -57,7 +59,7 @@ const SearchBar = ({ data = [], onSearch }) => {
 
   const handleSearch = () => {
     onSearch(filteredData);
-    navigation.navigate('Home');
+    navigation.navigate("Home");
   };
 
   const handleInputChange = (text) => {
@@ -66,7 +68,10 @@ const SearchBar = ({ data = [], onSearch }) => {
       onSearch(data);
     }
   };
-
+  const searchii = () => {
+    onSearch(filteredData);
+    navigation.navigate("Home");
+  };
   const handleDropdownSelect = (item) => {
     setQuery(item.name);
     onSearch([item]);
@@ -77,7 +82,7 @@ const SearchBar = ({ data = [], onSearch }) => {
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <Image
-          source={require('../assets/icons/search.png')}
+          source={require("../assets/icons/search.png")}
           style={styles.searchIcon}
         />
         <TextInput
@@ -100,15 +105,15 @@ const SearchBar = ({ data = [], onSearch }) => {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
+    position: "relative",
     marginHorizontal: 10,
     marginVertical: 20,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
-    borderColor: '#042630',
+    borderColor: "#042630",
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
@@ -119,13 +124,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   dropdown: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 8,
     zIndex: 1000,
     maxHeight: 200,
@@ -133,11 +138,11 @@ const styles = StyleSheet.create({
   dropdownItem: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
   },
   button: {
-    backgroundColor: '#042630',
-    color: 'white',
+    backgroundColor: "#042630",
+    color: "white",
     padding: 10,
   },
 });
