@@ -17,14 +17,21 @@ import {
 import io from "socket.io-client";
 import { BASE_URL } from "../private.json";
 import { FontAwesome } from "@expo/vector-icons";
+import { jwtDecode } from "jwt-decode";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+const WorkerChatModal = ({
+  workerId,
+  clientId,
 
-const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
+  isVisible,
+  onClose,
+}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [conversationId, setConversationId] = useState(null);
   const [socket, setSocket] = useState(null);
   const opacity = useState(new Animated.Value(0))[0];
-
+  const [userType, setUserType] = useState("");
   useEffect(() => {
     if (isVisible) {
       const newSocket = io(BASE_URL);
@@ -53,12 +60,20 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
       };
     }
   }, [isVisible]);
+  useEffect(() => {
+    const getUserType = async () => {
+      const token = await AsyncStorage.getItem("token");
+      const decodedToken = jwtDecode(token);
+      setUserType(decodedToken.userType);
+      console.log(decodedToken, "decoded token");
+    };
+  });
 
+  console.log(userType, "user type");
   const fetchOldMessages = (socket, id) => {
     socket.emit("oldmsgs", { conversationid: id });
     socket.on("messages", (msgs) => {
       setMessages(msgs);
-      console.log(msgs, "hethom");
     });
   };
 
@@ -69,24 +84,31 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: "worker",
+        sender: userType,
       });
       setNewMessage("");
     }
   };
+  console.log(userType);
 
   const renderItem = ({ item }) => (
     <View
-      style={item.sender === "worker" ? styles.myMessage : styles.theirMessage}
+      style={
+        isMyMessage(item, userType) ? styles.myMessage : styles.theirMessage
+      }
     >
       <Text
         style={
-          item.sender === "worker"
+          isMyMessage(item, userType)
             ? styles.myMessageText
             : styles.theirMessageText
         }
       >
         {item.content}
+      </Text>
+      <Text style={styles.timestamp}>
+        {String(new Date(item.createdat).getHours()).padStart(2, "0")}:
+        {String(new Date(item.createdat).getMinutes()).padStart(2, "0")}
       </Text>
     </View>
   );
@@ -112,19 +134,20 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
         >
           <FlatList
             data={messages}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) => index.toString()}
             renderItem={renderItem}
             contentContainerStyle={styles.messagesContainer}
           />
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Type your message..."
               value={newMessage}
               onChangeText={setNewMessage}
+              placeholder="Type a message"
+              placeholderTextColor="#888"
             />
-            <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-              <FontAwesome name="send" size={24} color="white" />
+            <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+              <Text style={styles.sendButtonText}>Send</Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -133,21 +156,23 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
   );
 };
 
+const isMyMessage = (message, userType) => {
+  return message.sender === userType; // Direct comparison
+};
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#FFFFFF",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    backgroundColor: "#FFFFFF",
   },
   closeButton: {
-    marginRight: 15,
+    marginRight: 10,
   },
   headerTitle: {
     fontSize: 18,
@@ -156,50 +181,70 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor: "#FFFFFF",
   },
   messagesContainer: {
-    padding: 15,
+    padding: 10,
+  },
+  myMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#1c2733",
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 15,
+    maxWidth: "80%",
+    borderWidth: 1,
+    borderColor: "#2c3e50",
+  },
+  theirMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#2c3e50",
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 15,
+    maxWidth: "80%",
+  },
+  myMessageText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  theirMessageText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  timestamp: {
+    color: "#7f8c8d",
+    fontSize: 12,
+    marginTop: 5,
+    alignSelf: "flex-end",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 15,
-    backgroundColor: "#fff",
+    padding: 10,
     borderTopWidth: 1,
-    borderTopColor: "#ddd",
+    borderTopColor: "#2c3e50",
+    backgroundColor: "#FFFFFF",
   },
   input: {
     flex: 1,
-    height: 40,
-    paddingHorizontal: 10,
+    backgroundColor: "#e5e5e5",
     borderRadius: 20,
-    backgroundColor: "#f1f1f1",
+    padding: 10,
+    color: "#000",
     marginRight: 10,
   },
   sendButton: {
-    padding: 10,
-    backgroundColor: "#42a5f5",
+    backgroundColor: "#2c3e50",
     borderRadius: 20,
+    width: 80,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  myMessage: {
-    alignSelf: "flex-end",
-    backgroundColor: "#42a5f5",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  myMessageText: {
+  sendButtonText: {
     color: "#fff",
-  },
-  theirMessage: {
-    alignSelf: "flex-start",
-    backgroundColor: "#f1f1f1",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  theirMessageText: {
-    color: "#000",
+    fontSize: 18,
   },
 });
 
