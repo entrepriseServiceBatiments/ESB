@@ -17,24 +17,25 @@ const SERVER_URL = "http://192.168.56.1:3000";
 const Conversationspage = ({ modalVisible, setModalVisible }) => {
   const [conversations, setConversations] = useState([]);
   const [socket, setSocket] = useState(null);
-  const [userId, setUserId] = useState(null);
+  const [user, setUser] = useState(null);
   const navigation = useNavigation();
 
   useEffect(() => {
     const setupSocket = async () => {
       if (modalVisible) {
         try {
-          const user = await AsyncStorage.getItem("user");
-          if (user) {
-            const parsedUser = JSON.parse(user);
-            const id = parsedUser.idClient || parsedUser.idworker;
-            setUserId(id);
+          const userData = await AsyncStorage.getItem("user");
+          if (userData) {
+            const parsedUser = JSON.parse(userData);
+            setUser(parsedUser);
 
             const newSocket = io(SERVER_URL, { transports: ["websocket"] });
             setSocket(newSocket);
 
-            newSocket.emit("getconvos", { clientId: id });
-            console.log("Requesting conversations for user ID:", id);
+            newSocket.emit("getconvos", {
+              user: parsedUser.idClient || parsedUser.idworker,
+            });
+            console.log("Requesting conversations for user:", parsedUser);
 
             newSocket.on("convos", (data) => {
               console.log("Received conversations data:", data);
@@ -59,22 +60,20 @@ const Conversationspage = ({ modalVisible, setModalVisible }) => {
     };
   }, [modalVisible]);
 
-  useEffect(() => {
-    console.log("Updated conversations:", conversations);
-  }, [conversations]);
-
-  const navigateToChat = (conversationId, idworker) => {
+  const navigateToChat = (conversationId, userId) => {
     setModalVisible(false);
     navigation.navigate("Chat", {
       conversationId,
-      idworker,
+      userId,
     });
   };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.messageItem}
-      onPress={() => navigateToChat(item.conversationId, item.idworker)}
+      onPress={() =>
+        navigateToChat(item.conversationId, item.idworker || item.idClient)
+      }
     >
       <Image
         source={{
@@ -86,10 +85,7 @@ const Conversationspage = ({ modalVisible, setModalVisible }) => {
       />
       <View style={styles.textContainer}>
         <Text style={styles.messageTitle}>
-          {item.userName || "Unknown User"}
-        </Text>
-        <Text style={styles.lastMessage}>
-          {item.lastMessage || "No messages yet"}
+          {item.userName || item.name || "Unknown User"}
         </Text>
       </View>
     </TouchableOpacity>
@@ -114,7 +110,7 @@ const Conversationspage = ({ modalVisible, setModalVisible }) => {
         {conversations.length > 0 ? (
           <FlatList
             data={conversations}
-            keyExtractor={(item) => item.idworker.toString()}
+            keyExtractor={(item) => (item.idworker || item.idClient).toString()}
             renderItem={renderItem}
           />
         ) : (
