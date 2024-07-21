@@ -7,8 +7,6 @@ import {
   Image,
   TouchableOpacity
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-
 import { useNavigation } from "@react-navigation/native";
 const SearchBar = ({ data = [], onSearch }) => {
   const [query, setQuery] = useState("");
