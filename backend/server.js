@@ -1,24 +1,26 @@
-require("dotenv").config();
+require('dotenv').config();
 
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
+const cors = require('cors');
 
 const app = express();
-const http = require("http");
+const http = require('http');
 const server = http.createServer(app);
-const socket_io = require("socket.io");
+const socket_io = require('socket.io');
 const io = socket_io(server);
 
-const clientRoutes = require("./routes/clientRoutes");
-const workerRoutes = require("./routes/workerRoutes");
-const productRoutes = require("./routes/productRoutes");
-const orderRoutes = require("./routes/orderRoutes");
-const authAdminRoutes = require("./routes/authAdminRoutes");
-const authRoutes = require("./routes/authRoutes");
-const chatRoutes = require("./routes/chatRoutes");
-const prisma = require("./prisma/index.js");
+const paymentRoutes = require("./routes/paymentRoutes")
+const PenOrder = require('./routes/PenOrder.js');
+const clientRoutes = require('./routes/clientRoutes');
+const workerRoutes = require('./routes/workerRoutes');
+const productRoutes = require('./routes/productRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const authAdminRoutes = require('./routes/authAdminRoutes');
+const authRoutes = require('./routes/authRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const prisma = require('./prisma/index.js');
 
-const wishlistRoutes = require("./routes/wishlistRoutes");
+const wishlistRoutes = require('./routes/wishlistRoutes');
 
 app.use(express.json());
 app.use(cors());
@@ -59,13 +61,13 @@ io.on("connect", (socket) => {
           ],
         },
       });
-      console.log("exist conco", existconvo);
+      console.log('exist conco', existconvo);
       if (existconvo) {
         existid = existconvo.id;
       } else {
         const newconvo = await prisma.conversation.create({
           data: {
-            title: "new conversation",
+            title: 'new conversation',
             clientId: clientId,
             workerId: workerId,
           },
@@ -75,29 +77,36 @@ io.on("connect", (socket) => {
       }
 
       socket.join(existid.toString());
-      socket.emit("conversationId", existid.toString());
+      console.log(clientId, workerId, "fuck");
+      socket.emit("conversationId", existid.toString(), clientId, workerId);
     } catch (error) {
       console.log(error);
     }
   });
   socket.on("oldmsgs", async ({ conversationid }) => {
-    console.log(conversationid);
     try {
       const messages = await prisma.message.findMany({
         where: {
           conversationId: parseInt(conversationid),
         },
       });
-      socket.emit("messages", messages);
+      socket.emit('messages', messages);
     } catch (error) {
       console.log(error);
     }
   });
 
   socket.on(
-    "sendmsg",
+    'sendmsg',
     async ({ workerId, clientId, content, conversationid, sender }) => {
-      console.log(workerId, clientId, content, conversationid, sender);
+      console.log(
+        workerId,
+        "client",
+        clientId,
+        content,
+        conversationid,
+        sender
+      );
       try {
         const message = await prisma.message.create({
           data: {
@@ -114,7 +123,6 @@ io.on("connect", (socket) => {
           },
         });
         io.emit("messagecoming", message);
-        console.log(message);
       } catch (error) {
         console.log(error);
       }
@@ -135,7 +143,6 @@ io.on("connect", (socket) => {
       });
 
       let conversations = [];
-      console.log(messages);
       messages.forEach((message) => {
         const conversationId = message.conversationId;
         if (user === message.clientId) {
@@ -161,7 +168,7 @@ io.on("connect", (socket) => {
       console.log(error);
     }
   });
-  socket.on("disconnect", () => {
+  socket.on('disconnect', () => {
     console.log(`disonnected ${socket.id}`);
   });
 });

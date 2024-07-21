@@ -17,7 +17,7 @@ import WorkerDetailsScreen from './OneWorker';
 import ProductDetailsModal from './OneProduct';
 import QuantitySelector from './QuantitySelector';
 
-const ItemsList = ({ category, type, onClose }) => {
+const ItemsList = ({ category, type, onClose ,navigation}) => {
   const [favorites, setFavorites] = useState([]);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -105,7 +105,7 @@ const ItemsList = ({ category, type, onClose }) => {
     setSelectedWorker(worker);
   };
 
-  const handleRentPress = (product) => {
+  const RentPress = (product) => {
     openQuantitySelector(product);
   };
 
@@ -114,7 +114,7 @@ const ItemsList = ({ category, type, onClose }) => {
     setQuantitySelectorVisible(true);
   };
 
-  const handleAddToCart = (product, quantity) => {
+  const AddToCart = (product, quantity) => {
     setSelectedProducts((prevSelected) => {
       const existingProductIndex = prevSelected.findIndex(
         (p) => p.idproducts === product.idproducts
@@ -128,10 +128,10 @@ const ItemsList = ({ category, type, onClose }) => {
       }
     });
     setQuantitySelectorVisible(false);
-    setSelectedProduct(null); // Close the product details modal if open
+    setSelectedProduct(null);
   };
 
-  const handleRemoveFromCart = (productId) => {
+  const RemoveFromCart = (productId) => {
     setSelectedProducts((prevSelected) => 
       prevSelected.filter((p) => p.idproducts !== productId)
     );
@@ -157,13 +157,14 @@ const ItemsList = ({ category, type, onClose }) => {
   const renderItem = (item) => {
     if (type === 'Products') {
       const isInCart = selectedProducts.some(p => p.idproducts === item.idproducts);
+      console.log(item,'item');
       return (
         <ProductCard
           key={item.idproducts}
           item={item}
           onPress={() => ProductCardPress(item)}
-          onRentPress={() => handleRentPress(item)}
-          onRemovePress={() => handleRemoveFromCart(item.idproducts)}
+          onRentPress={() => RentPress(item)}
+          onRemovePress={() => RemoveFromCart(item.idproducts)}
           isInCart={isInCart}
           toggleFavorite={toggleFavorite}
         />
@@ -174,13 +175,14 @@ const ItemsList = ({ category, type, onClose }) => {
           key={item.idworker}
           item={item}
           onPress={() => WorkerCardPress(item)}
+
         />
       );
     } else {
       return null;
     }
   };
-
+console.log(selectedProduct,'selected');
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={onClose}>
@@ -202,13 +204,14 @@ const ItemsList = ({ category, type, onClose }) => {
       <ProductDetailsModal
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
-        onRentPress={() => handleRentPress(selectedProduct)}
-        onRemovePress={() => handleRemoveFromCart(selectedProduct?.idproducts)}
+        onRentPress={() => RentPress(selectedProduct)}
+        onRemovePress={() => RemoveFromCart(selectedProduct?.idproducts)}
         isInCart={selectedProducts.some(p => p.idproducts === selectedProduct?.idproducts)}
         visible={!!selectedProduct}
         toggleFavorite={toggleFavorite}
       />
       <WorkerDetailsScreen
+        navigation={navigation}
         worker={selectedWorker}
         onClose={() => setSelectedWorker(null)}
         visible={!!selectedWorker}
@@ -218,11 +221,13 @@ const ItemsList = ({ category, type, onClose }) => {
           <Text style={styles.orderButtonText}>Order ({selectedProducts.length})</Text>
         </TouchableOpacity>
       )}
-      <QuantitySelector
-        visible={quantitySelectorVisible}
-        onConfirm={(quantity) => handleAddToCart(currentProduct, quantity)}
-        onCancel={() => setQuantitySelectorVisible(false)}
-      />
+      {quantitySelectorVisible && (
+        <QuantitySelector
+          visible={quantitySelectorVisible}
+          onConfirm={(quantity) => AddToCart(currentProduct, quantity)}
+          onCancel={() => setQuantitySelectorVisible(false)}
+        />
+      )}
     </View>
   );
 };

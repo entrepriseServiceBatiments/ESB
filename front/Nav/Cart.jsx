@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,12 @@ import {
   Alert,
   ScrollView,
   RefreshControl,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import axios from 'axios';
+import { BASE_URL } from '../private.json';
+import ModalManager from '../payment/ModalManager';
 
 const CartScreen = ({ navigation }) => {
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -20,8 +23,10 @@ const CartScreen = ({ navigation }) => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [clientId, setClientId] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [datePickerMode, setDatePickerMode] = useState("start");
+  const [datePickerMode, setDatePickerMode] = useState('start');
   const [refreshing, setRefreshing] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [orderId, setOrderId] = useState(null);
 
   useEffect(() => {
     retrieveData();
@@ -29,21 +34,21 @@ const CartScreen = ({ navigation }) => {
 
   const retrieveData = async () => {
     try {
-      const user = await AsyncStorage.getItem("user");
+      const user = await AsyncStorage.getItem('user');
       if (user) {
         const parsedUser = JSON.parse(user);
         setClientId(parsedUser.idClient || parsedUser.idworker);
       }
 
-      const products = await AsyncStorage.getItem("selectedProducts");
+      const products = await AsyncStorage.getItem("orders");
       if (products) {
         setSelectedProducts(JSON.parse(products));
       } else {
         setSelectedProducts([]);
       }
     } catch (error) {
-      console.error("Error retrieving data:", error);
-      Alert.alert("Error", "Failed to load cart data. Please try again.");
+      console.error('Error retrieving data:', error);
+      Alert.alert('Error', 'Failed to load cart data. Please try again.');
     }
   };
 
@@ -62,55 +67,45 @@ const CartScreen = ({ navigation }) => {
 
   const handleSubmitOrder = async () => {
     if (!clientId) {
-      Alert.alert("Error", "Client ID not found. Please login again.");
+      Alert.alert("Error", "Client ID not found. Please login.");
+      navigation.navigate('Login')
       return;
     }
-
+  
     if (selectedProducts.length === 0) {
-      Alert.alert(
-        "Error",
-        "No products selected. Please add products to your cart."
-      );
+      Alert.alert('Error', 'No products selected. Please add products to your cart.');
       return;
     }
-
+  
     if (startDate >= endDate) {
-      Alert.alert("Error", "End date must be after start date.");
+      Alert.alert('Error', 'End date must be after start date.');
       return;
     }
-
-    const order = {
-      clientId: clientId,
-      startDate: startDate.toISOString().split("T")[0],
-      endDate: endDate.toISOString().split("T")[0],
-      products: selectedProducts.map((product) => ({
-        idproducts: product.idproducts,
-      })),
-      totalAmount: totalAmount,
-    };
-
+  
     try {
-      Alert.alert(
-        "Order Submitted",
-        `Order details:\n${JSON.stringify(order, null, 2)}`,
-        [
-          {
-            text: "OK",
-            onPress: async () => {
-              await AsyncStorage.removeItem("selectedProducts");
-              setSelectedProducts([]);
-              setTotalAmount(0);
-              navigation.navigate("Home");
-            },
-          },
-        ]
-      );
+      const response = await axios.post(`${BASE_URL}/pen`, {
+        clientId: clientId,
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        Products: selectedProducts.map((product) => ({
+          idproducts: product.idproducts,
+        })),
+        amount: totalAmount,
+      });
+  
+      if (response.status === 201 || response.status === 200) {
+        const newOrderId = response.data.id; // Assuming the response includes the new order's ID
+        setOrderId(newOrderId);
+        setIsModalVisible(true);
+      } else {
+        Alert.alert('Error', 'Failed to submit order. Please try again.');
+      }
     } catch (error) {
-      console.error("Error submitting order:", error);
-      Alert.alert("Error", "Failed to submit order. Please try again.");
+      console.error('Error submitting order:', error);
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
     }
   };
-
+  
   const showDatePicker = (mode) => {
     setDatePickerMode(mode);
     setDatePickerVisibility(true);
@@ -121,12 +116,37 @@ const CartScreen = ({ navigation }) => {
   };
 
   const handleConfirmDate = (date) => {
-    if (datePickerMode === "start") {
+    if (datePickerMode === 'start') {
       setStartDate(date);
     } else {
       setEndDate(date);
     }
     hideDatePicker();
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleSuccessfulPayment = async () => {
+    try {
+      await AsyncStorage.removeItem('selectedProducts');
+      setSelectedProducts([]);
+      setTotalAmount(0);
+      Alert.alert(
+        'Order Submitted',
+        'Your order has been successfully placed and paid for.',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('Home'),
+          },
+        ]
+      );
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+      Alert.alert('Error', 'Failed to clear cart. Please try again.');
+    }
   };
 
   const onRefresh = React.useCallback(() => {
@@ -165,13 +185,13 @@ const CartScreen = ({ navigation }) => {
         <View style={styles.dateContainer}>
           <TouchableOpacity
             style={styles.dateButton}
-            onPress={() => showDatePicker("start")}
+            onPress={() => showDatePicker('start')}
           >
             <Text>Start Date: {startDate.toLocaleDateString()}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.dateButton}
-            onPress={() => showDatePicker("end")}
+            onPress={() => showDatePicker('end')}
           >
             <Text>End Date: {endDate.toLocaleDateString()}</Text>
           </TouchableOpacity>
@@ -198,6 +218,14 @@ const CartScreen = ({ navigation }) => {
           onCancel={hideDatePicker}
           minimumDate={new Date()}
         />
+        <ModalManager
+          visible={isModalVisible}
+          onClose={handleCloseModal}
+          orderId={orderId}
+          amount={totalAmount}
+          clientId={clientId}
+          onSuccessfulPayment={handleSuccessfulPayment}
+        />
       </View>
     </ScrollView>
   );
@@ -210,18 +238,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: '#f8f8f8',
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 20,
   },
   productItem: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 15,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 10,
     elevation: 2,
@@ -236,58 +264,58 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   productName: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 5,
   },
   emptyCartText: {
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 16,
-    color: "#666",
+    color: '#666',
     marginTop: 20,
   },
   dateContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 20,
   },
   dateButton: {
     padding: 10,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: '#e0e0e0',
     borderRadius: 5,
     flex: 1,
     marginHorizontal: 5,
-    alignItems: "center",
+    alignItems: 'center',
   },
   calculateButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: '#007BFF',
     padding: 15,
     borderRadius: 8,
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 20,
   },
   calculateButtonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   totalText: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginTop: 15,
-    textAlign: "center",
+    textAlign: 'center',
   },
   orderButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: '#28a745',
     padding: 15,
     borderRadius: 8,
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 20,
   },
   orderButtonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });
 

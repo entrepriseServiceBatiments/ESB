@@ -5,10 +5,16 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from 'react-native';
-import ServiceCard from './ServiceCard';
+import { useNavigation } from '@react-navigation/native';
 
-const ServicesDemand = ({ services, onServicePress }) => {
+const ServicesDemand = ({ services }) => {
+  const navigation = useNavigation();
+
+  const handleServicePress = (service) => {
+    navigation.navigate('ServiceDetails', { service, services });
+  };
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -17,21 +23,27 @@ const ServicesDemand = ({ services, onServicePress }) => {
           <Text style={styles.viewMore}>Voir plus</Text>
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={services}
-        renderItem={({ item }) => (
-          <ServiceCard
-            imageUri={item.imageUri}
-            title={item.title}
-            description={item.description}
-            onPress={() => onServicePress(item.id)}
-          />
-        )}
-        keyExtractor={(item) => item.id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.list}
-      />
+      <View style={styles.border}>
+        <FlatList
+          data={services}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => handleServicePress(item)}
+              style={styles.card}
+            >
+              <Image source={{ uri: item.imageUri }} style={styles.image} />
+              <View style={styles.textContainer}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.description}>{item.description}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id.toString()}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.list}
+        />
+      </View>
     </View>
   );
 };
@@ -50,14 +62,51 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#042630	',
+    color: '#042630',
   },
   viewMore: {
     fontSize: 14,
     color: '#FFD700',
   },
+  border: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginHorizontal: 10,
+  },
   list: {
     paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  card: {
+    width: 300,
+    height: 200,
+    marginHorizontal: 10,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+  textContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background for text
+    paddingHorizontal: 10,
+    paddingBottom: 5,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 5,
+  },
+  description: {
+    fontSize: 14,
+    color: '#ddd',
   },
 });
 

@@ -12,21 +12,29 @@ import {
   Easing,
   Modal,
   SafeAreaView,
-  StatusBar
+  StatusBar,
 } from "react-native";
 import io from "socket.io-client";
 import { BASE_URL } from "../private.json";
 import { FontAwesome } from "@expo/vector-icons";
-const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
+import { jwtDecode } from "jwt-decode";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+const WorkerChatModal = ({
+  workerId,
+  clientId,
+
+  isVisible,
+  onClose,
+}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [conversationId, setConversationId] = useState(null);
   const [socket, setSocket] = useState(null);
   const opacity = useState(new Animated.Value(0))[0];
-
+  const [userType, setUserType] = useState("");
   useEffect(() => {
     if (isVisible) {
-      const newSocket = io(`${BASE_URL}`);
+      const newSocket = io(BASE_URL);
       setSocket(newSocket);
 
       Animated.timing(opacity, {
@@ -37,9 +45,10 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
       }).start();
 
       newSocket.emit("joinconvo", { clientId, workerId });
+
       newSocket.on("conversationId", (id) => {
         setConversationId(id);
-        fetchOldMessages(id);
+        fetchOldMessages(newSocket, id);
       });
 
       newSocket.on("messagecoming", (message) => {
@@ -51,8 +60,17 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
       };
     }
   }, [isVisible]);
+  useEffect(() => {
+    const getUserType = async () => {
+      const token = await AsyncStorage.getItem("token");
+      const decodedToken = jwtDecode(token);
+      setUserType(decodedToken.userType);
+      console.log(decodedToken, "decoded token");
+    };
+  });
 
-  const fetchOldMessages = (id) => {
+  console.log(userType, "user type");
+  const fetchOldMessages = (socket, id) => {
     socket.emit("oldmsgs", { conversationid: id });
     socket.on("messages", (msgs) => {
       setMessages(msgs);
@@ -66,28 +84,31 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: workerId.toString(),
+        sender: userType,
       });
       setNewMessage("");
     }
   };
+  console.log(userType);
 
   const renderItem = ({ item }) => (
     <View
       style={
-        item.sender === workerId.toString()
-          ? styles.myMessage
-          : styles.theirMessage
+        isMyMessage(item, userType) ? styles.myMessage : styles.theirMessage
       }
     >
       <Text
         style={
-          item.sender === workerId.toString()
+          isMyMessage(item, userType)
             ? styles.myMessageText
             : styles.theirMessageText
         }
       >
         {item.content}
+      </Text>
+      <Text style={styles.timestamp}>
+        {String(new Date(item.createdat).getHours()).padStart(2, "0")}:
+        {String(new Date(item.createdat).getMinutes()).padStart(2, "0")}
       </Text>
     </View>
   );
@@ -107,13 +128,13 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Chat</Text>
         </View>
-        <KeyboardAvoidingView 
+        <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.container}
         >
           <FlatList
             data={messages}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) => index.toString()}
             renderItem={renderItem}
             contentContainerStyle={styles.messagesContainer}
           />
@@ -122,7 +143,7 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
               style={styles.input}
               value={newMessage}
               onChangeText={setNewMessage}
-              placeholder="Type a message..."
+              placeholder="Type a message"
               placeholderTextColor="#888"
             />
             <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
@@ -135,78 +156,52 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
   );
 };
 
+const isMyMessage = (message, userType) => {
+  return message.sender === userType; // Direct comparison
+};
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#e6ede6",
+    backgroundColor: "#FFFFFF",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#FFFFFF",
+  },
+  closeButton: {
+    marginRight: 10,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#042630",
   },
   container: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e6ede6',
-  },
-  closeButton: {
-    padding: 10,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginLeft: 20,
-    color: '#042630',
+    backgroundColor: "#FFFFFF",
   },
   messagesContainer: {
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderTopWidth: 1,
-    borderColor: "#d1d5db",
-    backgroundColor: "#e6ede6",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#d1d5db",
     padding: 10,
-    borderRadius: 30,
-    backgroundColor: "#d0d6d6",
-    marginRight: 10,
-    fontSize: 16,
-  },
-  sendButton: {
-    backgroundColor: "#042630",
-    borderRadius: 30,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  sendButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
   },
   myMessage: {
     alignSelf: "flex-end",
-    backgroundColor: "#042630",
-    padding: 15,
+    backgroundColor: "#1c2733",
+    padding: 10,
     marginVertical: 5,
-    borderRadius: 20,
+    borderRadius: 15,
     maxWidth: "80%",
+    borderWidth: 1,
+    borderColor: "#2c3e50",
   },
   theirMessage: {
     alignSelf: "flex-start",
-    backgroundColor: "#042680",
-    padding: 15,
+    backgroundColor: "#2c3e50",
+    padding: 10,
     marginVertical: 5,
-    borderRadius: 20,
+    borderRadius: 15,
     maxWidth: "80%",
   },
   myMessageText: {
@@ -214,8 +209,42 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   theirMessageText: {
-    color: "#000",
+    color: "#fff",
     fontSize: 16,
+  },
+  timestamp: {
+    color: "#7f8c8d",
+    fontSize: 12,
+    marginTop: 5,
+    alignSelf: "flex-end",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#2c3e50",
+    backgroundColor: "#FFFFFF",
+  },
+  input: {
+    flex: 1,
+    backgroundColor: "#e5e5e5",
+    borderRadius: 20,
+    padding: 10,
+    color: "#000",
+    marginRight: 10,
+  },
+  sendButton: {
+    backgroundColor: "#2c3e50",
+    borderRadius: 20,
+    width: 80,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  sendButtonText: {
+    color: "#fff",
+    fontSize: 18,
   },
 });
 

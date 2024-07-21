@@ -4,11 +4,8 @@ import {
   Text,
   ScrollView,
   TextInput,
-  FlatList,
   StyleSheet,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
   Animated,
   Easing,
 } from "react-native";
@@ -16,7 +13,7 @@ import io from "socket.io-client";
 import { BASE_URL } from "../private.json";
 
 const Chat = ({ route }) => {
-  const { workerId, clientId } = route.params;
+  const { workerId, clientId, userType } = route.params; // Add userType
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [conversationId, setConversationId] = useState(null);
@@ -52,6 +49,14 @@ const Chat = ({ route }) => {
       setMessages(msgs);
     });
   };
+  const isMyMessage = (message, userType) => {
+    if (userType === "client") {
+      return message.sender === "client";
+    } else if (userType === "worker") {
+      return message.sender === "worker";
+    }
+    return false;
+  };
 
   const handleSend = () => {
     if (newMessage.trim()) {
@@ -60,7 +65,7 @@ const Chat = ({ route }) => {
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: "client",
+        sender: userType,
       });
       setNewMessage("");
     }
@@ -73,23 +78,20 @@ const Chat = ({ route }) => {
           <View
             key={index}
             style={
-              message.sender === "client"
+              isMyMessage(message, userType)
                 ? styles.myMessage
                 : styles.theirMessage
             }
           >
-            {console.log(message, "message")}
-            <View>
-              <Text
-                style={
-                  message.sender === "client"
-                    ? styles.myMessageText
-                    : styles.theirMessageText
-                }
-              >
-                {message.content}
-              </Text>
-            </View>
+            <Text
+              style={
+                isMyMessage(message, userType)
+                  ? styles.myMessageText
+                  : styles.theirMessageText
+              }
+            >
+              {message.content}
+            </Text>
             <Text style={styles.timestamp}>
               {String(new Date(message.createdat).getHours()).padStart(2, "0")}:
               {String(new Date(message.createdat).getMinutes()).padStart(
@@ -120,28 +122,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1c2733",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#2c3e50",
-  },
-  backButton: {
-    color: "#fff",
-    fontSize: 24,
-    marginRight: 10,
-  },
-  headerTitle: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-    flex: 1,
-  },
-  infoButton: {
-    color: "#fff",
-    fontSize: 24,
   },
   messagesContainer: {
     padding: 10,

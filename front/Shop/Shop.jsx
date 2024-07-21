@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Modal } from
 import Categories from './CategoriesModal';
 import ItemsList from './ItemsList';
 
-const Shop = () => {
+const Shop = ({navigation}) => {
   const [selectedCard, setSelectedCard] = useState(null);
   const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -55,7 +55,7 @@ const Shop = () => {
 
       {isItemsListVisible && (
         <Modal visible={isItemsListVisible} animationType="slide" transparent={true}>
-          <ItemsList category={selectedCategory} type={selectedCard} onClose={CloseItemsList} />
+          <ItemsList category={selectedCategory} type={selectedCard} onClose={CloseItemsList} navigation={navigation} />
         </Modal>
       )}
     </View>

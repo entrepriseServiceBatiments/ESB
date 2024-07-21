@@ -1,19 +1,19 @@
-import React, { useState } from "react";
-import axios from "axios";
-import "./AddProducts.css";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import axios from 'axios';
+import './AddProducts.css';
+import { useNavigate } from 'react-router-dom';
 
 const AddProduct = ({ setRefresh, refresh }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: "",
-    category: "",
-    description: "",
-    price: "",
+    name: '',
+    category: '',
+    description: '',
+    price: 0,
     picture: null,
-    rating: "",
-    stock: "",
-    numOfRatings: "",
+    rating: '',
+    stock: '',
+    numOfRatings: '',
   });
   const [error, setError] = useState(null);
 
@@ -35,44 +35,58 @@ const AddProduct = ({ setRefresh, refresh }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const data = new FormData();
-    data.append("name", formData.name);
-    data.append("category", formData.category);
-    data.append("description", formData.description);
-    data.append("price", formData.price);
-    data.append("rating", formData.rating);
-    data.append("stock", formData.stock);
-    data.append("numOfRatings", formData.numOfRatings);
-    data.append("picture", formData.picture);
-    // data.append("upload_preset", "ademsalah"); 
+    // Upload image to Cloudinary
+    const imageData = new FormData();
+    imageData.append('file', formData.picture);
+    imageData.append('upload_preset', 'Boughanmi');
 
     try {
+      const cloudinaryResponse = await axios.post(
+        'https://api.cloudinary.com/v1_1/tahacloudinary/image/upload',
+        imageData
+      );
+
+      // Get the image URL from Cloudinary response
+      const imageUrl = cloudinaryResponse.data.secure_url
+
+      // Now send the product data along with the image URL to your backend
+      const productData = {
+        ...formData,
+        picture: imageUrl,
+      };
+      console.log('Product data:', productData); // Added log
+
       const response = await axios.post(
-        "http://localhost:3000/products",
-        data,
+        'http://localhost:3000/products',
+        productData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            'Content-Type': 'application/json',
           },
         }
       );
+      console.log('Response:', response); // Log the entire response object for debugging
       console.log(response.data);
-      alert("Product added successfully!");
-      setFormData({
-        name: "",
-        category: "",
-        description: "",
-        price: "",
-        picture: null,
-        rating: "",
-        stock: "",
-        numOfRatings: "",
-      });
-      setRefresh(!refresh);
-      setError(null);
+      if (response.data) {
+        alert('Product added successfully!');
+        setFormData({
+          name: '',
+          category: '',
+          description: '',
+          price: 0,
+          picture: null,
+          rating: '',
+          stock: '',
+          numOfRatings: '',
+        });
+        setRefresh(!refresh);
+        setError(null);
+      } else {
+        throw new Error('Unexpected response format');
+      }
     } catch (error) {
-      console.error("There was an error adding the product!", error);
-      setError(error.response ? error.response.data : "An error occurred");
+      console.error('There was an error adding the product!', error);
+      setError(error.response ? error.response.data : 'An error occurred');
     }
   };
 
@@ -81,7 +95,7 @@ const AddProduct = ({ setRefresh, refresh }) => {
       <h2>Add New Product</h2>
       {error && (
         <div className="error">
-          {typeof error === "object" && error.error
+          {typeof error === 'object' && error.error
             ? error.error
             : JSON.stringify(error)}
         </div>
