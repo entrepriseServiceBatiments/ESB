@@ -13,10 +13,11 @@ import io from "socket.io-client";
 import { BASE_URL } from "../private.json";
 
 const Chat = ({ route }) => {
-  const { workerId, clientId, userType } = route.params; // Add userType
+  const { workerId, clientId, userType } = route.params;
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [conversationId, setConversationId] = useState(null);
+  // const [userType, setUserType] = useState(null);
   const socket = io(`${BASE_URL}`);
   const opacity = useState(new Animated.Value(0))[0];
 
@@ -49,15 +50,25 @@ const Chat = ({ route }) => {
       setMessages(msgs);
     });
   };
-  const isMyMessage = (message, userType) => {
-    if (userType === "Client") {
-      return message.sender === "Client";
-    } else if (userType === "Worker") {
-      return message.sender === "Worker";
-    }
-    return false;
-  };
 
+  // const isMyMessage = (message) => {
+  //   if (userType === "Client") {
+  //     return message.sender === "Client";
+  //   } else if (userType === "Worker") {
+  //     return message.sender === "Worker";
+  //   }
+  //   console.log(userType);
+  //   return false;
+  // };
+  useEffect(() => {
+    const getUserType = async () => {
+      const token = await AsyncStorage.getItem("token");
+      const decodedToken = jwtDecode(token);
+      setUserType(decodedToken.userType);
+      console.log(decodedToken, "decoded token");
+    };
+  });
+  console.log(userType);
   const handleSend = () => {
     if (newMessage.trim()) {
       socket.emit("sendmsg", {
@@ -70,7 +81,7 @@ const Chat = ({ route }) => {
       setNewMessage("");
     }
   };
-
+  console.log(messages, "messages");
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.messagesContainer}>
@@ -78,18 +89,19 @@ const Chat = ({ route }) => {
           <View
             key={index}
             style={
-              isMyMessage(message, userType)
+              message.sender === "Client" || message.sender === "Worker"
                 ? styles.myMessage
                 : styles.theirMessage
             }
           >
             <Text
               style={
-                isMyMessage(message, userType)
+                message.sender === "Client" || message.sender === "Worker"
                   ? styles.myMessageText
                   : styles.theirMessageText
               }
             >
+              {console.log(message, "client msg")}
               {message.content}
             </Text>
             <Text style={styles.timestamp}>
@@ -117,7 +129,9 @@ const Chat = ({ route }) => {
     </View>
   );
 };
-
+const isMyMessage = (message, userType) => {
+  return message.sender === userType;
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -83,14 +83,14 @@ const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: userType, // Use the userType here
+        sender: userType,
       });
       setNewMessage("");
     }
   };
 
   console.log(userType);
-
+  console.log(messages, "messages");
   const renderItem = ({ item }) => (
     <View style={isMyMessage(item, userType) ? styles.myMessage : styles.theirMessage}>
       <Text style={isMyMessage(item, userType) ? styles.myMessageText : styles.theirMessageText}>
