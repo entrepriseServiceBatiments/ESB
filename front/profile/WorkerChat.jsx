@@ -17,21 +17,17 @@ import {
 import io from "socket.io-client";
 import { BASE_URL } from "../private.json";
 import { FontAwesome } from "@expo/vector-icons";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode"; // Fixed import
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const WorkerChatModal = ({
-  workerId,
-  clientId,
 
-  isVisible,
-  onClose,
-}) => {
+const WorkerChatModal = ({ workerId, clientId, isVisible, onClose }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [conversationId, setConversationId] = useState(null);
   const [socket, setSocket] = useState(null);
   const opacity = useState(new Animated.Value(0))[0];
   const [userType, setUserType] = useState("");
+
   useEffect(() => {
     if (isVisible) {
       const newSocket = io(BASE_URL);
@@ -60,6 +56,7 @@ const WorkerChatModal = ({
       };
     }
   }, [isVisible]);
+
   useEffect(() => {
     const getUserType = async () => {
       const token = await AsyncStorage.getItem("token");
@@ -67,9 +64,11 @@ const WorkerChatModal = ({
       setUserType(decodedToken.userType);
       console.log(decodedToken, "decoded token");
     };
-  });
+    getUserType(); // Call the function here
+  }, []); // Add dependency array
 
   console.log(userType, "user type");
+
   const fetchOldMessages = (socket, id) => {
     socket.emit("oldmsgs", { conversationid: id });
     socket.on("messages", (msgs) => {
@@ -84,26 +83,17 @@ const WorkerChatModal = ({
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: "Client",
+        sender: userType, // Use the userType here
       });
       setNewMessage("");
     }
   };
+
   console.log(userType);
 
   const renderItem = ({ item }) => (
-    <View
-      style={
-        isMyMessage(item, userType) ? styles.myMessage : styles.theirMessage
-      }
-    >
-      <Text
-        style={
-          isMyMessage(item, userType)
-            ? styles.myMessageText
-            : styles.theirMessageText
-        }
-      >
+    <View style={isMyMessage(item, userType) ? styles.myMessage : styles.theirMessage}>
+      <Text style={isMyMessage(item, userType) ? styles.myMessageText : styles.theirMessageText}>
         {item.content}
       </Text>
       <Text style={styles.timestamp}>
@@ -114,12 +104,7 @@ const WorkerChatModal = ({
   );
 
   return (
-    <Modal
-      visible={isVisible}
-      animationType="slide"
-      transparent={false}
-      onRequestClose={onClose}
-    >
+    <Modal visible={isVisible} animationType="slide" transparent={false} onRequestClose={onClose}>
       <SafeAreaView style={styles.safeArea}>
         <StatusBar barStyle="dark-content" />
         <View style={styles.header}>
@@ -128,10 +113,7 @@ const WorkerChatModal = ({
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Chat</Text>
         </View>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.container}
-        >
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
           <FlatList
             data={messages}
             keyExtractor={(item, index) => index.toString()}
@@ -157,7 +139,7 @@ const WorkerChatModal = ({
 };
 
 const isMyMessage = (message, userType) => {
-  return message.sender === userType; 
+  return message.sender === userType;
 };
 
 const styles = StyleSheet.create({
