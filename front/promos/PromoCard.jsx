@@ -38,8 +38,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 10,
-    backgroundColor: 'rgba(4, 38, 48, 0.9)', // Semi-transparent overlay
-  },
+    backgroundColor: 'rgba(4, 38, 48, 0.9)', },
   title: {
     fontSize: 16,
     color: '#fff',

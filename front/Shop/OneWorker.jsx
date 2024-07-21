@@ -20,15 +20,11 @@ const WorkerDetailsScreen = ({ worker, onClose, visible, navigation }) => {
       console.log(client, "worker");
       if (client) {
         console.log(worker);
-        navigation.navigate('Home', { screen: 'Chat',
-          params: { 
-          workerId: parseInt(worker.idworker),
-          clientId: parseInt(client.idClient),}
-        } );
-        // navigation.navigate("Chat", {
-        //   workerId: parseInt(worker.idworker),
-        //   clientId: parseInt(client.idClient),
-        // });
+        navigation.navigate('Chat', {
+          workerId: parseInt(worker.id),
+          clientId: parseInt(client.idClient),
+        });
+        
       } else {
         console.error("Client ID not found");
       }

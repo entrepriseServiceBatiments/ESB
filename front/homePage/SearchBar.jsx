@@ -5,8 +5,8 @@ import {
   StyleSheet,
   Text,
   Image,
-  TouchableOpacity,
-} from "react-native";
+  TouchableOpacity
+} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 const SearchBar = ({ data = [], onSearch }) => {
   const [query, setQuery] = useState("");
@@ -95,7 +95,21 @@ const SearchBar = ({ data = [], onSearch }) => {
         <TouchableOpacity onPress={handleSearch} style={styles.button}>
           <Text style={styles.buttonText}>SEARCH</Text>
         </TouchableOpacity>
+      
       </View>
+      {showDropdown && (
+        <View style={styles.dropdown}>
+          {filteredData.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleDropdownSelect(item)}
+              style={styles.dropdownItem}
+            >
+              <Text>{item.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
       {showDropdown && (
         <View style={styles.dropdown}>
           {filteredData.map((item, index) => (
@@ -120,14 +134,14 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderColor: "#042630",
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: '#042630',
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   searchIcon: {
     width: 24,
@@ -141,14 +155,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   button: {
-    backgroundColor: "#042630",
+    backgroundColor: '#042630',
     paddingVertical: 7,
     paddingHorizontal: 15,
     borderRadius: 5,
   },
   buttonText: {
-    color: "white",
-    fontWeight: "bold",
+    color: 'white',
+    fontWeight: 'bold',
   },
   dropdown: {
     position: "absolute",

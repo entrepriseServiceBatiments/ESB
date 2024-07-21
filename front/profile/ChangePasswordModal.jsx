@@ -134,8 +134,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: '#dc3545',
-    marginLeft: 15,
+    backgroundColor: 'darkred',
+    marginLeft: 8,
+    alignSelf:'flex-end'
   },
 });
 

@@ -6,10 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
+  Image
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import PromoCard from '../promos/PromoCard';
-import AnnouncementCard from '../homePage/Announcement';
 import ServicesDemand from '../homePage/ServicesDemand';
 import SearchBar from '../homePage/SearchBar';
 import NeedHelp from '../homePage/NeedHelp';
@@ -108,14 +108,14 @@ const Home = () => {
     setFilteredCategories(filteredData);
   };
 
-
-
   return (
     <View style={[styles.container, { backgroundColor: '#e6ede6' }]}>
+      
       <ScrollView>
-        <SearchBar data={categoryData} onSearch={handleSearch} />
-
-        <ScrollView
+      <View style={styles.logoContainer}>
+        <Image style={styles.logo} source={require('../assets/logo.png')} />
+      </View>
+      <ScrollView
           horizontal
           contentContainerStyle={styles.scrollView}
           showsHorizontalScrollIndicator={false}
@@ -130,8 +130,9 @@ const Home = () => {
             </TouchableOpacity>
           ))}
         </ScrollView>
+        <SearchBar data={categoryData} onSearch={handleSearch} />
 
-        
+       
 
         <View style={styles.promoContainer}>
           <Text style={styles.promoHeader}>Promotions</Text>
@@ -150,10 +151,7 @@ const Home = () => {
           </View>
         </View>
 
-        <ServicesDemand
-          services={services}
-          
-        />
+        <ServicesDemand services={services} />
 
         <View style={styles.needHelpContainer}>
           <NeedHelp />
@@ -169,6 +167,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#e6ede6",
     marginTop: 30,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 0,
+  },
+  logo: {
+    width: 150,
+    height: 150,
   },
   scrollView: {
     paddingHorizontal: 10,

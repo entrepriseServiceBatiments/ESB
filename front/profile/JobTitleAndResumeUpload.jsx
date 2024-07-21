@@ -38,7 +38,7 @@ const JobTitleAndResumeUpload = ({modalVisible,setModalVisible}) => {
       name: file.assets[0].name,
     });
     data.append('upload_preset', 'Boughanmi');
-
+;
     try {
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/tahacloudinary/image/upload`,
@@ -52,6 +52,7 @@ const JobTitleAndResumeUpload = ({modalVisible,setModalVisible}) => {
       );
 
       const responseData = await response.json();
+      console.log(responseData);
       if (responseData.secure_url) {
         return responseData.secure_url;
       } else {
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 16,
-    color: '#042630',
+    color: 'darkred',
   },
   label: {
     fontSize: 16,

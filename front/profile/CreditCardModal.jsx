@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,
-    backgroundColor: "white",
+    backgroundColor: "#e6ede6",
     padding: 20,
     shadowColor: "#000",
     shadowOffset: {
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: "#dc3545",
+    backgroundColor: "darkred",
     marginLeft: 10,
     flex: 1,
   },

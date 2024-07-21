@@ -135,14 +135,14 @@ const isMyMessage = (message, userType) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1c2733",
+    backgroundColor: "#e6ede6",
   },
   messagesContainer: {
     padding: 10,
   },
   myMessage: {
     alignSelf: "flex-end",
-    backgroundColor: "#1c2733",
+    backgroundColor: "#042630",
     padding: 10,
     marginVertical: 5,
     borderRadius: 15,
@@ -152,22 +152,22 @@ const styles = StyleSheet.create({
   },
   theirMessage: {
     alignSelf: "flex-start",
-    backgroundColor: "#2c3e50",
+    backgroundColor: "#042630",
     padding: 10,
     marginVertical: 5,
     borderRadius: 15,
     maxWidth: "80%",
   },
   myMessageText: {
-    color: "#fff",
+    color: "#d0d6d6",
     fontSize: 16,
   },
   theirMessageText: {
-    color: "#fff",
+    color: "#d0d6d6",
     fontSize: 16,
   },
   timestamp: {
-    color: "#7f8c8d",
+    color: "#d0d6d6",
     fontSize: 12,
     marginTop: 5,
     alignSelf: "flex-end",
@@ -177,20 +177,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     borderTopWidth: 1,
-    borderTopColor: "#2c3e50",
+    borderTopColor: "#042630",
   },
   input: {
     flex: 1,
-    backgroundColor: "#2c3e50",
+    backgroundColor: "#d0d6d6",
     borderRadius: 20,
     padding: 10,
     color: "#fff",
     marginRight: 10,
   },
   sendButton: {
-    backgroundColor: "#2c3e50",
+    backgroundColor: "#042630",
     borderRadius: 20,
-    width: 40,
+    width: 60,
     height: 40,
     justifyContent: "center",
     alignItems: "center",

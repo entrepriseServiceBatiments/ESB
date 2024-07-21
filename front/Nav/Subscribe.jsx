@@ -24,6 +24,9 @@ const Subscribe = () => {
 
   return (
     <View style={styles.container}>
+       <TouchableOpacity style={styles.closeButton} onPress={()=> navigation.goBack()}>
+        <Text style={styles.closeButtonText}>Close</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Subscribe Form</Text>
       <TextInput
         style={styles.input}
@@ -54,13 +57,14 @@ const Subscribe = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 30,
     justifyContent: 'center',
+    backgroundColor:'#e6ede6'
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 250,
     textAlign: 'center',
   },
   input: {
@@ -70,9 +74,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 10,
     borderRadius: 5,
+    backgroundColor:'lightgrey'
   },
   button: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#042630',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -80,7 +85,16 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },closeButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    padding: 10,
   },
+  closeButtonText: {
+    fontSize: 16,
+    color: 'darkred',
+  }
 });
 
 export default Subscribe;

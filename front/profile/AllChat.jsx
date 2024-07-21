@@ -146,7 +146,7 @@ const Conversationspage = ({ modalVisible, setModalVisible }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    padding: 15,
     backgroundColor: "#042630",
   },
   messageItem: {
@@ -166,18 +166,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   messageTitle: {
+    marginRight:15,
     fontSize: 18,
     fontWeight: "bold",
-    color: "white",
+    color: "#d0d6d6",
   },
   closeButton: {
     alignSelf: "flex-end",
+    paddingTop:40,
     padding: 10,
     marginBottom: 10,
   },
   closeButtonText: {
     fontSize: 16,
-    color: "white",
+    color: "darkred",
     fontWeight: "bold",
   },
   noConversationsText: {

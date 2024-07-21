@@ -166,7 +166,7 @@ const Profile = ({ navigation }) => {
       <ScrollView style={styles.scrollView}>
         <View style={styles.container}>
           <TouchableOpacity onPress={Logout} style={styles.logoutButton}>
-            <FontAwesome name="sign-out" size={24} color="#dc3545" />
+            <FontAwesome name="sign-out" size={24} color="darkred" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.profileImageContainer} onPress={AddPicture}>
@@ -183,7 +183,7 @@ const Profile = ({ navigation }) => {
             <View style={styles.row}>
               <Text style={styles.label}>User Name:</Text>
               <TouchableOpacity style={styles.editButton} onPress={EditProfile}>
-                <FontAwesome name="pencil" size={24} color="#042630" />
+                <FontAwesome name="pencil" size={24} color="darkred" />
               </TouchableOpacity>
             </View>
             <Text style={styles.value}>{userName}</Text>
@@ -207,7 +207,7 @@ const Profile = ({ navigation }) => {
                 <View style={styles.row}>
                   <Text style={styles.label}>Card:</Text>
                   <TouchableOpacity style={styles.editButton} onPress={AddCreditCard}>
-                    <FontAwesome name="pencil" size={24} color="#042630" />
+                    <FontAwesome name="pencil" size={24} color="darkred" />
                   </TouchableOpacity>
                 </View>
                 <Text style={styles.creditCard}>**** **** **** {creditCardNumber.slice(-4)}</Text>
@@ -223,7 +223,7 @@ const Profile = ({ navigation }) => {
                 <View style={styles.row}>
                   <Text style={styles.label}>Resume:</Text>
                   <TouchableOpacity style={styles.editButton} onPress={JobTitleModalOpen}>
-                    <FontAwesome name="pencil" size={24} color="#042630" />
+                    <FontAwesome name="pencil" size={24} color="darkred" />
                   </TouchableOpacity>
                 </View>
                 <Text>{resume.split("/").pop()}</Text>
@@ -241,7 +241,7 @@ const Profile = ({ navigation }) => {
                 <View style={styles.row}>
                   <Text style={styles.label}>Address:</Text>
                   <TouchableOpacity onPress={togglePositionModalOpen} style={styles.editButton}>
-                    <FontAwesome name="pencil" size={24} color="#042630" />
+                    <FontAwesome name="pencil" size={24} color="darkred" />
                   </TouchableOpacity>
                 </View>
                 <Text style={styles.value}>{address}</Text>

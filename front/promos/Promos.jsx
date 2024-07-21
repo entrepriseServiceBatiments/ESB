@@ -4,7 +4,7 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  Button,
+  TouchableOpacity,
   ScrollView,
   Image,
 } from 'react-native';
@@ -52,6 +52,12 @@ const Promos = () => {
 
   return (
     <ScrollView style={styles.container}>
+      <TouchableOpacity style={styles.closeButton} onPress={()=> navigation.goBack()}>
+        <Text style={styles.closeButtonText}>Close</Text>
+      </TouchableOpacity>
+      <View style={styles.logoContainer}>
+        <Image style={styles.logo} source={require('../assets/logo.png')} />
+      </View>
       <Image source={{ uri: item.image }} style={styles.mainImage} />
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.location}>{item.location}</Text>
@@ -59,7 +65,9 @@ const Promos = () => {
         {item.price} DT <Text style={styles.oldPrice}>{item.oldPrice} DT</Text>
       </Text>
 
-      <Button title="Subscribe" onPress={subScription} />
+      <TouchableOpacity style={styles.button} onPress={subScription}>
+        <Text style={styles.buttonText}>Subscribe</Text>
+      </TouchableOpacity>
 
       <Text style={styles.discoverMoreTitle}>Discover More</Text>
       <View style={styles.promoSection}>
@@ -82,8 +90,27 @@ const Promos = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
+    backgroundColor: '#e6ede6',
+    padding: 30,
+    paddingTop:2
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 20,
+    right: 10,
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: 'darkred',
+  },
+   logoContainer: {
+    alignItems: 'center',
+    marginBottom: 0,
+  },
+  logo: {
+    width: 150,
+    height: 150,
   },
   mainImage: {
     width: '100%',
@@ -129,8 +156,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
   },
-  promoList: {
-    paddingHorizontal: 10,
+ 
+  button: {
+    backgroundColor: '#042630',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
