@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -9,14 +9,14 @@ import {
   RefreshControl,
   SafeAreaView,
   ScrollView,
-} from 'react-native';
-import { Dialog } from 'react-native-simple-dialogs';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+} from "react-native";
+import { Dialog } from "react-native-simple-dialogs";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   GestureHandlerRootView,
   Swipeable,
   RectButton,
-} from 'react-native-gesture-handler';
+} from "react-native-gesture-handler";
 
 const Favorites = ({ navigation }) => {
   const [favorites, setFavorites] = useState([]);
@@ -65,8 +65,8 @@ const Favorites = ({ navigation }) => {
 
   const removeFromFavorites = async (productId) => {
     try {
-      const response = await fetch('http://localhost:3000/wishlist', {
-        method: 'DELETE',
+      const response = await fetch("http://localhost:3000/wishlist", {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
@@ -103,7 +103,7 @@ const Favorites = ({ navigation }) => {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
-    }, 2000);
+    }, 500);
   }, []);
 
   const renderRightActions = (progress, dragX, itemId) => {
@@ -116,7 +116,7 @@ const Favorites = ({ navigation }) => {
         }}
       >
         <Image
-          source={require('../assets/icons/bin.png')}
+          source={require("../assets/icons/bin.png")}
           style={styles.trashIcon}
         />
         <Text style={styles.actionText}>DELETE</Text>
@@ -189,36 +189,42 @@ const Favorites = ({ navigation }) => {
             title="Delete Product"
             onTouchOutside={() => {
               setDialogVisible(false);
-              if (selectedProductId && swipeableRefs.current.has(selectedProductId)) {
+              if (
+                selectedProductId &&
+                swipeableRefs.current.has(selectedProductId)
+              ) {
                 swipeableRefs.current.get(selectedProductId).close();
               }
             }}
-            contentStyle={{ alignItems: 'center', justifyContent: 'center' }}
+            contentStyle={{ alignItems: "center", justifyContent: "center" }}
             animationType="fade"
           >
             <View>
               <Text>Would you like to delete this product?</Text>
               <View
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-around',
+                  flexDirection: "row",
+                  justifyContent: "space-around",
                   marginTop: 20,
                 }}
               >
                 <TouchableOpacity
                   onPress={() => removeFromFavorites(selectedProductId)}
                 >
-                  <Text style={{ color: '#FF0000', fontSize: 18 }}>DELETE</Text>
+                  <Text style={{ color: "#FF0000", fontSize: 18 }}>DELETE</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
                     setDialogVisible(false);
-                    if (selectedProductId && swipeableRefs.current.has(selectedProductId)) {
+                    if (
+                      selectedProductId &&
+                      swipeableRefs.current.has(selectedProductId)
+                    ) {
                       swipeableRefs.current.get(selectedProductId).close();
                     }
                   }}
                 >
-                  <Text style={{ color: '#007BFF', fontSize: 18 }}>CANCEL</Text>
+                  <Text style={{ color: "#007BFF", fontSize: 18 }}>CANCEL</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -283,16 +289,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   rightAction: {
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
     width: 80,
-    height: '100%',
+    height: "100%",
   },
   actionText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   trashIcon: {
     width: 24,

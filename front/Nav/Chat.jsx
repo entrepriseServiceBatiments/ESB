@@ -50,10 +50,10 @@ const Chat = ({ route }) => {
     });
   };
   const isMyMessage = (message, userType) => {
-    if (userType === "client") {
-      return message.sender === "client";
-    } else if (userType === "worker") {
-      return message.sender === "worker";
+    if (userType === "Client") {
+      return message.sender === "Client";
+    } else if (userType === "Worker") {
+      return message.sender === "Worker";
     }
     return false;
   };
@@ -65,7 +65,7 @@ const Chat = ({ route }) => {
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: userType,
+        sender: "Client",
       });
       setNewMessage("");
     }
