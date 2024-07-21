@@ -95,7 +95,23 @@ const SearchBar = ({ data = [], onSearch }) => {
         <TouchableOpacity onPress={handleSearch} style={styles.button}>
           <Text style={styles.buttonText}>SEARCH</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={handleSearch} style={styles.button}>
+          <Text style={styles.buttonText}>SEARCH</Text>
+        </TouchableOpacity>
       </View>
+      {showDropdown && (
+        <View style={styles.dropdown}>
+          {filteredData.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleDropdownSelect(item)}
+              style={styles.dropdownItem}
+            >
+              <Text>{item.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
       {showDropdown && (
         <View style={styles.dropdown}>
           {filteredData.map((item, index) => (

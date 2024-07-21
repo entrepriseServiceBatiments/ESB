@@ -1,14 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from "../private.json";
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; 
-import AwesomeAlert from 'react-native-awesome-alerts';
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import AwesomeAlert from "react-native-awesome-alerts";
 
-const ProductCard = ({ item, onPress, onRentPress, onRemovePress, isInCart, toggleFavorite }) => {
+const ProductCard = ({
+  item,
+  onPress,
+  onRentPress,
+  onRemovePress,
+  isInCart,
+  toggleFavorite,
+}) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     const checkFavoriteStatus = async () => {
@@ -20,7 +34,9 @@ const ProductCard = ({ item, onPress, onRentPress, onRemovePress, isInCart, togg
 
           const response = await fetch(`${BASE_URL}/wishlist/${clientId}`);
           const data = await response.json();
-          const isFav = data.some(favItem => favItem.idproducts === item.idproducts);
+          const isFav = data.some(
+            (favItem) => favItem.idproducts === item.idproducts
+          );
           setIsFavorite(isFav);
         }
       } catch (error) {
@@ -32,7 +48,7 @@ const ProductCard = ({ item, onPress, onRentPress, onRemovePress, isInCart, togg
   }, [item.idproducts]);
 
   const showAlert = (action) => {
-    let toFrom = action === 'added' ? 'to' : 'from';
+    let toFrom = action === "added" ? "to" : "from";
     setAlertMessage(`The item has been ${action} ${toFrom} your favorites.`);
     setAlertVisible(true);
   };
@@ -53,7 +69,7 @@ const ProductCard = ({ item, onPress, onRentPress, onRemovePress, isInCart, togg
             body: JSON.stringify({ clientId, productsId: item.idproducts }),
           });
           setIsFavorite(false);
-          showAlert('removed');
+          showAlert("removed");
         } else {
           await fetch(`${BASE_URL}/wishlist`, {
             method: "POST",
@@ -63,12 +79,11 @@ const ProductCard = ({ item, onPress, onRentPress, onRemovePress, isInCart, togg
             body: JSON.stringify({ clientId, productsId: item.idproducts }),
           });
           setIsFavorite(true);
-          showAlert('added');
+          showAlert("added");
         }
-        toggleFavorite(item.idproducts); 
+        toggleFavorite(item.idproducts);
       } else {
-        Alert.alert('Please login to  be able to add product to favorites')
-        
+        Alert.alert("Please login to  be able to add product to favorites");
       }
     } catch (error) {
       console.error("Error toggling favorite status:", error);
@@ -85,17 +100,20 @@ const ProductCard = ({ item, onPress, onRentPress, onRemovePress, isInCart, togg
         <Text style={styles.price}>{item.price} €</Text>
       </View>
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity 
-          style={[styles.rentButton, isInCart && styles.removeButton]} 
+        <TouchableOpacity
+          style={[styles.rentButton, isInCart && styles.removeButton]}
           onPress={isInCart ? onRemovePress : onRentPress}
         >
-          <Text style={styles.rentText}>{isInCart ? 'Remove' : 'Rent'}</Text>
+          <Text style={styles.rentText}>{isInCart ? "Remove" : "Rent"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.favoriteButton} onPress={ToggleFavorite}>
-          <Icon 
-            name={isFavorite ? 'trash-can' : 'heart'} 
-            size={24} 
-            color={isFavorite ? 'darkred' : 'darkred'}
+        <TouchableOpacity
+          style={styles.favoriteButton}
+          onPress={ToggleFavorite}
+        >
+          <Icon
+            name={isFavorite ? "trash-can" : "heart"}
+            size={24}
+            color={isFavorite ? "darkred" : "darkred"}
           />
         </TouchableOpacity>
       </View>
@@ -103,7 +121,7 @@ const ProductCard = ({ item, onPress, onRentPress, onRemovePress, isInCart, togg
       <AwesomeAlert
         show={alertVisible}
         showProgress={false}
-        title={isFavorite ? 'Removed' : 'Added'}
+        title={isFavorite ? "Added" : "Removed"}
         message={alertMessage}
         closeOnTouchOutside={true}
         closeOnHardwareBackPress={false}
@@ -118,7 +136,7 @@ const ProductCard = ({ item, onPress, onRentPress, onRemovePress, isInCart, togg
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
@@ -128,9 +146,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   image: {
-    width: '100%',
+    width: "100%",
     height: 150,
-    resizeMode: 'cover',
+    resizeMode: "cover",
     borderRadius: 10,
   },
   info: {
@@ -138,39 +156,39 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   price: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 10,
   },
   rentButton: {
-    backgroundColor: '#042630',
+    backgroundColor: "#042630",
     paddingVertical: 10,
     borderRadius: 5,
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   removeButton: {
-    backgroundColor: '#FF0000',
+    backgroundColor: "#FF0000",
   },
   rentText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
   },
   favoriteButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     paddingVertical: 10,
     borderRadius: 5,
     marginLeft: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderColor:'#042630'
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "#042630",
   },
 });
 

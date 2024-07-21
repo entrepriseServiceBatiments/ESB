@@ -84,7 +84,7 @@ const WorkerChatModal = ({
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: userType,
+        sender: "Client",
       });
       setNewMessage("");
     }
@@ -157,7 +157,7 @@ const WorkerChatModal = ({
 };
 
 const isMyMessage = (message, userType) => {
-  return message.sender === userType; // Direct comparison
+  return message.sender === userType; 
 };
 
 const styles = StyleSheet.create({
