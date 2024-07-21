@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   Alert,
   ScrollView,
   ActivityIndicator,
@@ -180,6 +179,7 @@ const CategoryDetails = ({ route, navigation }) => {
       key={item.idworker}
       item={item}
       onPress={() => WorkerCardPress(item)}
+      navigation={navigation}
     />
   );
 
@@ -261,13 +261,13 @@ const CategoryDetails = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#e6ede6",
     marginTop: 30,
   },
   navbar: {
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: "#fff",
+    backgroundColor: "#042630",
     paddingVertical: 10,
     elevation: 2,
   },
@@ -281,9 +281,9 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     fontSize: 16,
-    color: "#2196F3",
+    color: "#e6ede6",
     borderBottomWidth: 2,
-    borderBottomColor: "#2196F3",
+    borderBottomColor: "#e6ede6",
     paddingBottom: 5,
   },
   scrollView: {
@@ -302,12 +302,11 @@ const styles = StyleSheet.create({
   },
   orderButton: {
     position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
-    backgroundColor: "#2196F3",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#042630",
     padding: 15,
-    borderRadius: 10,
     alignItems: "center",
   },
   orderButtonText: {

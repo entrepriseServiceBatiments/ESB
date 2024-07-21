@@ -112,7 +112,7 @@ const Favorites = ({ navigation }) => {
     setTimeout(() => {
       setRefreshing(false);
       setRefresh(!refresh); // Trigger re-fetching of favorites
-    }, 2000);
+    }, 1000);
   }, [refresh]);
 
   return (
@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     padding: 10,
     alignSelf: "center",
+    color:'#042630'
   },
   orderButton: {
     position: 'absolute',

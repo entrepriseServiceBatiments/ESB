@@ -27,7 +27,7 @@ const CartScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [orderId, setOrderId] = useState(null);
-
+  const [user,setuser]=useState({})
   useEffect(() => {
     retrieveData();
   }, []);
@@ -38,6 +38,7 @@ const CartScreen = ({ navigation }) => {
       if (user) {
         const parsedUser = JSON.parse(user);
         setClientId(parsedUser.idClient || parsedUser.idworker);
+        setuser(parsedUser)
       }
 
       const products = await AsyncStorage.getItem("orders");
@@ -90,7 +91,7 @@ const CartScreen = ({ navigation }) => {
         Products: selectedProducts.map((product) => ({
           idproducts: product.idproducts,
         })),
-        amount: totalAmount,
+        // amount: totalAmount,
       });
   
       if (response.status === 201 || response.status === 200) {
@@ -238,12 +239,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#e6ede6',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color:"#042630",
+    textAlign:'center'
+
   },
   productItem: {
     flexDirection: 'row',
@@ -286,9 +290,10 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 5,
     alignItems: 'center',
+    color:"#042630"
   },
   calculateButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#042630',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
@@ -304,9 +309,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 15,
     textAlign: 'center',
+    color:"#042630"
   },
   orderButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#042630',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',

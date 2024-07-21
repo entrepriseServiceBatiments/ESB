@@ -67,7 +67,7 @@ const Navbar = () => {
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: "#042630",
-        tabBarInactiveTintColor: "black",
+        tabBarInactiveTintColor: "#042630",
       })}
     >
       {isLoggedIn ? (

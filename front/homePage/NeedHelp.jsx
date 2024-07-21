@@ -6,6 +6,7 @@ import {
   Modal,
   StyleSheet,
   Linking,
+  Button,
 } from "react-native";
 import { FontAwesome, Entypo } from "@expo/vector-icons";
 
@@ -28,7 +29,7 @@ const NeedHelp = () => {
   return (
     <View>
       <TouchableOpacity style={styles.helpButton} onPress={handleHelpPress}>
-        <Text style={styles.helpText}>Need help?</Text>
+        <Text style={styles.helpText}>Need Help    ?</Text>
       </TouchableOpacity>
 
       <Modal
@@ -39,7 +40,7 @@ const NeedHelp = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text>Contactez nous:</Text>
+            <Text>Contact us:</Text>
             <TouchableOpacity
               style={styles.contactItem}
               onPress={() => handleContactPress("20458583")}
@@ -92,7 +93,7 @@ const NeedHelp = () => {
               style={styles.closeButton}
               onPress={handleCloseModal}
             >
-              <Text>Close</Text>
+              <Text style={styles.Button}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -112,6 +113,8 @@ const styles = StyleSheet.create({
   helpText: {
     color: "#fff",
     fontSize: 16,
+    marginLeft:50,
+    marginRight:50
   },
   modalContainer: {
     flex: 1,
@@ -139,10 +142,12 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     alignSelf: "center",
-    backgroundColor: "#FFD700",
+    backgroundColor: "#042630",
     padding: 10,
     borderRadius: 5,
+    
   },
+  Button:{color:"white"}
 });
 
 export default NeedHelp;

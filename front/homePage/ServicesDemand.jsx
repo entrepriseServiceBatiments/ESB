@@ -18,9 +18,9 @@ const ServicesDemand = ({ services }) => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.header}>Réserver un service</Text>
+        <Text style={styles.header}>Book a service</Text>
         <TouchableOpacity>
-          <Text style={styles.viewMore}>Voir plus</Text>
+          <Text style={styles.viewMore}>Show more</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.border}>
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
   viewMore: {
     fontSize: 14,
-    color: '#FFD700',
+    color: '#042630',
   },
   border: {
     borderWidth: 1,
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background for text
+    backgroundColor: 'rgba(4, 38, 48, 0.9)', // Semi-transparent background for text
     paddingHorizontal: 10,
     paddingBottom: 5,
   },

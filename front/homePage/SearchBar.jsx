@@ -95,9 +95,7 @@ const SearchBar = ({ data = [], onSearch }) => {
         <TouchableOpacity onPress={handleSearch} style={styles.button}>
           <Text style={styles.buttonText}>SEARCH</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleSearch} style={styles.button}>
-          <Text style={styles.buttonText}>SEARCH</Text>
-        </TouchableOpacity>
+      
       </View>
       {showDropdown && (
         <View style={styles.dropdown}>
