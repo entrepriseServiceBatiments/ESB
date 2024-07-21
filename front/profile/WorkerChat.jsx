@@ -84,13 +84,13 @@ const WorkerChatModal = ({
         clientId,
         content: newMessage,
         conversationid: conversationId,
-        sender: "Client",
+        sender: userType,
       });
       setNewMessage("");
     }
   };
   console.log(userType);
-
+  console.log(messages, "messages");
   const renderItem = ({ item }) => (
     <View
       style={
@@ -157,7 +157,7 @@ const WorkerChatModal = ({
 };
 
 const isMyMessage = (message, userType) => {
-  return message.sender === userType; 
+  return message.sender === userType;
 };
 
 const styles = StyleSheet.create({

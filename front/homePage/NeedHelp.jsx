@@ -1,5 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  Linking,
+} from "react-native";
+import { FontAwesome, Entypo } from "@expo/vector-icons";
 
 const NeedHelp = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -10,6 +18,11 @@ const NeedHelp = () => {
 
   const handleCloseModal = () => {
     setModalVisible(false);
+  };
+
+  const handleContactPress = (number) => {
+    const phoneUrl = `tel:${number}`;
+    Linking.openURL(phoneUrl);
   };
 
   return (
@@ -27,16 +40,52 @@ const NeedHelp = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text>Contactez nous:</Text>
-            <TouchableOpacity style={styles.contactItem}>
+            <TouchableOpacity
+              style={styles.contactItem}
+              onPress={() => handleContactPress("20458583")}
+            >
+              <FontAwesome
+                name="phone"
+                size={40}
+                color="#042630"
+                style={styles.contactIcon}
+              />
               <Text>Ilyes</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.contactItem}>
+            <TouchableOpacity
+              style={styles.contactItem}
+              onPress={() => handleContactPress("27306205")}
+            >
+              <FontAwesome
+                name="phone"
+                size={40}
+                color="#042630"
+                style={styles.contactIcon}
+              />
               <Text>Adem</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.contactItem}>
+            <TouchableOpacity
+              style={styles.contactItem}
+              onPress={() => handleContactPress("96003581")}
+            >
+              <FontAwesome
+                name="phone"
+                size={40}
+                color="#042630"
+                style={styles.contactIcon}
+              />
               <Text>Aziz</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.contactItem}>
+            <TouchableOpacity
+              style={styles.contactItem}
+              onPress={() => handleContactPress("94904323")}
+            >
+              <FontAwesome
+                name="phone"
+                size={40}
+                color="#042630"
+                style={styles.contactIcon}
+              />
               <Text>Taha</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -58,7 +107,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 20,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   helpText: {
     color: "#fff",
@@ -66,30 +115,34 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "flex-end",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    width: '100%',
-    backgroundColor: '#fff',
+    width: "100%",
+    backgroundColor: "#fff",
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
   contactItem: {
+    flexDirection: "row",
+    alignItems: "center",
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
+  },
+  contactIcon: {
+    marginRight: 10,
   },
   closeButton: {
     marginTop: 10,
     alignSelf: "center",
-    backgroundColor: "#FFD700", 
+    backgroundColor: "#FFD700",
     padding: 10,
     borderRadius: 5,
   },
 });
 
-
-export default NeedHelp
+export default NeedHelp;
