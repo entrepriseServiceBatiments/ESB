@@ -17,11 +17,11 @@ import NeedHelp from '../homePage/NeedHelp';
 const categoryData = [
   { name: 'Plumbing', jobTitle: 'Plumber' },
   { name: 'Electricity', jobTitle: 'Electrician' },
-  { name: 'Housekeeping', jobTitle: 'Housekeeper' },
+  { name: 'Carpentry', jobTitle: 'Housekeeper' },
   { name: 'Masonry', jobTitle: 'Mason' },
-  { name: 'Air conditioning', jobTitle: 'HVAC Technician' },
+  { name: 'Elevator Mechanic', jobTitle: 'HVAC Technician' },
   { name: 'DIY and assembly', jobTitle: 'Handyman' },
-  { name: 'Washing machine', jobTitle: 'Appliance Repair Technician' },
+  { name: 'HVAC', jobTitle: 'Appliance Repair Technician' },
   { name: 'Painting', jobTitle: 'Painter' },
   { name: 'Gardening', jobTitle: 'Gardener' },
 ];

@@ -80,6 +80,7 @@ const CreditCardModal = ({
         cvv,
       };
       const endpoint = decodedToken.userType === "client" ? `clients/${clientId}` : `workers/${clientId}`;
+      console.log('endpoint',endpoint);
       const response = await axios.put(
         `${BASE_URL}/${endpoint}`,
         { creditCard: JSON.stringify(creditCardInfo) },
