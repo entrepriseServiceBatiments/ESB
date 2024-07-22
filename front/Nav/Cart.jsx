@@ -220,6 +220,7 @@ const CartScreen = ({ navigation }) => {
           minimumDate={new Date()}
         />
         <ModalManager
+        user={user}
           visible={isModalVisible}
           onClose={handleCloseModal}
           orderId={orderId}
@@ -239,6 +240,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    paddingTop:40,
     backgroundColor: '#e6ede6',
   },
   title: {

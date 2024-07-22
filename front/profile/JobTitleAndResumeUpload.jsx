@@ -20,6 +20,8 @@ const JobTitleAndResumeUpload = ({modalVisible,setModalVisible}) => {
 
       if (file.type !== 'cancel') {
         const cloudinaryUrl = await uploadFileToCloudinary(file);
+
+        console.log(cloudinaryUrl);
         setSelectedFile({ uri: cloudinaryUrl, name: file.assets[0].name });
       } else {
         console.log('Document picker cancelled');
