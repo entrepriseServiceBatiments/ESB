@@ -22,7 +22,7 @@ const WorkerDetailsScreen = ({ worker, onClose, visible, navigation }) => {
         console.log(worker);
         navigation.navigate('Chat', {
           workerId: parseInt(worker.id),
-          clientId: parseInt(client.idClient),
+          clientId: parseInt(client.idClient||client.idworker),
         });
         
       } else {

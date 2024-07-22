@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -7,18 +7,27 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  Platform,
 } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import axios from 'axios';
 import { BASE_URL } from '../private.json';
 
-const ModalManager = ({ visible, onClose, orderId, amount, clientId }) => {
+const ModalManager = ({ visible, onClose, orderId, amount, clientId, user }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [creditCardNumber, setCreditCardNumber] = useState('');
   const [expirationMonth, setExpirationMonth] = useState('');
   const [expirationYear, setExpirationYear] = useState('');
   const [cvv, setCvv] = useState('');
+  const [useExistingCard, setUseExistingCard] = useState(false);
+  const [last4Digits, setLast4Digits] = useState('');
+let cc={};
+  useEffect(() => {
+    if (user && user.creditCard) {
+       cc=JSON.parse(user.creditCard)
+      setUseExistingCard(true);
+      setLast4Digits(cc.creditCardNumber.slice(-4));
+    }
+  }, [user]);
 
   const validateCreditCardNumber = (number) => {
     const regex = new RegExp('^[0-9]{16}$');
@@ -44,17 +53,19 @@ const ModalManager = ({ visible, onClose, orderId, amount, clientId }) => {
 
   const handleNext = () => {
     if (currentStep === 1) {
-      if (!validateCreditCardNumber(creditCardNumber)) {
-        Alert.alert(
-          'Invalid Credit Card Number',
-          'Please enter a valid 16-digit credit card number.'
-        );
-        return;
-      }
+      if (!useExistingCard) {
+        if (!validateCreditCardNumber(creditCardNumber)) {
+          Alert.alert(
+            'Invalid Credit Card Number',
+            'Please enter a valid 16-digit credit card number.'
+          );
+          return;
+        }
 
-      if (!validateCvv(cvv)) {
-        Alert.alert('Invalid CVV', 'Please enter a valid 3-digit CVV.');
-        return;
+        if (!validateCvv(cvv)) {
+          Alert.alert('Invalid CVV', 'Please enter a valid 3-digit CVV.');
+          return;
+        }
       }
 
       setCurrentStep(2);
@@ -65,28 +76,16 @@ const ModalManager = ({ visible, onClose, orderId, amount, clientId }) => {
 
   const handleConfirm = async () => {
     try {
-      const response = await axios.post(`${BASE_URL}/payments`, {
-        clientId,
-        pendingOrderId: orderId,
-        amount,
-        creditCardInfo: {
-          creditCardNumber,
-          expirationMonth,
-          expirationYear,
-          cvv,
-        },
-      });
-
-      if (response.status === 201) {
+      
         setCurrentStep(3);
-      }
+      
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again later.');
     }
   };
 
   const handleReturnHome = () => {
-    onClose();
+    onClose()
   };
 
   return (
@@ -100,44 +99,66 @@ const ModalManager = ({ visible, onClose, orderId, amount, clientId }) => {
         {currentStep === 1 && (
           <View style={styles.modalContent}>
             <Text style={styles.title}>Add Credit Card</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Credit Card Number"
-              keyboardType="numeric"
-              onChangeText={setCreditCardNumber}
-              value={creditCardNumber}
-            />
-            <Text style={styles.label}>Expiration Date</Text>
-            <View style={styles.dropdownContainer}>
-              <RNPickerSelect
-                onValueChange={setExpirationMonth}
-                items={[...Array(12).keys()].map((i) => ({
-                  label: (i + 1).toString().padStart(2, '0'),
-                  value: (i + 1).toString().padStart(2, '0'),
-                }))}
-                placeholder={{ label: 'Month', value: null }}
-                value={expirationMonth}
-                style={pickerSelectStyles}
-              />
-              <RNPickerSelect
-                onValueChange={setExpirationYear}
-                items={[...Array(10).keys()].map((i) => ({
-                  label: (new Date().getFullYear() + i).toString(),
-                  value: (new Date().getFullYear() + i).toString(),
-                }))}
-                placeholder={{ label: 'Year', value: null }}
-                value={expirationYear}
-                style={pickerSelectStyles}
-              />
-            </View>
-            <TextInput
-              style={styles.input}
-              placeholder="CVV"
-              keyboardType="numeric"
-              secureTextEntry={true}
-              onChangeText={setCvv}
-              value={cvv}
-            />
+            {user && user.creditCard && (
+              <View style={styles.radioContainer}>
+                <TouchableOpacity
+                  style={styles.radio}
+                  onPress={() => setUseExistingCard(true)}
+                >
+                  <Text style={useExistingCard ? styles.radioSelected : styles.radioUnselected}>●</Text>
+                </TouchableOpacity>
+                <Text style={styles.radioLabel}>Use Existing Card (**** **** **** {last4Digits})</Text>
+                <TouchableOpacity
+                  style={styles.radio}
+                  onPress={() => setUseExistingCard(false)}
+                >
+                  <Text style={!useExistingCard ? styles.radioSelected : styles.radioUnselected}>●</Text>
+                </TouchableOpacity>
+                <Text style={styles.radioLabel}>Use New Card</Text>
+              </View>
+            )}
+            {!useExistingCard && (
+              <>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Credit Card Number"
+                  keyboardType="numeric"
+                  onChangeText={setCreditCardNumber}
+                  value={creditCardNumber}
+                />
+                <Text style={styles.label}>Expiration Date</Text>
+                <View style={styles.dropdownContainer}>
+                  <RNPickerSelect
+                    onValueChange={setExpirationMonth}
+                    items={[...Array(12).keys()].map((i) => ({
+                      label: (i + 1).toString().padStart(2, '0'),
+                      value: (i + 1).toString().padStart(2, '0'),
+                    }))}
+                    placeholder={{ label: 'Month', value: null }}
+                    value={expirationMonth}
+                    // style={styles.pickerSelectStyles}
+                  />
+                  <RNPickerSelect
+                    onValueChange={setExpirationYear}
+                    items={[...Array(10).keys()].map((i) => ({
+                      label: (new Date().getFullYear() + i).toString(),
+                      value: (new Date().getFullYear() + i).toString(),
+                    }))}
+                    placeholder={{ label: 'Year', value: null }}
+                    value={expirationYear}
+                    // style={pickerSelectStyles}
+                  />
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="CVV"
+                  keyboardType="numeric"
+                  secureTextEntry={true}
+                  onChangeText={setCvv}
+                  value={cvv}
+                />
+              </>
+            )}
             <TouchableOpacity style={styles.button} onPress={handleNext}>
               <Text style={styles.buttonText}>Next</Text>
             </TouchableOpacity>
@@ -166,7 +187,7 @@ const ModalManager = ({ visible, onClose, orderId, amount, clientId }) => {
               Thank you for your payment. Your order has been processed successfully.
             </Text>
             <TouchableOpacity style={styles.button} onPress={handleReturnHome}>
-              <Text style={styles.buttonText}>Return to Home</Text>
+              <Text style={styles.buttonText}>thank you</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -174,6 +195,7 @@ const ModalManager = ({ visible, onClose, orderId, amount, clientId }) => {
     </Modal>
   );
 };
+
 
 const styles = StyleSheet.create({
   modalContainer: {
@@ -234,32 +256,25 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     textAlign: 'center',
   },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    color: 'black',
-    paddingRight: 30,
-    backgroundColor: '#f0f0f0',
-    width: '48%',
+  radioContainer: {
+    flexDirection: 'column',
+    alignItems: 'left',
+    marginBottom: 20,
   },
-  inputAndroid: {
+  radio: {
+    marginRight: 10,
+  },
+  radioLabel: {
     fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    color: 'black',
-    paddingRight: 30,
-    backgroundColor: '#f0f0f0',
-    width: '48%',
+    marginRight: 20,
+  },
+  radioSelected: {
+    fontSize: 18,
+    color: '#042630',
+  },
+  radioUnselected: {
+    fontSize: 18,
+    color: '#ccc',
   },
 });
 

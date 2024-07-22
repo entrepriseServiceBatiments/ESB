@@ -11,7 +11,9 @@ const Stack = createStackNavigator();
 
 function LoginStack() {
   return (
-    <Stack.Navigator initialRouteName="LoginForm">
+    <Stack.Navigator initialRouteName="LoginForm" screenOptions={{
+      headerShown: false
+    }}>
       <Stack.Screen name="LoginForm" component={LoginForm} />
       <Stack.Screen name="Signup" component={SignupForm} />
       <Stack.Screen name="SignupPassword" component={SignupPassword} />

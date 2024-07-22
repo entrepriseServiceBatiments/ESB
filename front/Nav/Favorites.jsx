@@ -14,7 +14,7 @@ import {
   Swipeable,
   RectButton,
 } from "react-native-gesture-handler";
-
+import {BASE_URL} from '../private.json'
 const Favorites = ({ navigation }) => {
   const [favorites, setFavorites] = useState([]);
   const [clientId, setClientId] = useState(null);
@@ -51,7 +51,8 @@ const Favorites = ({ navigation }) => {
       const response = await fetch(
         `${BASE_URL}/wishlist/${clientId}`
       );
-      console.log('data');
+      console.log('data', response);
+
       const data = await response.json();
       setFavorites(data);
     } catch (error) {
@@ -61,7 +62,7 @@ const Favorites = ({ navigation }) => {
 
   const removeFromFavorites = async (productId) => {
     try {
-      const response = await fetch("http://localhost:3000/wishlist", {
+      const response = await fetch(`${BASE_URL}/wishlist`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
